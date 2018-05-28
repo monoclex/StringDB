@@ -91,13 +91,13 @@ namespace StringDB {
 				var locationShowsUp = indxsShowsUpAt[i.Key];
 
 				//overwrite this
-				_bw.Seek((int)overwriteAt, SeekOrigin.Begin);
+				_bw.BaseStream.Seek((long)overwriteAt, SeekOrigin.Begin);
 				_bw.Write(locationShowsUp); //overwrite the old data
 			}
 
 			//INDEX CHAIN THIS NEW DATA WITH THE OLD INDEXES
 			if(_indexChainWrite != 0) { //if the place to overwrite the old index chain exists
-				_bw.Seek((int)_indexChainWrite, SeekOrigin.Begin); //go to it
+				_bw.BaseStream.Seek((long)_indexChainWrite, SeekOrigin.Begin); //go to it
 				_bw.Write(indxChain); //write the start of the new index chain
 			}
 
