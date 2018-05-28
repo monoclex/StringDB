@@ -1,20 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
 namespace StringDB.Tester {
 	class Program {
 		static void Main(string[] args) {
-			using (var fs = File.Open("example.db", FileMode.OpenOrCreate)) {
-				var db = new Database(fs);
-				
-					foreach (var i in db.Indexes())
-						Console.WriteLine(i);
+			using (var fs = File.Open("test.db", FileMode.OpenOrCreate)) {
+				var db = new Database(fs, DatabaseMode.Read);
 
-				Write(db);
+				Stopwatch a = new Stopwatch();
+				a.Start();
+				Console.WriteLine(db.Get("BABCIEBCGEIIAFHIEEEDCCDCCAIADEEDDGAAIIBBCHEGIHFGADFHAEIHFIAIEAICIFECEHAEDDBDHFCD"));
+				a.Stop();
+
+				Console.WriteLine(a.ElapsedMilliseconds + " - " + a.ElapsedTicks);
+
+				//Write(db);
 			}
-
+			
 			Console.ReadLine();
 		}
 		
@@ -24,9 +29,8 @@ namespace StringDB.Tester {
 			Console.WriteLine("Generating Data");
 
 			var chrdata = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' };
-			int max = 100000;
-			var data = new Dictionary<string, string>(max);
-			
+			int max = 1000000;
+
 			for(uint i = 0; i < max; i++) {
 				var strb_id = new StringBuilder();
 				var strb_val = new StringBuilder();
@@ -37,13 +41,8 @@ namespace StringDB.Tester {
 				for (uint j = 0; j < 1280; j++)
 					strb_val.Append(chrdata[r.Next(0, 9)]);
 
-				try {
-					data.Add(strb_id.ToString(), strb_val.ToString());
-				} catch (Exception ini) {  }
+				db.Insert(strb_id.ToString(), strb_val.ToString());
 			}
-
-			for(uint i = 0; i < 5; i++)
-				db.InsertRange(data);
 		}
 	}
 }
