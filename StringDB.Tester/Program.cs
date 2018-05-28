@@ -8,16 +8,14 @@ namespace StringDB.Tester {
 	class Program {
 		static void Main(string[] args) {
 			using (var fs = File.Open("test.db", FileMode.OpenOrCreate)) {
-				var db = new Database(fs, DatabaseMode.Read);
-
 				Stopwatch a = new Stopwatch();
 				a.Start();
+				var db = new Database(fs, DatabaseMode.ReadWrite);
+				
 				Console.WriteLine(db.Get("BABCIEBCGEIIAFHIEEEDCCDCCAIADEEDDGAAIIBBCHEGIHFGADFHAEIHFIAIEAICIFECEHAEDDBDHFCD"));
 				a.Stop();
 
 				Console.WriteLine(a.ElapsedMilliseconds + " - " + a.ElapsedTicks);
-
-				//Write(db);
 			}
 			
 			Console.ReadLine();

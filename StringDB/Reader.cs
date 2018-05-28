@@ -36,7 +36,10 @@ namespace StringDB {
 			_stream.Seek(0, SeekOrigin.Begin);
 
 			FullRead(false, false, out byte[] indexSearchResult, true, Encoding.UTF8.GetBytes(index));
-			return indexSearchResult;
+			if (indexSearchResult == null)
+				return new byte[0];
+			else
+				return indexSearchResult;
 		}
 
 		private byte[][] _GetOnlyIndexes() {
@@ -63,17 +66,16 @@ namespace StringDB {
 		}
 
 		private Tuple<ulong, ulong, Tuple<byte[], ulong>[]> Read(bool storeIndexes_, bool storePositions_) {
-			var res = FullRead(storeIndexes_, storePositions_, out var nil);
+			var res = FullRead(storeIndexes_, storePositions_, out var nil, false, null);
 			return res;
 		}
 
-		private Tuple<ulong, ulong, Tuple<byte[], ulong>[]> FullRead(bool storeIndexes_, bool storePositions_, out byte[] indexSearch, bool searchForIndex = false, byte[] indexSearching = null) {
+		private Tuple<ulong, ulong, Tuple<byte[], ulong>[]> FullRead(bool storeIndexes, bool storePositions, out byte[] indexSearch, bool searchForIndex = false, byte[] indexSearching = null) {
 			indexSearch = null;
 
 			if (_stream.Length < 1)
 				return Tuple.Create((ulong)0, (ulong)0, new Tuple<byte[], ulong>[] { Tuple.Create(new byte[0], (ulong)0) }); //throw up a bunch of """null""" data
-
-			bool storeIndexes = true, storePositions = true;
+			
 			_stream.Seek(0, SeekOrigin.Begin);
 			var data = new List<Tuple<byte[], ulong>>();
 
@@ -99,16 +101,7 @@ namespace StringDB {
 					ulong dataPos = _bw.ReadUInt64(); //int64 is a long
 					byte[] indxName = _bw.ReadBytes((int)b);
 
-
-					if (searchForIndex) {
-						if (BytesEqual(indxName, indexSearching)) {
-							//var curPos = _bw.BaseStream.Position; //not sure if we'll ever need this but hey
-
-							_bw.BaseStream.Seek((long)dataPos, SeekOrigin.Begin); //we basically only need to return this piece of data so /shrug
-							indexSearch = _bw.ReadBytes(_bw.ReadInt32());
-							return null; //done :)
-						}
-					} else if (storeIndexes || storePositions) {
+					if (storeIndexes || storePositions) {
 						if (!storeIndexes)
 							indxName = null;
 
@@ -118,6 +111,16 @@ namespace StringDB {
 						var tplData = Tuple.Create<byte[], ulong>(indxName, dataPos);
 						
 						data.Add(tplData);
+					} else if (searchForIndex) {
+						if (BytesEqual(indxName, indexSearching)) {
+							//var curPos = _bw.BaseStream.Position; //not sure if we'll ever need this but hey
+
+							_bw.BaseStream.Seek((long)dataPos, SeekOrigin.Begin); //we basically only need to return this piece of data so /shrug
+							indexSearch = _bw.ReadBytes(_bw.ReadInt32());
+							return null; //done :)
+						}
+					} else { //we're obviously here for the index chain so dont store anything
+
 					}
 				}
 			}
