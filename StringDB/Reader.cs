@@ -42,6 +42,17 @@ namespace StringDB {
 				return indexSearchResult;
 		}
 
+		public Tuple<string, ulong> NextIndex(string index, ulong startAt) {
+			if (startAt > (ulong)_stream.Length)
+				return null;
+
+			var res = FullRead(false, false, out var nextIndex, false, null, true, startAt);
+			if (nextIndex != null)
+				if (nextIndex.Length != 0)
+					return Tuple.Create(Encoding.UTF8.GetString(nextIndex), res.Item1);
+			return Tuple.Create("", (ulong)0);
+		}
+
 		private byte[][] _GetOnlyIndexes() {
 			var tpl = Read(true, false);
 
@@ -65,18 +76,24 @@ namespace StringDB {
 			return Tuple.Create(tpl.Item1, tpl.Item2);
 		}
 
+		public string FirstIndex() {
+			var tpl = FullRead(false, false, out var fs, false, null, false, 0, true);
+
+			return Encoding.UTF8.GetString(fs);
+		}
+
 		private Tuple<ulong, ulong, Tuple<byte[], ulong>[]> Read(bool storeIndexes_, bool storePositions_) {
 			var res = FullRead(storeIndexes_, storePositions_, out var nil, false, null);
 			return res;
 		}
 
-		private Tuple<ulong, ulong, Tuple<byte[], ulong>[]> FullRead(bool storeIndexes, bool storePositions, out byte[] indexSearch, bool searchForIndex = false, byte[] indexSearching = null) {
+		private Tuple<ulong, ulong, Tuple<byte[], ulong>[]> FullRead(bool storeIndexes, bool storePositions, out byte[] indexSearch, bool searchForIndex = false, byte[] indexSearching = null, bool wantNextIndex = false, ulong startAt = 0, bool firstIndex = false) {
 			indexSearch = null;
 
 			if (_stream.Length < 1)
 				return Tuple.Create((ulong)0, (ulong)0, new Tuple<byte[], ulong>[] { Tuple.Create(new byte[0], (ulong)0) }); //throw up a bunch of """null""" data
 			
-			_stream.Seek(0, SeekOrigin.Begin);
+			_stream.Seek((long)startAt, SeekOrigin.Begin);
 			var data = new List<Tuple<byte[], ulong>>();
 
 			//we will store every single piece of data unless told not to do so
@@ -85,6 +102,7 @@ namespace StringDB {
 			long indexChainWrite = 0;
 
 			bool inIndexes = true;
+			bool nextIndexIsIt = false;
 
 			while(inIndexes) {
 				var b = _bw.ReadByte();
@@ -95,13 +113,17 @@ namespace StringDB {
 
 					if (indexChain == 0) //the index chain is 0 - we finished reading all of the indexes
 						inIndexes = false;
-					else //we haven't finished - go to the next index chain
+					else //we haven't finished - go to the next index chain 
 						_bw.BaseStream.Seek((long)indexChain, SeekOrigin.Begin);
 				} else {
 					ulong dataPos = _bw.ReadUInt64(); //int64 is a long
 					byte[] indxName = _bw.ReadBytes((int)b);
 
-					if (storeIndexes || storePositions) {
+					if(firstIndex) {
+						indexSearch = indxName;
+						return null;
+					} else if(nextIndexIsIt) {
+					} else if (storeIndexes || storePositions) {
 						if (!storeIndexes)
 							indxName = null;
 
@@ -109,7 +131,7 @@ namespace StringDB {
 							dataPos = 0;
 
 						var tplData = Tuple.Create<byte[], ulong>(indxName, dataPos);
-						
+
 						data.Add(tplData);
 					} else if (searchForIndex) {
 						if (BytesEqual(indxName, indexSearching)) {
@@ -119,6 +141,10 @@ namespace StringDB {
 							indexSearch = _bw.ReadBytes(_bw.ReadInt32());
 							return null; //done :)
 						}
+					} else if (wantNextIndex) {
+						//var curPos = _bw.BaseStream.Position; //not sure if we'll ever need this but hey
+
+						indexSearch = indxName; return Tuple.Create((ulong)(_bw.BaseStream.Position), (ulong)0, new Tuple<byte[], ulong>[] { Tuple.Create(new byte[0], (ulong)0) }); //got it so we're done
 					} else { //we're obviously here for the index chain so dont store anything
 
 					}
@@ -151,6 +177,11 @@ namespace StringDB {
 		static unsafe bool EqualBytesLongUnrolled(byte[] data1, byte[] data2) {
 			if (data1 == data2)
 				return true;
+
+			//custom null checking code
+			if (data1 == null || data2 == null)
+				return false;
+
 			if (data1.Length != data2.Length)
 				return false;
 

@@ -33,6 +33,17 @@ namespace StringDB {
 
 		public string[] Indexes() => _reader.GetIndexes();
 		public string Get(string index) => _reader.GetValueOf(index);
+		public string FirstIndex() => _reader.FirstIndex();
+
+		public ulong lastAsk = 0;
+		public string IndexAfter(string index) {
+			var res = _reader.NextIndex(index, lastAsk);
+			if (res == null)
+				throw new Exception("End of stream."); //note: this never happens
+
+			this.lastAsk = res.Item2;
+			return res.Item1;
+		}
 
 		public void Flush() => _stream.Flush();
 	}

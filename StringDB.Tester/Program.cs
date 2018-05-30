@@ -7,13 +7,32 @@ using System.Text;
 namespace StringDB.Tester {
 	class Program {
 		static void Main(string[] args) {
-			using (var fs = File.Open("test.db", FileMode.OpenOrCreate)) {
-				Stopwatch a = new Stopwatch();
-				a.Start();
+			using (var fs = File.Open("teaaastss.db", FileMode.OpenOrCreate)) {
 				var db = new Database(fs, DatabaseMode.ReadWrite);
-				
-				Console.WriteLine(db.Get("BABCIEBCGEIIAFHIEEEDCCDCCAIADEEDDGAAIIBBCHEGIHFGADFHAEIHFIAIEAICIFECEHAEDDBDHFCD"));
-				a.Stop();
+				Write(db);
+
+				var a = new Stopwatch();
+				a.Start();
+
+				var ind = db.IndexAfter(db.FirstIndex());
+
+				while(true) {
+					Console.WriteLine(db.lastAsk);
+					ind = db.IndexAfter(ind);
+	
+				}
+
+				Console.ReadLine();
+
+				//var firstIndex = db.FirstIndex();
+				//var index = firstIndex;
+
+				while(true) {
+					foreach(var i in db.Indexes())
+						Console.WriteLine(i);
+					Console.ReadKey(true);
+					//index = db.IndexAfter(index);
+				}
 
 				Console.WriteLine(a.ElapsedMilliseconds + " - " + a.ElapsedTicks);
 			}
@@ -27,8 +46,8 @@ namespace StringDB.Tester {
 			Console.WriteLine("Generating Data");
 
 			var chrdata = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' };
-			int max = 1000000;
-
+			int max = 10;
+		
 			for(uint i = 0; i < max; i++) {
 				var strb_id = new StringBuilder();
 				var strb_val = new StringBuilder();
