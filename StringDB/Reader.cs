@@ -15,7 +15,9 @@ namespace StringDB {
 			_stream = streamUse;
 			_bw = new BinaryReader(_stream);
 		}
-		
+
+		public const byte IndexSeperator = 0xFF;
+
 		private Stream _stream { get; set; }
 		private BinaryReader _bw { get; set; }
 
