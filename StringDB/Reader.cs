@@ -1,255 +1,332 @@
-﻿#define USE_UNSAFE_CODE //REMOVE THIS IF YOU DO NOT WANT TO USE UNSAFE CODE
-#define USE_PINVOKE_IF_NOT_UNSAFE //REMOVE THIS IF YOU DO NOT WANT TO USE P/INVOKE AS A FALLBACK IF UNSAFE CODE IS DISABLED
-//note the top: if you care to compile w/ unsafe code then you can do this
-
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace StringDB {
-	public class Reader {
+	public interface IReader : IEnumerable<string> {
+		string GetValueOf(IReaderInteraction r, bool doSeek = false);
+		string GetValueOf(string index, bool doSeek = false, ulong quickSeek = 0);
+
+		bool IsIndexAfter(IReaderInteraction r, bool doSeek = false);
+		bool IsIndexAfter(string index, bool doSeek = false, ulong quickSeek = 0);
+
+		IReaderInteraction IndexAfter(IReaderInteraction r, bool doSeek = false);
+		IReaderInteraction IndexAfter(string index, bool doSeek = false, ulong quickSeek = 0);
+		
+		IReaderInteraction FirstIndex();
+
+		string[] GetIndexes();
+
+		IReaderChain GetReaderChain();
+	}
+
+	public class Reader : IReader {
 		public Reader(Stream streamUse) {
 			_stream = streamUse;
-			_bw = new BinaryReader(_stream);
+			_br = new BinaryReader(this._stream);
 		}
 
 		public const byte IndexSeperator = 0xFF;
 
+		//public implementations of stuff
+
+		#region public implementations
+		public string[] GetIndexes() => _Indexes();
+
+		public IEnumerator<string> GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());
+		IEnumerator IEnumerable.GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());
+
+		public string GetValueOf(IReaderInteraction r, bool doSeek = true) => GetValueOf(r.Index, doSeek, r.QuickSeek);
+		public string GetValueOf(string index, bool doSeek = true, ulong quickSeek = 0) => _ValueOf(index, doSeek, quickSeek);
+
+		public bool IsIndexAfter(IReaderInteraction r, bool doSeek = true) => IsIndexAfter(r.Index, doSeek, r.QuickSeek);
+		public bool IsIndexAfter(string index, bool doSeek = true, ulong quickSeek = 0) => _IsIndexAfter(index, doSeek, quickSeek);
+
+		public IReaderInteraction IndexAfter(IReaderInteraction r, bool doSeek = true) => IndexAfter(r.Index, doSeek, r.QuickSeek);
+		public IReaderInteraction IndexAfter(string index, bool doSeek = true, ulong quickSeek = 0) => _IndexAfter(index, doSeek, quickSeek);
+
+		public IReaderInteraction FirstIndex() => IndexAfter(null, true, 0);
+
+		public IReaderChain GetReaderChain() => _ReadChain();
+		#endregion
+
+		//nitty gritty part
+
 		private Stream _stream { get; set; }
-		private BinaryReader _bw { get; set; }
+		private BinaryReader _br { get; set; }
 
-		public string GetValueOf(string index) => Encoding.UTF8.GetString(_GetValueOf(index));
+		private string _ValueOf(string index, bool doSeek, ulong quickSeek) {
+			var _curPos = _br.BaseStream.Position;
 
-		public string[] GetIndexes() {
-			var tpl = Read(true, false);
+			var i = _ReadIndex(doSeek, quickSeek);
 
-			var data = new List<string>();
-
-			foreach (var i in tpl.Item3)
-				data.Add(Encoding.UTF8.GetString(i.Item1));
-
-			return data.ToArray();
-		}
-
-		private byte[] _GetValueOf(string index) {
-			_stream.Seek(0, SeekOrigin.Begin);
-
-			FullRead(false, false, out byte[] indexSearchResult, true, Encoding.UTF8.GetBytes(index));
-			if (indexSearchResult == null)
-				return new byte[0];
-			else
-				return indexSearchResult;
-		}
-
-		public Tuple<string, ulong> NextIndex(string index, ulong startAt) {
-			if (startAt > (ulong)_stream.Length)
-				return null;
-
-			var res = FullRead(false, false, out var nextIndex, false, null, true, startAt);
-			if (nextIndex != null)
-				if (nextIndex.Length != 0)
-					return Tuple.Create(Encoding.UTF8.GetString(nextIndex), res.Item1);
-			return Tuple.Create("", (ulong)0);
-		}
-
-		private byte[][] _GetOnlyIndexes() {
-			var tpl = Read(true, false);
-
-			var data = new List<byte[]>();
-
-			foreach (var i in tpl.Item3)
-				data.Add(i.Item1);
-
-			return data.ToArray();
-		}
-
-		private Tuple<byte[], ulong>[] _GetIndexes() {
-			var tpl = Read(true, true);
-
-			return tpl.Item3;
-		}
-
-		public Tuple<ulong, ulong> GetIndexChain() {
-			var tpl = Read(false, false);
-
-			return Tuple.Create(tpl.Item1, tpl.Item2);
-		}
-
-		public string FirstIndex() {
-			var tpl = FullRead(false, false, out var fs, false, null, false, 0, true);
-
-			return Encoding.UTF8.GetString(fs);
-		}
-
-		private Tuple<ulong, ulong, Tuple<byte[], ulong>[]> Read(bool storeIndexes_, bool storePositions_) {
-			var res = FullRead(storeIndexes_, storePositions_, out var nil, false, null);
-			return res;
-		}
-
-		private Tuple<ulong, ulong, Tuple<byte[], ulong>[]> FullRead(bool storeIndexes, bool storePositions, out byte[] indexSearch, bool searchForIndex = false, byte[] indexSearching = null, bool wantNextIndex = false, ulong startAt = 0, bool firstIndex = false) {
-			indexSearch = null;
-
-			if (_stream.Length < 1)
-				return Tuple.Create((ulong)0, (ulong)0, new Tuple<byte[], ulong>[] { Tuple.Create(new byte[0], (ulong)0) }); //throw up a bunch of """null""" data
-			
-			_stream.Seek((long)startAt, SeekOrigin.Begin);
-			var data = new List<Tuple<byte[], ulong>>();
-
-			//we will store every single piece of data unless told not to do so
-
-			long indexChain = 0;
-			long indexChainWrite = 0;
-
-			bool inIndexes = true;
-			bool nextIndexIsIt = false;
-
-			while(inIndexes) {
-				var b = _bw.ReadByte();
-
-				if (b == Writer.IndexSeperator) { //read an index seperator - up next is the indexChain position for where to read next
-					indexChainWrite = _bw.BaseStream.Position; //this will give us the write chain ( where to overwrite this index chain
-					indexChain = _bw.ReadInt64(); //this will give us the location of the next indexChain
-
-					if (indexChain == 0) //the index chain is 0 - we finished reading all of the indexes
-						inIndexes = false;
-					else //we haven't finished - go to the next index chain 
-						_bw.BaseStream.Seek((long)indexChain, SeekOrigin.Begin);
-				} else {
-					ulong dataPos = _bw.ReadUInt64(); //int64 is a long
-					byte[] indxName = _bw.ReadBytes((int)b);
-
-					if(firstIndex) {
-						indexSearch = indxName;
-						return null;
-					} else if(nextIndexIsIt) {
-					} else if (storeIndexes || storePositions) {
-						if (!storeIndexes)
-							indxName = null;
-
-						if (!storePositions)
-							dataPos = 0;
-
-						var tplData = Tuple.Create<byte[], ulong>(indxName, dataPos);
-
-						data.Add(tplData);
-					} else if (searchForIndex) {
-						if (BytesEqual(indxName, indexSearching)) {
-							//var curPos = _bw.BaseStream.Position; //not sure if we'll ever need this but hey
-
-							_bw.BaseStream.Seek((long)dataPos, SeekOrigin.Begin); //we basically only need to return this piece of data so /shrug
-							indexSearch = _bw.ReadBytes(_bw.ReadInt32());
-							return null; //done :)
-						}
-					} else if (wantNextIndex) {
-						//var curPos = _bw.BaseStream.Position; //not sure if we'll ever need this but hey
-
-						indexSearch = indxName; return Tuple.Create((ulong)(_bw.BaseStream.Position), (ulong)0, new Tuple<byte[], ulong>[] { Tuple.Create(new byte[0], (ulong)0) }); //got it so we're done
-					} else { //we're obviously here for the index chain so dont store anything
-
-					}
-				}
+			while (i.Index != index) {
+				i = _ReadIndex();
+				if (i == null)
+					return null;
 			}
 
-			return Tuple.Create(
-					(ulong)indexChain,
-					(ulong)indexChainWrite,
-					data.ToArray()
+			return _ReadValue(i);
+		}
+
+		private bool _IsIndexAfter(string index, bool doSeek, ulong quickSeek) {
+			var _curPos = _br.BaseStream.Position;
+
+			var rs = _ReadIndex(doSeek, quickSeek);
+
+			while (rs.Index != index) {
+				rs = _ReadIndex();
+				if (rs == null)
+					return false;
+			}
+
+			rs = _ReadIndex();
+
+			_br.BaseStream.Seek(_curPos, SeekOrigin.Begin);
+
+			return rs == null;
+		}
+
+		private IReaderInteraction _IndexAfter(string index, bool doSeek, ulong quickSeek) {
+			var _curPos = _br.BaseStream.Position;
+
+			var rs = _ReadIndex(doSeek, quickSeek);
+
+			if (rs == null)
+				return null;
+
+			if (index == null)
+				return rs;
+
+			while (rs.Index != index) {
+				rs = _ReadIndex();
+				if (rs == null)
+					return null;
+			}
+
+			rs = _ReadIndex();
+
+			_br.BaseStream.Seek(_curPos, SeekOrigin.Begin);
+
+			if (rs == null)
+				return null;
+
+			return rs;
+		}
+
+		private string[] _Indexes() {
+			var _curPos = _br.BaseStream.Position;
+
+			var indexes = new List<string>();
+
+			var rs = _ReadIndex(true, 0);
+
+			while (rs != null) {
+				indexes.Add(rs.Index);
+				rs = _ReadIndex();
+			}
+
+			_br.BaseStream.Seek(_curPos, SeekOrigin.Begin);
+
+			return indexes.ToArray();
+		}
+
+		//the actual work part of it
+
+		private IReaderInteraction _ReadIndex(bool restart = false, ulong start = 0) {
+			if (restart)
+				_br.BaseStream.Seek((long)start, SeekOrigin.Begin);
+
+			byte b = _br.ReadByte();
+
+			while (b == IndexSeperator) { //hippety hoppity get off my property
+				var seekTo = (long)(_br.ReadUInt64());
+
+				if (seekTo == 0)
+					return null;
+
+				_br.BaseStream.Seek(seekTo, SeekOrigin.Begin);
+				b = _br.ReadByte();
+			}
+
+			var dataPos = _br.ReadUInt64();
+			var indexName = Encoding.UTF8.GetString(_br.ReadBytes((int)b));
+
+			return new ReaderInteraction(
+					indexName, (ulong)_br.BaseStream.Position, dataPos
 				);
 		}
 
-		/*
-		 * speedyness for comparing two byte array's names ~ below ~
-		 * 
-		 *  ___
-		 * /   \
-		 * 
-		 *  | |
-		 * 
-		 */
+		private string _ReadValue(IReaderInteraction readerInteraction) {
+			_br.BaseStream.Seek((long)readerInteraction.DataPos, SeekOrigin.Begin);
 
-		//keke credits over https://stackoverflow.com/questions/43289/comparing-two-byte-arrays-in-net
-		private static bool BytesEqual(byte[] a1, byte[] a2) {
-#if USE_UNSAFE_CODE
-			return EqualBytesLongUnrolled(a1, a2);
+			return Encoding.UTF8.GetString(
+					_br.ReadBytes(_br.ReadInt32())
+				);
 		}
 
-		static unsafe bool EqualBytesLongUnrolled(byte[] data1, byte[] data2) {
-			if (data1 == data2)
-				return true;
+		private string _ReadValue(ulong location) {
+			_br.BaseStream.Seek((long)location, SeekOrigin.Begin);
 
-			//custom null checking code
-			if (data1 == null || data2 == null)
-				return false;
-
-			if (data1.Length != data2.Length)
-				return false;
-
-			fixed (byte* bytes1 = data1, bytes2 = data2) {
-				int len = data1.Length;
-				int rem = len % (sizeof(long) * 16);
-				long* b1 = (long*)bytes1;
-				long* b2 = (long*)bytes2;
-				long* e1 = (long*)(bytes1 + len - rem);
-
-				while (b1 < e1) {
-					if (*(b1) != *(b2) || *(b1 + 1) != *(b2 + 1) ||
-						*(b1 + 2) != *(b2 + 2) || *(b1 + 3) != *(b2 + 3) ||
-						*(b1 + 4) != *(b2 + 4) || *(b1 + 5) != *(b2 + 5) ||
-						*(b1 + 6) != *(b2 + 6) || *(b1 + 7) != *(b2 + 7) ||
-						*(b1 + 8) != *(b2 + 8) || *(b1 + 9) != *(b2 + 9) ||
-						*(b1 + 10) != *(b2 + 10) || *(b1 + 11) != *(b2 + 11) ||
-						*(b1 + 12) != *(b2 + 12) || *(b1 + 13) != *(b2 + 13) ||
-						*(b1 + 14) != *(b2 + 14) || *(b1 + 15) != *(b2 + 15))
-						return false;
-					b1 += 16;
-					b2 += 16;
-				}
-
-				for (int i = 0; i < rem; i++)
-					if (data1[len - 1 - i] != data2[len - 1 - i])
-						return false;
-
-				return true;
-			}
-		}
-#elif USE_PINVOKE_IF_NOT_UNSAFE
-			return ByteArrayCompare(a1, a2); //if you comment out the unsafe compare you can just use this
+			return Encoding.UTF8.GetString(
+					_br.ReadBytes(_br.ReadInt32())
+				);
 		}
 
-		[DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
-		static extern int memcmp(byte[] b1, byte[] b2, long count);
+		private IReaderChain _ReadChain() {
+			_br.BaseStream.Seek((long)0, SeekOrigin.Begin);
 
-		static bool ByteArrayCompare(byte[] b1, byte[] b2) {
-			// Validate buffers are the same length.
-			// This also ensures that the count does not exceed the length of either buffer.  
-			return b1.Length == b2.Length && memcmp(b1, b2, b1.Length) == 0;
-		}
-#else
-			return equals(a1, a2);
-		}
+			ulong ic = 0;
+			ulong icw = 0;
 
-		//what are you; ****ing gay?
+			bool shouldContinueLook = true;
+			byte b = _br.ReadByte();
 
-		public static bool equals(byte[] a1, byte[] a2) {
-			if (a1 == a2) {
-				return true;
-			}
-			if ((a1 != null) && (a2 != null)) {
-				if (a1.Length != a2.Length) {
-					return false;
-				}
-				for (int i = 0; i < a1.Length; i++) {
-					if (a1[i] != a2[i]) {
-						return false;
+			while (shouldContinueLook) {
+				while (b == IndexSeperator) { //hippety hoppity get off my property
+					var p = _br.BaseStream.Position;
+					var seekTo = (long)(_br.ReadUInt64());
+
+					if (seekTo == 0)
+						shouldContinueLook = false;
+					else {
+						ic = (ulong)seekTo;
+						icw = (ulong)p;
+
+						_br.BaseStream.Seek(seekTo, SeekOrigin.Begin);
 					}
+
+					b = _br.ReadByte();
 				}
+
+				//stuff to pass the reader
+				_br.ReadUInt64();
+				_br.ReadBytes((int)b);
+
+				if (_br.BaseStream.Position == _br.BaseStream.Length)
+					break;
+
+				b = _br.ReadByte();
+			}
+
+			return new ReaderChain(ic, icw);
+		}
+	}
+
+	public class ReaderEnumerator : IEnumerator<string> {
+		internal ReaderEnumerator(Reader parent, IReaderInteraction start) {
+			this._parent = parent;
+
+			this._indexOn = start.Index;
+			
+			this._seekTo = 0;
+			this._toSeek = start.QuickSeek;
+			this._first = false;
+		}
+
+		private bool _first { get; set; }
+
+		private string _indexOn { get; set; }
+		private ulong _seekTo { get; set; }
+		private ulong _toSeek { get; set; }
+		private Reader _parent { get; set; }
+
+		public string Current => _parent.GetValueOf(this._indexOn, true, this._seekTo);
+
+		object IEnumerator.Current => Current;
+
+		public bool MoveNext() {
+			if (!this._first) {
+				this._first = true;
 				return true;
 			}
-			return false;
+
+			var rr = _parent.IndexAfter(this._indexOn, true, this._seekTo);
+
+			if (rr == null)
+				return false;
+
+			this._indexOn = rr.Index;
+			
+			this._seekTo = this._toSeek;
+			this._toSeek = rr.QuickSeek;
+
+			return true;
 		}
-#endif
+
+		public void Reset() {
+			var rr = _parent.FirstIndex();
+
+			this._indexOn = rr.Index;
+			this._seekTo = rr.QuickSeek;
+		}
+
+		#region IDisposable Support
+		private bool disposedValue = false; // To detect redundant calls
+
+		protected virtual void Dispose(bool disposing) {
+			if (!disposedValue) {
+				if (disposing) {
+					// TODO: dispose managed state (managed objects).
+				}
+
+				// TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+				// TODO: set large fields to null.
+
+				disposedValue = true;
+			}
+		}
+
+		// TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+		// ~ReaderEnumerator() {
+		//   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+		//   Dispose(false);
+		// }
+
+		// This code added to correctly implement the disposable pattern.
+		public void Dispose() {
+			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+			Dispose(true);
+			// TODO: uncomment the following line if the finalizer is overridden above.
+			// GC.SuppressFinalize(this);
+		}
+		#endregion
+	}
+
+	//
+	
+	public interface IReaderChain {
+		ulong IndexChain { get; }
+		ulong IndexChainWrite { get; }
+	}
+
+	public struct ReaderChain : IReaderChain {
+		public ReaderChain(ulong indexChain, ulong indexChainWrite) {
+			this.IndexChain = indexChain;
+			this.IndexChainWrite = indexChainWrite;
+		}
+
+		public ulong IndexChain { get; }
+		public ulong IndexChainWrite { get; }
+	}
+	
+	public interface IReaderInteraction {
+		string Index { get; }
+		ulong QuickSeek { get; }
+		ulong DataPos { get; }
+	}
+
+	public struct ReaderInteraction : IReaderInteraction {
+		public ReaderInteraction(string index, ulong quickSeek = 0, ulong dataPos = 0) {
+			this.Index = index;
+			this.QuickSeek = quickSeek;
+			this.DataPos = dataPos;
+		}
+
+		public string Index { get; }
+		public ulong QuickSeek { get; }
+		public ulong DataPos { get; }
 	}
 }

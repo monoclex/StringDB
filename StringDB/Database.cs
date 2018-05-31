@@ -9,7 +9,7 @@ namespace StringDB {
 			this._stream = output;
 			this._dbm = dbm;
 
-			this._reader = new NewReader(this._stream);
+			this._reader = new Reader(this._stream);
 			this._writer = new Writer(this._stream);
 
 			if (dbm != DatabaseMode.Read) { //if we're just reading we don't need this
@@ -25,7 +25,7 @@ namespace StringDB {
 		private Stream _stream { get; set; }
 		private string _file { get; set; }
 
-		private NewReader _reader { get; set; }
+		private Reader _reader { get; set; }
 		private Writer _writer { get; set; }
 
 		public void Insert(string index, string data) => _writer.Insert(index, data);

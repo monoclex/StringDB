@@ -23,22 +23,8 @@ namespace StringDB.Tester {
 
 				foreach (var i in db) {
 					Console.WriteLine(i);
-					Console.ReadKey(true);
 				}
-
-				Console.ReadLine();
-
-				//var firstIndex = db.FirstIndex();
-				//var index = firstIndex;
-
-				while(true) {
-					foreach(var i in db.Indexes())
-						Console.WriteLine(i);
-					Console.ReadKey(true);
-					//index = db.IndexAfter(index);
-				}
-
-				Console.WriteLine(a.ElapsedMilliseconds + " - " + a.ElapsedTicks);
+				
 			}
 			
 			Console.ReadLine();
