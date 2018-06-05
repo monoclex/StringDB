@@ -7,17 +7,17 @@ using Xunit;
 namespace StringDB.Tests {
 	public class WriterTests {
 		public WriterTests() {
-			sampleTest = TestingFileConsts.SingleIndexFile();
-			_stream = new MemoryStream();
-			db = new Database(_stream, DatabaseMode.Write);
+			this._sampleTest = TestingFileConsts.SingleIndexFile();
+			this._stream = new MemoryStream();
+			this._db = new Database(this._stream, DatabaseMode.Write);
 		}
 
 		private Stream _stream { get; set; }
-		public SampleTest sampleTest { get; set; }
-		public Database db { get; set; }
+		public SampleTest _sampleTest { get; set; }
+		public Database _db { get; set; }
 
 		private void CompareStreams(Stream a, Stream b) {
-			long len = a.Length;
+			var len = a.Length;
 
 			if (b.Length < len)
 				len = b.Length;
@@ -33,12 +33,12 @@ namespace StringDB.Tests {
 
 		[Fact]
 		public void SingleInsert() {
-			db.Insert(TestingFileConsts.keyName, TestingFileConsts.keyValue);
+			this._db.Insert(TestingFileConsts.keyName, TestingFileConsts.keyValue);
 
-			CompareStreams(sampleTest.stream, _stream);
+			CompareStreams(this._sampleTest._stream, this._stream);
 
-			_stream = new MemoryStream();
-			db = new Database(_stream, DatabaseMode.Write);
+			this._stream = new MemoryStream();
+			this._db = new Database(this._stream, DatabaseMode.Write);
 		}
 	}
 }

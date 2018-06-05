@@ -48,13 +48,13 @@ namespace StringDB.Tests {
 	}
 
 	public class SampleTest {
-		public SampleTest(string[] indexes, string[] datas, Stream _stream) {
+		public SampleTest(string[] indexes, string[] datas, Stream stream) {
 			this.Indexes = indexes;
 			this.Datas = datas;
-			this.stream = _stream;
+			this._stream = stream;
 		}
 
-		public Stream stream { get; set; }
+		public Stream _stream { get; set; }
 		public string[] Indexes { get; set; }
 		public string[] Datas { get; set; }
 	}

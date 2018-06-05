@@ -7,40 +7,40 @@ using Xunit;
 namespace StringDB.Tests {
 	public class ReaderTests {
 		public ReaderTests() {
-			sampleTest = TestingFileConsts.SingleIndexFile();
-			complexsampleTest = TestingFileConsts.ThreeIndexesTheSameFile();
-			db = new Database(sampleTest.stream, DatabaseMode.Read);
-			complexdb = new Database(complexsampleTest.stream, DatabaseMode.Read);
+			this._sampleTest = TestingFileConsts.SingleIndexFile();
+			this._complexsampleTest = TestingFileConsts.ThreeIndexesTheSameFile();
+			this._db = new Database(this._sampleTest._stream, DatabaseMode.ReadWrite);
+			this._complexdb = new Database(this._complexsampleTest._stream, DatabaseMode.ReadWrite);
 		}
 
-		public SampleTest sampleTest { get; set; }
-		public SampleTest complexsampleTest { get; set; }
-		public Database db { get; set; }
-		public Database complexdb { get; set; }
+		public SampleTest _sampleTest { get; set; }
+		public SampleTest _complexsampleTest { get; set; }
+		public Database _db { get; set; }
+		public Database _complexdb { get; set; }
 
 		[Fact]
 		public void GetsIndexesCorrectly() {
-			var indx = db.Indexes();
+			var indx = this._db.Indexes();
 
 			for (uint i = 0; i < indx.Length; i++)
-				Assert.True(sampleTest.Indexes[i] == indx[i], $"sampleTest.Indexes[{i}] ({sampleTest.Indexes[i]}) != indx[{i}] ({indx[i]})");
+				Assert.True(this._sampleTest.Indexes[i] == indx[i], $"sampleTest.Indexes[{i}] ({this._sampleTest.Indexes[i]}) != indx[{i}] ({indx[i]})");
 		}
 
 		[Fact]
 		public void ValuesAreCorrect() {
-			var indx = db.Indexes();
+			var indx = this._db.Indexes();
 
 			for (uint i = 0; i < indx.Length; i++)
-				Assert.True(sampleTest.Datas[i] == db.GetValueOf(indx[i]), $"sampleTest.Datas[{i}] ({sampleTest.Datas[i]}) != db.Get(indx[{i}]) ({db.GetValueOf(indx[i])})");
+				Assert.True(this._sampleTest.Datas[i] == this._db.GetValueOf(indx[i]), $"sampleTest.Datas[{i}] ({this._sampleTest.Datas[i]}) != db.Get(indx[{i}]) ({this._db.GetValueOf(indx[i])})");
 		}
 
 		[Fact]
 		public void ForeachWorks() {
-			var indx = db.Indexes();
+			var indx = this._db.Indexes();
 
 			uint c = 0;
-			foreach(var i in db) {
-				Assert.True(db.GetValueOf(indx[c]) == i, $"db.Get(indx[c]) (db.Get(indx[{c}]) (db.Get({indx[c]})) != {i}");
+			foreach(var i in this._db) {
+				Assert.True(this._db.GetValueOf(indx[c]) == i.Value, $"db.Get(indx[c]) (db.Get(indx[{c}]) (db.Get({indx[c]})) != {i}");
 
 				c++;
 			}
@@ -48,23 +48,23 @@ namespace StringDB.Tests {
 
 		[Fact]
 		public void ComplexUsage() {
-			foreach (var i in db) {
+			foreach (var i in this._db) {
 				for (uint fi = 0; fi < 10; fi++) {
-					db.FirstIndex();
-					db.Indexes();
-					db.GetValueOf(sampleTest.Indexes[0]);
+					this._db.FirstIndex();
+					this._db.Indexes();
+					this._db.GetValueOf(this._sampleTest.Indexes[0]);
 				}
 			}
 		}
 
 		[Fact]
 		public void MultipleIndexesAreFine() {
-			var vals = complexdb.GetValuesOf(complexsampleTest.Indexes[0]);
+			var vals = this._complexdb.GetValuesOf(this._complexsampleTest.Indexes[0]);
 
-			Assert.True(vals.Length == complexsampleTest.Indexes.Length, $"vals.Length ({vals.Length}) != complexsampleTest.Indexes.Length ({complexsampleTest.Indexes.Length})");
+			Assert.True(vals.Length == this._complexsampleTest.Indexes.Length, $"vals.Length ({vals.Length}) != complexsampleTest.Indexes.Length ({this._complexsampleTest.Indexes.Length})");
 
 			for (var i = 0; i < vals.Length; i++)
-				Assert.True(vals[i] == complexsampleTest.Datas[i], $"vals[{i}] ({vals[i]}) != complexsampleTest.Datas[{i}] ({complexsampleTest.Datas[i]})");
+				Assert.True(vals[i] == this._complexsampleTest.Datas[i], $"vals[{i}] ({vals[i]}) != complexsampleTest.Datas[{i}] ({this._complexsampleTest.Datas[i]})");
 		}
 	}
 }

@@ -6,7 +6,7 @@ using System.Text;
 namespace StringDB.Reader {
 	/// <summary>Allows you to enumerate over an IReader efficiently.</summary>
 	public class ReaderEnumerator : IEnumerator<KeyValuePair<string, string>> {
-		internal ReaderEnumerator(StreamReader parent, IReaderInteraction start) {
+		internal ReaderEnumerator(IReader parent, IReaderInteraction start) {
 			this._parent = parent;
 
 			this._indexOn = start.Index;
@@ -21,7 +21,7 @@ namespace StringDB.Reader {
 		private string _indexOn { get; set; }
 		private ulong _seekTo { get; set; }
 		private ulong _toSeek { get; set; }
-		private StreamReader _parent { get; set; }
+		private IReader _parent { get; set; }
 
 		//TODO: Reading the value of the index is resource heavy, especially if one is only iterating over it for the indexes. Should use some kind of class to fetch the value of the index for quicker reading.
 		/// <inheritdoc/>

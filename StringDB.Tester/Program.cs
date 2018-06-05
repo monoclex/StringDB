@@ -27,7 +27,7 @@ namespace StringDB.Tester {
 			Console.WriteLine("Generating Data");
 
 			var chrdata = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' };
-			int max = 20;
+			var max = 20;
 		
 			for(uint i = 0; i < max; i++) {
 				var strb_id = new StringBuilder();

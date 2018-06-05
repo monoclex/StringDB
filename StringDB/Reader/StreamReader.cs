@@ -53,6 +53,9 @@ namespace StringDB.Reader {
 
 			var i = _ReadIndex(doSeek, quickSeek);
 
+			if (i == null)
+				return null;
+
 			while (i.Index != index) {
 				i = _ReadIndex();
 				if (i == null)
