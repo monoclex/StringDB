@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace StringDB.Reader {
+	/// <summary>Allows you to enumerate over an IReader efficiently.</summary>
 	public class ReaderEnumerator : IEnumerator<KeyValuePair<string, string>> {
 		internal ReaderEnumerator(StreamReader parent, IReaderInteraction start) {
 			this._parent = parent;
@@ -22,9 +23,11 @@ namespace StringDB.Reader {
 		private ulong _toSeek { get; set; }
 		private StreamReader _parent { get; set; }
 
-		public KeyValuePair<string, string> Current => new KeyValuePair<string, string>(this._indexOn, _parent.GetValueOf(this._indexOn, true, this._seekTo));
+		//TODO: Reading the value of the index is resource heavy, especially if one is only iterating over it for the indexes. Should use some kind of class to fetch the value of the index for quicker reading.
+		/// <inheritdoc/>
+		public KeyValuePair<string, string> Current => new KeyValuePair<string, string>(this._indexOn, this._parent.GetValueOf(this._indexOn, true, this._seekTo));
 
-		object IEnumerator.Current => Current;
+		object IEnumerator.Current => this.Current; /// <inheritdoc/>
 
 		public bool MoveNext() {
 			if (!this._first) {
@@ -32,7 +35,7 @@ namespace StringDB.Reader {
 				return true;
 			}
 
-			var rr = _parent.IndexAfter(this._indexOn, true, this._seekTo);
+			var rr = this._parent.IndexAfter(this._indexOn, true, this._seekTo);
 
 			if (rr == null)
 				return false;
@@ -43,32 +46,32 @@ namespace StringDB.Reader {
 			this._toSeek = rr.QuickSeek;
 
 			return true;
-		}
+		} /// <inheritdoc/>
 
 		public void Reset() {
-			var rr = _parent.FirstIndex();
+			var rr = this._parent.FirstIndex();
 
 			this._indexOn = rr.Index;
 			this._seekTo = rr.QuickSeek;
 		}
 
 		#region IDisposable Support
-		private bool disposedValue = false; // To detect redundant calls
+		private bool disposedValue = false; /// <inheritdoc/>
 
 		protected virtual void Dispose(bool disposing) {
-			if (!disposedValue) {
+			if (!this.disposedValue) {
 				if (disposing) {
-					// TODO: dispose managed state (managed objects).
+					//TODO: dispose managed state (managed objects).
 				}
 
-				// TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-				// TODO: set large fields to null.
+				//TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+				//TODO: set large fields to null.
 
-				disposedValue = true;
+				this.disposedValue = true;
 			}
-		}
+		} /// <inheritdoc/>
 
-		// TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+		//TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
 		// ~ReaderEnumerator() {
 		//   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
 		//   Dispose(false);
@@ -78,7 +81,7 @@ namespace StringDB.Reader {
 		public void Dispose() {
 			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
 			Dispose(true);
-			// TODO: uncomment the following line if the finalizer is overridden above.
+			//TODO: uncomment the following line if the finalizer is overridden above.
 			// GC.SuppressFinalize(this);
 		}
 		#endregion

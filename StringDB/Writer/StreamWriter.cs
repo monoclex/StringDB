@@ -4,16 +4,20 @@ using System.IO;
 using System.Text;
 
 namespace StringDB.Writer {
+	/// <inheritdoc/>
 	public class StreamWriter : IWriter {
+		/// <summary>Create a new StreamWriter.</summary>
+		/// <param name="outputStream">The stream to write to. You may need to call the Load() void to set the indexChain data.</param>
 		public StreamWriter(Stream outputStream) {
-			_stream = outputStream;
-			_bw = new BinaryWriter(_stream);
-			_indexChain = 0;
-			_indexChainWrite = 0;
+			this._stream = outputStream;
+			this._bw = new BinaryWriter(this._stream);
+			this._indexChain = 0;
+			this._indexChainWrite = 0;
 
-			_stream.Position = 0;
+			this._stream.Position = 0;
 		}
 
+		/// <summary>Used for seperating indexes from data. This is why you can't have indexes with lengths more then 253.</summary>
 		public const byte IndexSeperator = 0xFF;
 
 		private Stream _stream { get; set; }
@@ -27,6 +31,7 @@ namespace StringDB.Writer {
 			this._indexChain = indexChain;
 		}
 
+		/// <inheritdoc/>
 		public void InsertRange(Dictionary<string, string> data) {
 			var dat = new List<Tuple<string, string>>();
 
@@ -36,16 +41,18 @@ namespace StringDB.Writer {
 			this.InsertRange(dat.ToArray());
 		}
 
+		/// <inheritdoc/>
 		public void Insert(string index, string data) => InsertRange(new Tuple<string, string>[] { Tuple.Create(index, data) });
 
+		/// <inheritdoc/>
 		public void InsertRange(Tuple<string, string>[] data) {
-			_bw.Seek(0, SeekOrigin.End); //goto the end of the stream to append data
+			this._bw.Seek(0, SeekOrigin.End); //goto the end of the stream to append data
 
 			var indxChain = (ulong)0; //responsible for storing the start of the index
 			var indxChainWrite = (ulong)0; //responsible for storing the location of where to overwrite the indexChain
 
-			string[] indx = new string[data.Length];
-			string[] dta = new string[data.Length];
+			var indx = new string[data.Length];
+			var dta = new string[data.Length];
 
 			var indxsAt = new Dictionary<string, ulong>();
 			var indxsShowsUpAt = new Dictionary<string, ulong>();
@@ -57,31 +64,31 @@ namespace StringDB.Writer {
 			}
 
 			//SET INDEX CHAIN
-			indxChain = (ulong)_stream.Position;
+			indxChain = (ulong)this._stream.Position;
 
 			//WRITE EACH INDEX
 			for (uint i = 0; i < indx.Length; i++) {
-				if (indx[i].Length > 253)
-					throw new Exception($"Index cannot be longer then 253 chars. {indx[i]}");
+				if (indx[i].Length > 254)
+					throw new Exception($"Index cannot be longer then 254 chars. 0xFF is reserved for the index chain. {indx[i]}");
 
-				_bw.Write(Convert.ToByte(indx[i].Length));  //LENGTH OF INDEXER
-				indxsAt[indx[i]] = (ulong)_stream.Position;
-				_bw.Write((ulong)0);                //WHERE IT WILL SHOW UP IN THE FILE
+				this._bw.Write(Convert.ToByte(indx[i].Length));  //LENGTH OF INDEXER
+				indxsAt[indx[i]] = (ulong)this._stream.Position;
+				this._bw.Write((ulong)0);                //WHERE IT WILL SHOW UP IN THE FILE
 
 				WriteStringRaw(indx[i]);
 			}
 
 			//SEPERATE INDEXES
-			_bw.Write(IndexSeperator);
+			this._bw.Write(IndexSeperator);
 
-			indxChainWrite = (ulong)_stream.Position;
-			_bw.Write((ulong)0); //if we want to append more data, we'll link this to the next set of indexes. aka the index chain
+			indxChainWrite = (ulong)this._stream.Position;
+			this._bw.Write((ulong)0); //if we want to append more data, we'll link this to the next set of indexes. aka the index chain
 
 			//WRITE DATA
 			for (uint i = 0; i < dta.Length; i++) {
-				indxsShowsUpAt[indx[i]] = (ulong)_stream.Position; //we wanna know when we'll see it again
+				indxsShowsUpAt[indx[i]] = (ulong)this._stream.Position; //we wanna know when we'll see it again
 
-				_bw.Write(dta[i].Length);		//LENTH OF DATA
+				this._bw.Write(dta[i].Length);		//LENTH OF DATA
 				WriteStringRaw(dta[i]);			//THE DATA ITSELF
 			}
 			
@@ -91,23 +98,23 @@ namespace StringDB.Writer {
 				var locationShowsUp = indxsShowsUpAt[i.Key];
 
 				//overwrite this
-				_bw.BaseStream.Seek((long)overwriteAt, SeekOrigin.Begin);
-				_bw.Write(locationShowsUp); //overwrite the old data
+				this._bw.BaseStream.Seek((long)overwriteAt, SeekOrigin.Begin);
+				this._bw.Write(locationShowsUp); //overwrite the old data
 			}
 
 			//INDEX CHAIN THIS NEW DATA WITH THE OLD INDEXES
-			if(_indexChainWrite != 0) { //if the place to overwrite the old index chain exists
-				_bw.BaseStream.Seek((long)_indexChainWrite, SeekOrigin.Begin); //go to it
-				_bw.Write(indxChain); //write the start of the new index chain
+			if(this._indexChainWrite != 0) { //if the place to overwrite the old index chain exists
+				this._bw.BaseStream.Seek((long)this._indexChainWrite, SeekOrigin.Begin); //go to it
+				this._bw.Write(indxChain); //write the start of the new index chain
 			}
 
 			//SET NEW INDEX CHAIN
-			_indexChain = indxChain;
-			_indexChainWrite = indxChainWrite;
+			this._indexChain = indxChain;
+			this._indexChainWrite = indxChainWrite;
 
 			//DONE
 		}
 
-		private void WriteStringRaw(string raw) { foreach (var i in raw) _bw.Write(i); }
+		private void WriteStringRaw(string raw) { foreach (var i in raw) this._bw.Write(i); }
 	}
 }

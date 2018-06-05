@@ -7,25 +7,16 @@ using System.Text;
 namespace StringDB.Tester {
 	class Program {
 		static void Main(string[] args) {
-			using (var fs = File.Open("aaAa.db", FileMode.OpenOrCreate)) {
+			using (var fs = File.Open(@"xxxxxx", FileMode.OpenOrCreate)) {
 				var db = new Database(fs, DatabaseMode.ReadWrite);
-				Write(db);
 
-				//var ix = db.Indexes();
+				var reader = new Reader.StreamReader(null);
 
-				//foreach (var i in ix)
-				//	Console.WriteLine(i);
-
-				var a = new Stopwatch();
-				a.Start();
-
-				Console.WriteLine("--");
-
-				foreach (var i in db) {
-					Console.WriteLine(i);
-				}
+				foreach (var i in db) { } 
 				
 			}
+
+			Console.WriteLine("eZ");
 			
 			Console.ReadLine();
 		}
