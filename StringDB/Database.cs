@@ -33,7 +33,8 @@ namespace StringDB {
 		public void InsertRange(Tuple<string, string>[] range) => _writer.InsertRange(range);
 
 		public string[] Indexes() => _reader.GetIndexes();
-		public string Get(string index) => _reader.GetValueOf(index);
+		public string GetValueOf(string index) => _reader.GetValueOf(index);
+		public string[] GetValuesOf(string index) => _reader.GetValuesOf(index);
 		public string FirstIndex() => _reader.FirstIndex().Index;
 		
 		public void Flush() => _stream.Flush();

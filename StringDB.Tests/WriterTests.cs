@@ -33,7 +33,7 @@ namespace StringDB.Tests {
 
 		[Fact]
 		public void SingleInsert() {
-			db.Insert("test", "datadatadatadatadatadatadatadata");
+			db.Insert(TestingFileConsts.keyName, TestingFileConsts.keyValue);
 
 			CompareStreams(sampleTest.stream, _stream);
 

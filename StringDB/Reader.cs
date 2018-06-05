@@ -9,6 +9,9 @@ namespace StringDB {
 		string GetValueOf(IReaderInteraction r, bool doSeek = false);
 		string GetValueOf(string index, bool doSeek = false, ulong quickSeek = 0);
 
+		string[] GetValuesOf(IReaderInteraction r, bool doSeek = false);
+		string[] GetValuesOf(string index, bool doSeek = false, ulong quickSeek = 0);
+
 		bool IsIndexAfter(IReaderInteraction r, bool doSeek = false);
 		bool IsIndexAfter(string index, bool doSeek = false, ulong quickSeek = 0);
 
@@ -41,6 +44,9 @@ namespace StringDB {
 		public string GetValueOf(IReaderInteraction r, bool doSeek = true) => GetValueOf(r.Index, doSeek, r.QuickSeek);
 		public string GetValueOf(string index, bool doSeek = true, ulong quickSeek = 0) => _ValueOf(index, doSeek, quickSeek);
 
+		public string[] GetValuesOf(IReaderInteraction r, bool doSeek = true) => GetValuesOf(r.Index, doSeek, r.QuickSeek);
+		public string[] GetValuesOf(string index, bool doSeek = true, ulong quickSeek = 0) => _ValuesOf(index, doSeek, quickSeek);
+
 		public bool IsIndexAfter(IReaderInteraction r, bool doSeek = true) => IsIndexAfter(r.Index, doSeek, r.QuickSeek);
 		public bool IsIndexAfter(string index, bool doSeek = true, ulong quickSeek = 0) => _IsIndexAfter(index, doSeek, quickSeek);
 
@@ -69,6 +75,33 @@ namespace StringDB {
 			}
 
 			return _ReadValue(i);
+		}
+
+		private string[] _ValuesOf(string index, bool doSeek, ulong quickSeek) {
+			var _curPos = _br.BaseStream.Position;
+
+			var i = _ReadIndex(doSeek, quickSeek);
+
+			var valuesOf = new List<string>();
+
+			var lastpos = _br.BaseStream.Position;
+
+			if(i != null)
+				if (i.Index == index)
+					valuesOf.Add(_ReadValue(i));
+
+			while (i.Index != null) {
+				i = _ReadIndex(true, (ulong)lastpos);
+				if (i == null)
+					break;
+
+				lastpos = _br.BaseStream.Position;
+
+				if (i.Index == index)
+					valuesOf.Add(_ReadValue(i));
+			}
+
+			return valuesOf.ToArray();
 		}
 
 		private bool _IsIndexAfter(string index, bool doSeek, ulong quickSeek) {
