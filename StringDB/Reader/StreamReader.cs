@@ -4,29 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace StringDB {
-	public interface IReader : IEnumerable<string> {
-		string GetValueOf(IReaderInteraction r, bool doSeek = false);
-		string GetValueOf(string index, bool doSeek = false, ulong quickSeek = 0);
-
-		string[] GetValuesOf(IReaderInteraction r, bool doSeek = false);
-		string[] GetValuesOf(string index, bool doSeek = false, ulong quickSeek = 0);
-
-		bool IsIndexAfter(IReaderInteraction r, bool doSeek = false);
-		bool IsIndexAfter(string index, bool doSeek = false, ulong quickSeek = 0);
-
-		IReaderInteraction IndexAfter(IReaderInteraction r, bool doSeek = false);
-		IReaderInteraction IndexAfter(string index, bool doSeek = false, ulong quickSeek = 0);
-		
-		IReaderInteraction FirstIndex();
-
-		string[] GetIndexes();
-
-		IReaderChain GetReaderChain();
-	}
-
-	public class Reader : IReader {
-		public Reader(Stream streamUse) {
+namespace StringDB.Reader {
+	public class StreamReader : IReader {
+		public StreamReader(Stream streamUse) {
 			_stream = streamUse;
 			_br = new BinaryReader(this._stream);
 		}
@@ -38,7 +18,7 @@ namespace StringDB {
 		#region public implementations
 		public string[] GetIndexes() => _Indexes();
 
-		public IEnumerator<string> GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());
+		public IEnumerator<KeyValuePair<string, string>> GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());
 		IEnumerator IEnumerable.GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());
 
 		public string GetValueOf(IReaderInteraction r, bool doSeek = true) => GetValueOf(r.Index, doSeek, r.QuickSeek);
@@ -246,120 +226,5 @@ namespace StringDB {
 
 			return new ReaderChain(ic, icw);
 		}
-	}
-
-	public class ReaderEnumerator : IEnumerator<string> {
-		internal ReaderEnumerator(Reader parent, IReaderInteraction start) {
-			this._parent = parent;
-
-			this._indexOn = start.Index;
-			
-			this._seekTo = 0;
-			this._toSeek = start.QuickSeek;
-			this._first = false;
-		}
-
-		private bool _first { get; set; }
-
-		private string _indexOn { get; set; }
-		private ulong _seekTo { get; set; }
-		private ulong _toSeek { get; set; }
-		private Reader _parent { get; set; }
-
-		public string Current => _parent.GetValueOf(this._indexOn, true, this._seekTo);
-
-		object IEnumerator.Current => Current;
-
-		public bool MoveNext() {
-			if (!this._first) {
-				this._first = true;
-				return true;
-			}
-
-			var rr = _parent.IndexAfter(this._indexOn, true, this._seekTo);
-
-			if (rr == null)
-				return false;
-
-			this._indexOn = rr.Index;
-			
-			this._seekTo = this._toSeek;
-			this._toSeek = rr.QuickSeek;
-
-			return true;
-		}
-
-		public void Reset() {
-			var rr = _parent.FirstIndex();
-
-			this._indexOn = rr.Index;
-			this._seekTo = rr.QuickSeek;
-		}
-
-		#region IDisposable Support
-		private bool disposedValue = false; // To detect redundant calls
-
-		protected virtual void Dispose(bool disposing) {
-			if (!disposedValue) {
-				if (disposing) {
-					// TODO: dispose managed state (managed objects).
-				}
-
-				// TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-				// TODO: set large fields to null.
-
-				disposedValue = true;
-			}
-		}
-
-		// TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-		// ~ReaderEnumerator() {
-		//   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-		//   Dispose(false);
-		// }
-
-		// This code added to correctly implement the disposable pattern.
-		public void Dispose() {
-			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-			Dispose(true);
-			// TODO: uncomment the following line if the finalizer is overridden above.
-			// GC.SuppressFinalize(this);
-		}
-		#endregion
-	}
-
-	//
-	
-	public interface IReaderChain {
-		ulong IndexChain { get; }
-		ulong IndexChainWrite { get; }
-	}
-
-	public struct ReaderChain : IReaderChain {
-		public ReaderChain(ulong indexChain, ulong indexChainWrite) {
-			this.IndexChain = indexChain;
-			this.IndexChainWrite = indexChainWrite;
-		}
-
-		public ulong IndexChain { get; }
-		public ulong IndexChainWrite { get; }
-	}
-	
-	public interface IReaderInteraction {
-		string Index { get; }
-		ulong QuickSeek { get; }
-		ulong DataPos { get; }
-	}
-
-	public struct ReaderInteraction : IReaderInteraction {
-		public ReaderInteraction(string index, ulong quickSeek = 0, ulong dataPos = 0) {
-			this.Index = index;
-			this.QuickSeek = quickSeek;
-			this.DataPos = dataPos;
-		}
-
-		public string Index { get; }
-		public ulong QuickSeek { get; }
-		public ulong DataPos { get; }
 	}
 }

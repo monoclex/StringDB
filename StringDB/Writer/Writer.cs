@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace StringDB {
-	public class Writer {
-		public Writer(Stream outputStream) {
+namespace StringDB.Writer {
+	public class StreamWriter : IWriter {
+		public StreamWriter(Stream outputStream) {
 			_stream = outputStream;
 			_bw = new BinaryWriter(_stream);
 			_indexChain = 0;
@@ -22,7 +22,7 @@ namespace StringDB {
 		private ulong _indexChainWrite { get; set; } //stores WHERE to overwrite stuff to link TO the start of a collection of indexes.
 		private ulong _indexChain { get; set; } //stores the START of a collection of indexes
 
-		public void Load(ulong indexChainWrite, ulong indexChain) {
+		internal void Load(ulong indexChainWrite, ulong indexChain) {
 			this._indexChainWrite = indexChainWrite;
 			this._indexChain = indexChain;
 		}
