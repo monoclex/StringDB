@@ -12,5 +12,5 @@ build_script:
   - cmd: dotnet restore
   - cmd: dotnet build "C:\projects\stringdb\StringDB\StringDB.csproj"
 artifacts:
- - path: 'C:\projects\stringdb\bin\Debug\netcoreapp2.0\publish'
+ - path: 'bin\Debug\netcoreapp2.0\publish'
    name: StringDB
