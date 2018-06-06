@@ -12,5 +12,49 @@ build_script:
   - cmd: dotnet restore
   - cmd: dotnet build "C:\projects\stringdb\StringDB\StringDB.csproj"
 artifacts:
- - path: 'bin\Debug\netcoreapp2.0\publish'
+ - path: 'bin\$(configuration)\netstandard2.0\'
+   name: StringDB
+ - path: 'bin\$(configuration)\netstandard1.6\'
+   name: StringDB
+ - path: 'bin\$(configuration)\netstandard1.5\'
+   name: StringDB
+ - path: 'bin\$(configuration)\netstandard1.4\'
+   name: StringDB
+ - path: 'bin\$(configuration)\netstandard1.3\'
+   name: StringDB
+ - path: 'bin\$(configuration)\netstandard1.2\'
+   name: StringDB
+ - path: 'bin\$(configuration)\netstandard1.1\'
+   name: StringDB
+ - path: 'bin\$(configuration)\netstandard1.0\'
+   name: StringDB
+ - path: 'bin\$(configuration)\netcoreapp2.0\'
+   name: StringDB
+ - path: 'bin\$(configuration)\netcoreapp1.1\'
+   name: StringDB
+ - path: 'bin\$(configuration)\netcoreapp1.0\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net20\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net35\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net40\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net45\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net46\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net47\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net451\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net452\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net461\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net462\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net471\'
+   name: StringDB
+ - path: 'bin\$(configuration)\net472\'
    name: StringDB
