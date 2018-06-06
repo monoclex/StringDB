@@ -9,9 +9,9 @@ namespace StringDB.Writer {
 		public void Insert(string index, string data) => throw new InoperableException();
 
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
-		public void InsertRange(Dictionary<string, string> data) => throw new InoperableException();
+		public void InsertRange(ICollection<KeyValuePair<string, string>> data) => throw new InoperableException();
 
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
-		public void InsertRange(Tuple<string, string>[] data) => throw new InoperableException();
+		public void InsertRange(params ICollection<KeyValuePair<string, string>>[] data) => throw new InoperableException();
 	}
 }

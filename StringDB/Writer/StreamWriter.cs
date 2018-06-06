@@ -28,23 +28,19 @@ namespace StringDB.Writer {
 		}
 
 		/// <inheritdoc/>
-		public void InsertRange(Dictionary<string, string> data) {
+		public void InsertRange(ICollection<KeyValuePair<string, string>> data) {
 			if (data == null)
 				throw new ArgumentNullException("data");
 
-			var dat = new List<Tuple<string, string>>();
-
-			foreach (var i in data)
-				dat.Add(new Tuple<string, string>(i.Key, i.Value));
-
-			this.InsertRange(dat.ToArray());
+			this.InsertRange(new ICollection<KeyValuePair<string, string>>[] { data });
 		}
+		
+		//TODO: not use new List<KeyValuePair> that seems just a *little bit* awful
+		/// <inheritdoc/>
+		public void Insert(string index, string data) => InsertRange(new ICollection<KeyValuePair<string, string>>[] { new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>(index, data) } });
 
 		/// <inheritdoc/>
-		public void Insert(string index, string data) => InsertRange(new Tuple<string, string>[] { new Tuple<string, string>(index, data) });
-
-		/// <inheritdoc/>
-		public void InsertRange(Tuple<string, string>[] data) {
+		public void InsertRange(params ICollection<KeyValuePair<string, string>>[] data) {
 			if (data == null)
 				throw new ArgumentNullException("data");
 
@@ -53,16 +49,31 @@ namespace StringDB.Writer {
 			var indxChain = (ulong)0; //responsible for storing the start of the index
 			var indxChainWrite = (ulong)0; //responsible for storing the location of where to overwrite the indexChain
 
-			var indx = new string[data.Length];
-			var dta = new string[data.Length];
+			string[] indx;
+			string[] dta;
+
+			{
+				var c = 0;
+				for (var i = 0u; i < data.Length; i++)
+					c += data[i].Count;
+
+				indx = new string[c];
+				dta = new string[c];
+			}
 
 			var indxsAt = new Dictionary<string, ulong>();
 			var indxsShowsUpAt = new Dictionary<string, ulong>();
 
 			//SET DATA
-			for (uint i = 0; i < data.Length; i++) {
-				indx[i] = data[i].Item1;
-				dta[i] = data[i].Item2;
+			{
+				var counter = 0u;
+				foreach(var j in data)
+					foreach(var i in j) {
+					indx[counter] = i.Key;
+					dta[counter] = i.Value;
+
+					counter++;
+				}
 			}
 
 			//SET INDEX CHAIN

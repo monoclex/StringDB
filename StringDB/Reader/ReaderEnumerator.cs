@@ -1,9 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace StringDB.Reader {
 	/// <summary>Pairs an index with a value. It only retrieves the value when it's called for, so it makes no wasted calls when iterating over in a foreach loop.</summary>
-	public class ReaderPair {
+	public class ReaderPair : IEquatable<ReaderPair> {
 		internal ReaderPair(IReader parent, IReaderInteraction dataPos) {
 			this._parent = parent;
 			this._dataPos = dataPos;
@@ -18,6 +19,18 @@ namespace StringDB.Reader {
 		
 		/// <summary>The Value of this ReaderPair.<para>When called for the first time, it retrieves the value of it and stores it for later usage incase of multiple calls.</para></summary>
 		public string Value => (this.ValueCached ?? (this.ValueCached = this._parent.GetValueOf(this._dataPos)));
+
+		/// <summary>Check if this ReaderPair is equal to another ReaderPair</summary>
+		/// <param name="other">The other ReaderPair</param>
+		/// <returns>True if it's equal to, false if it's not</returns>
+		public bool Equals(ReaderPair other) {
+			if (other is null) return false; //null and this checks
+			if (ReferenceEquals(this, other)) return true;
+			if (ReferenceEquals(this._parent, other._parent)) //make sure both parents are the same
+				return String.Equals(this.Index, other.Index); //make sure the indexes are the same
+
+			return false;
+		}
 	}
 
 	/// <summary>Allows you to enumerate over an IReader efficiently.</summary>
