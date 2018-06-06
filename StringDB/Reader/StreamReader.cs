@@ -14,16 +14,13 @@ namespace StringDB.Reader {
 			this._br = new BinaryReader(this._stream);
 		}
 
-		/// <summary>Used for seperating indexes from data. This is why you can't have indexes with lengths more then 253.</summary>
-		public const byte IndexSeperator = 0xFF;
-
 		//public implementations of stuff
 
 		#region public implementations
 		/// <inheritdoc/>
 		public string[] GetIndexes() => _Indexes();/// <inheritdoc/>
 
-		public IEnumerator<KeyValuePair<string, string>> GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());/// <inheritdoc/>
+		public IEnumerator<ReaderPair> GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());/// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());/// <inheritdoc/>
 
 		public string GetValueOf(IReaderInteraction r, bool doSeek = true) => GetValueOf(r.Index, doSeek, r.QuickSeek);/// <inheritdoc/>
@@ -48,7 +45,12 @@ namespace StringDB.Reader {
 		private Stream _stream { get; set; }
 		private BinaryReader _br { get; set; }
 
+		//TODO: somehow simplify all of these functions - they're very similar and or identical
+
 		private string _ValueOf(string index, bool doSeek, ulong quickSeek) {
+			if (index == null)
+				throw new ArgumentNullException("index");
+
 			var _curPos = this._br.BaseStream.Position;
 
 			var i = _ReadIndex(doSeek, quickSeek);
@@ -66,6 +68,9 @@ namespace StringDB.Reader {
 		}
 
 		private string[] _ValuesOf(string index, bool doSeek, ulong quickSeek) {
+			if (index == null)
+				throw new ArgumentNullException("index");
+
 			var _curPos = this._br.BaseStream.Position;
 
 			var i = _ReadIndex(doSeek, quickSeek);
@@ -93,6 +98,9 @@ namespace StringDB.Reader {
 		}
 
 		private bool _IsIndexAfter(string index, bool doSeek, ulong quickSeek) {
+			if (index == null)
+				throw new ArgumentNullException("index");
+
 			var _curPos = this._br.BaseStream.Position;
 
 			var rs = _ReadIndex(doSeek, quickSeek);
@@ -162,7 +170,7 @@ namespace StringDB.Reader {
 
 			var b = this._br.ReadByte();
 
-			while (b == IndexSeperator) { //hippety hoppity get off my property
+			while (b == Consts.IndexSeperator) { //hippety hoppity get off my property
 				var seekTo = (long)(this._br.ReadUInt64());
 
 				if (seekTo == 0)
@@ -181,6 +189,9 @@ namespace StringDB.Reader {
 		}
 
 		private string _ReadValue(IReaderInteraction readerInteraction) {
+			if (readerInteraction == null)
+				throw new ArgumentNullException("readerInteraction");
+
 			this._br.BaseStream.Seek((long)readerInteraction.DataPos, SeekOrigin.Begin);
 
 			return Encoding.UTF8.GetString(
@@ -206,7 +217,7 @@ namespace StringDB.Reader {
 			var b = this._br.ReadByte();
 
 			while (shouldContinueLook) {
-				while (b == IndexSeperator) { //hippety hoppity get off my property
+				while (b == Consts.IndexSeperator) { //hippety hoppity get off my property
 					var p = this._br.BaseStream.Position;
 					var seekTo = (long)(this._br.ReadUInt64());
 

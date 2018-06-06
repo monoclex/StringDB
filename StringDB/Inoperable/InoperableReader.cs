@@ -11,7 +11,7 @@ namespace StringDB.Reader {
 		public IReaderInteraction FirstIndex() => throw new InoperableException();
 
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
-		public IEnumerator<KeyValuePair<string, string>> GetEnumerator() => throw new InoperableException();
+		public IEnumerator<ReaderPair> GetEnumerator() => throw new InoperableException();
 
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
 		public string[] GetIndexes() => throw new InoperableException();

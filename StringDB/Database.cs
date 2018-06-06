@@ -7,14 +7,13 @@ using System.IO;
 
 namespace StringDB {
 	/// <summary>A StringDB Database.</summary>
-	public class Database : IEnumerable<KeyValuePair<string, string>> {
+	public class Database : IEnumerable<ReaderPair> {
 
 		/// <summary>Create a new StringDB database.</summary>
 		/// <param name="stream">The stream to read/write to.</param>
 		/// <param name="dbm">The DatabaseMode to be in.</param>
 		public Database(Stream stream, DatabaseMode dbm = DatabaseMode.ReadWrite) {
-			this._stream = stream;
-			//this._dbm = dbm;
+			this._stream = stream ?? throw new ArgumentNullException("stream");
 
 			if (this.Readable(dbm))
 				this._reader = new Reader.StreamReader(this._stream);
@@ -74,7 +73,7 @@ namespace StringDB {
 		/// <returns>A string, that is the first index.</returns>
 		public string FirstIndex() => this._reader.FirstIndex().Index; /// <inheritdoc/>
 			
-		public IEnumerator<KeyValuePair<string, string>> GetEnumerator() => this._reader.GetEnumerator(); /// <inheritdoc/>
+		public IEnumerator<ReaderPair> GetEnumerator() => this._reader.GetEnumerator(); /// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => this._reader.GetEnumerator();
 
 		//private methods to check for database modes and such

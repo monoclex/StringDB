@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using StringDB;
 
 namespace StringDB.Tester {
 	class Program {
@@ -10,7 +11,11 @@ namespace StringDB.Tester {
 			using (var fs = File.Open(@"xxxxxx", FileMode.OpenOrCreate)) {
 				var db = new Database(fs, DatabaseMode.ReadWrite);
 
-				var reader = new Reader.StreamReader(null);
+				db.Insert("", "ure gaa3");
+				var uregaa = db.GetValuesOf("");
+
+				foreach(var i in uregaa)
+				Console.WriteLine(i);
 
 				foreach (var i in db) { } 
 				

@@ -2,16 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>SirJosh3917</Authors>
+    <Description>StringDB is a fast, powerful, lightweight archival-style DB that uses mainly (you guessed it!) strings.</Description>
+    <PackageProjectUrl>https://www.github.com/SirJosh3917/StringDB</PackageProjectUrl>
+    <RepositoryUrl>https://www.github.com/SirJosh3917/StringDB</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>false</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Debug\netstandard2.0\StringDB.xml</DocumentationFile>
+    <DocumentationFile>..\bin\Debug\netstandard2.0\StringDB.xml</DocumentationFile>
+    <OutputPath>..\bin\Debug\netstandard2.0\</OutputPath>
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>..\bin\Release\netstandard2.0\StringDB.xml</DocumentationFile>
+    <OutputPath>..\bin\Release\netstandard2.0\</OutputPath>
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

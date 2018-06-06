@@ -17,9 +17,6 @@ namespace StringDB.Writer {
 			this._stream.Position = 0;
 		}
 
-		/// <summary>Used for seperating indexes from data. This is why you can't have indexes with lengths more then 253.</summary>
-		public const byte IndexSeperator = 0xFF;
-
 		private Stream _stream { get; set; }
 		private BinaryWriter _bw { get; set; }
 
@@ -33,6 +30,9 @@ namespace StringDB.Writer {
 
 		/// <inheritdoc/>
 		public void InsertRange(Dictionary<string, string> data) {
+			if (data == null)
+				throw new ArgumentNullException("data");
+
 			var dat = new List<Tuple<string, string>>();
 
 			foreach (var i in data)
@@ -46,6 +46,9 @@ namespace StringDB.Writer {
 
 		/// <inheritdoc/>
 		public void InsertRange(Tuple<string, string>[] data) {
+			if (data == null)
+				throw new ArgumentNullException("data");
+
 			this._bw.Seek(0, SeekOrigin.End); //goto the end of the stream to append data
 
 			var indxChain = (ulong)0; //responsible for storing the start of the index
@@ -79,7 +82,7 @@ namespace StringDB.Writer {
 			}
 
 			//SEPERATE INDEXES
-			this._bw.Write(IndexSeperator);
+			this._bw.Write(Consts.IndexSeperator);
 
 			indxChainWrite = (ulong)this._stream.Position;
 			this._bw.Write((ulong)0); //if we want to append more data, we'll link this to the next set of indexes. aka the index chain
@@ -115,6 +118,6 @@ namespace StringDB.Writer {
 			//DONE
 		}
 
-		private void WriteStringRaw(string raw) { foreach (var i in raw) this._bw.Write(i); }
+		private void WriteStringRaw(string raw) { if (raw == null) throw new ArgumentNullException("an index within the data"); foreach (var i in raw) this._bw.Write(i); }
 	}
 }

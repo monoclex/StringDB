@@ -4,7 +4,7 @@ using System.Text;
 
 namespace StringDB.Reader {
 	/// <summary>A reader. It reads out a stream ( that should hold StringDB data )</summary>
-	public interface IReader : IEnumerable<KeyValuePair<string, string>> {
+	public interface IReader : IEnumerable<ReaderPair> {
 
 		/// <summary>This should retrieve the value associated with an index.</summary>
 		/// <param name="r">The index and quickSeek position to use.</param>
