@@ -10,7 +10,7 @@ init:
 build_script:
   - cmd: dotnet --version
   - cmd: dotnet restore
-  - cmd: dotnet build "C:\projects\stringdb\StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug "StringDB\StringDB.csproj"
 artifacts:
  - path: 'bin\$(configuration)\netstandard2.0\'
    name: StringDB
