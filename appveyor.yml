@@ -9,22 +9,24 @@ install:
   # Install repo specific stuff here
 before_build:
   - cmd: dotnet --version
-  - cmd: dotnet restore ./StringDB/StringDB.csproj
+  - cmd: cd StringDB
+  - cmd: dotnet restore ./StringDB.csproj
+  - cmd: cd ..
 build_script:
-  # output will be in ../bin/Debug/netcoreapp2.0/netcoreapp2.0/publish
   - cmd: cd StringDB
   - cmd: dotnet publish ./StringDB.csproj
   - cmd: cd ..
 after_build:
   # For once the build has completed
 artifacts:
- - path: '\bin\Debug\netcoreapp2.0\netcoreapp2.0\publish'
+ - path: 'bin\Debug\netcoreapp2.0\publish'
    name: StringDB
 clone_depth: 1
 test_script:
-  - cmd: dotnet restore ./StringDB.Tests/StringDB.Tests.csproj --verbosity m
   - cmd: cd StringDB.Tests
+  - cmd: dotnet restore ./StringDB.Tests.csproj
   - cmd: dotnet xunit
+  - cmd: cd ..
 on_finish :
   # any cleanup in here
 deploy: off
