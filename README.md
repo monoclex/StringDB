@@ -1,4 +1,4 @@
-# StringDB
+# StringDB [![Build status](https://ci.appveyor.com/api/projects/status/github/SirJosh3917/StringDB?svg=true)](https://ci.appveyor.com/project/sirjosh3917/stringdb)
 StringDB is a fast, powerful, lightweight archival-style DB that uses mainly (you guessed it!) strings.
 
 # Why?

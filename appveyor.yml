@@ -12,7 +12,9 @@ before_build:
   - cmd: dotnet restore ./StringDB/StringDB.csproj
 build_script:
   # output will be in ../bin/Debug/netcoreapp2.0/netcoreapp2.0/publish
-  - cmd: dotnet publish ./StringDB/StringDB.csproj
+  - cmd: cd StringDB
+  - cmd: dotnet publish ./StringDB.csproj
+  - cmd: cd ..
 after_build:
   # For once the build has completed
 artifacts:
