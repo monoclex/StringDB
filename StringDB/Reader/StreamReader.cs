@@ -181,7 +181,8 @@ namespace StringDB.Reader {
 			}
 
 			var dataPos = this._br.ReadUInt64();
-			var indexName = Encoding.UTF8.GetString(this._br.ReadBytes((int)b));
+			
+			var indexName = this.GetString(this._br.ReadBytes((int)b));
 
 			return new ReaderInteraction(
 					indexName, (ulong)this._br.BaseStream.Position, dataPos
@@ -194,7 +195,7 @@ namespace StringDB.Reader {
 
 			this._br.BaseStream.Seek((long)readerInteraction.DataPos, SeekOrigin.Begin);
 
-			return Encoding.UTF8.GetString(
+			return this.GetString(
 					this._br.ReadBytes(this._br.ReadInt32())
 				);
 		}
@@ -202,7 +203,7 @@ namespace StringDB.Reader {
 		private string _ReadValue(ulong location) {
 			this._br.BaseStream.Seek((long)location, SeekOrigin.Begin);
 
-			return Encoding.UTF8.GetString(
+			return this.GetString(
 					this._br.ReadBytes(this._br.ReadInt32())
 				);
 		}
@@ -244,6 +245,19 @@ namespace StringDB.Reader {
 			}
 
 			return new ReaderChain(ic, icw);
+		}
+
+		//for compatability reasons
+		private string GetString(byte[] bytes) {
+#if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD1_2
+			return Encoding.UTF8.GetString(
+								bytes, 0, bytes.Length
+							);
+#else
+			return Encoding.UTF8.GetString(
+								bytes
+							);
+#endif
 		}
 	}
 }

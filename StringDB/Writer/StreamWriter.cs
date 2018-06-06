@@ -36,13 +36,13 @@ namespace StringDB.Writer {
 			var dat = new List<Tuple<string, string>>();
 
 			foreach (var i in data)
-				dat.Add(Tuple.Create(i.Key, i.Value));
+				dat.Add(new Tuple<string, string>(i.Key, i.Value));
 
 			this.InsertRange(dat.ToArray());
 		}
 
 		/// <inheritdoc/>
-		public void Insert(string index, string data) => InsertRange(new Tuple<string, string>[] { Tuple.Create(index, data) });
+		public void Insert(string index, string data) => InsertRange(new Tuple<string, string>[] { new Tuple<string, string>(index, data) });
 
 		/// <inheritdoc/>
 		public void InsertRange(Tuple<string, string>[] data) {
