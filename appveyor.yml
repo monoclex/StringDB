@@ -1,0 +1,28 @@
+version: '0.0.{build}'
+image: Visual Studio 2017
+branches:
+  only:
+  - master
+init:
+  - cmd: git config --global core.autocrlf true
+install:
+  # Install repo specific stuff here
+before_build:
+  - cmd: dotnet --version
+  - cmd: dotnet restore ./StringDB/StringDB.csproj
+build_script:
+  # output will be in ../bin/Debug/netcoreapp2.0/netcoreapp2.0/publish
+  - cmd: dotnet publish ./StringDB/StringDB.csproj
+after_build:
+  # For once the build has completed
+artifacts:
+ - path: '\bin\Debug\netcoreapp2.0\netcoreapp2.0\publish'
+   name: StringDB
+clone_depth: 1
+test_script:
+  - cmd: dotnet restore ./StringDB.Tests/StringDB.Tests.csproj --verbosity m
+  - cmd: cd StringDB.Tests
+  - cmd: dotnet xunit
+on_finish :
+  # any cleanup in here
+deploy: off

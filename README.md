@@ -1,5 +1,5 @@
 # StringDB
-StringDB is a fast, powerful, resource light DB for strings only.
+StringDB is a fast, powerful, lightweight archival-style DB that uses mainly (you guessed it!) strings.
 
 # Why?
 I was unsatisfied. LiteDB was too resouce hungry, and took up too much space for my liking.
