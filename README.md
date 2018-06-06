@@ -1,27 +1,28 @@
 # StringDB [![Build status](https://ci.appveyor.com/api/projects/status/github/SirJosh3917/StringDB?svg=true)](https://ci.appveyor.com/project/sirjosh3917/stringdb)
 StringDB is a fast, powerful, lightweight archival-style DB that uses mainly (you guessed it!) strings.
 
-# Why?
-I was unsatisfied. LiteDB was too resouce hungry, and took up too much space for my liking.
-Most other DB solutions required some form of "server exe" to be running.
-Storing a bunch of tiny files wouldn't work for me.
-It took forever to find something by an index.
-All I needed was to store a string attatched to a string, I can serialize the class myself using Newtonsoft.JSON or something of the sort.
+# Install
+Install from [nuget,](https://www.nuget.org/packages/StringDB) or from the [github releases page](https://github.com/SirJosh3917/StringDB/releases/latest)
+[```Install-Package StringDB```](https://www.nuget.org/packages/StringDB)
 
-Nothing seemed to work quite like how I wanted it to.
-So I set out to *change that*. I made my own.
+## Why make another DB engine?
+I wanted a DB engine that I could just write to once, and read from later. I was storing a lot of data, and modern day DB programs are very fancy, and add lots of overhead as a result.
+I didn't need that overhead. So I made my own.
 
-# How well is this supported?
-Not at all. Only use this if you know what you're doing and it's some simple home project.
+## How do I use it?
+It's very straight forward - and the library is documented so you shouldn't need to refer to anything online, it's hilariously easy to use.
 
-# How do I use this?
-See StringDB.Tester
+First, make a new database.
 
-# Unit tests?
-Run an issue if something breaks. Don't be retarded while using it either.
+```var db = new Database(File.Open("mydb.db"));```
 
-# Performance tests?
-Soon.
+Next, look at the [available methods](https://github.com/SirJosh3917/StringDB/blob/master/StringDB/Database.cs)!
 
-#Overhead?
-Approximately 17 bytes per string index and it's correlating data, if I remember correctly.
+## What's the byte overhead?
+There's exactly 9 bytes of overhead for each index, 4 bytes of overhead for each value, and an additional 9 bytes of overhead per each IndexChain.
+
+An IndexChain is a place in the DB where it links the previous IndexChain to the newest IndexChain. IndexChains are created anytime you do a single Insert(), or if you do an InsertRange().
+To minimize the size of your DB and speed up read times, it's recommended to use InsertRange as frequently as possible to prevent overhead.
+
+## Can I calculate the byte overhead using math?
+Yeah sure! Here's the forumla: `(13 * a) + 9`, with `a` representing how many indexes/values there are in the specified IndexChain. You have to repeat this formula for each and every IndexChain you write to.
