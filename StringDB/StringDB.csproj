@@ -12,8 +12,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>false</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>..\bin\Debug\netstandard2.0\StringDB.xml</DocumentationFile>
-    <OutputPath>..\bin\Debug\netstandard2.0\</OutputPath>
+    <DocumentationFile>..\bin\Debug\StringDB.xml</DocumentationFile>
+    <OutputPath>..\bin\Debug\</OutputPath>
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
