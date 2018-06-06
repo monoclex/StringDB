@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace StringDB.Reader {
 	/// <summary>A reader. It reads out a stream ( that should hold StringDB data )</summary>

@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringDB", "StringDB\StringDB.csproj", "{6FC6F182-5B42-4BA9-9E5C-18D3A67E4FC5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringDB.Tester", "StringDB.Tester\StringDB.Tester.csproj", "{A174CEE7-FDEF-446F-B20E-2812BD1F6375}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringDB.Tests", "StringDB.Tests\StringDB.Tests.csproj", "{45D6031F-23B7-487F-ABB2-F75368184E6D}"
 EndProject
 Global

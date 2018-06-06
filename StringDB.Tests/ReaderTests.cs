@@ -1,70 +1,299 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Xunit;
 
 namespace StringDB.Tests {
-	public class ReaderTests {
-		public ReaderTests() {
-			this._sampleTest = TestingFileConsts.SingleIndexFile();
-			this._complexsampleTest = TestingFileConsts.ThreeIndexesTheSameFile();
-			this._db = new Database(this._sampleTest._stream, DatabaseMode.ReadWrite);
-			this._complexdb = new Database(this._complexsampleTest._stream, DatabaseMode.ReadWrite);
+
+	public class ReaderUnitTests {
+		public static readonly Dictionary<string, string> SingleItem = new Dictionary<string, string>() {
+				{ "Sample", "Text" }
+			};
+
+		public static readonly Dictionary<string, string> OneIndexChain = new Dictionary<string, string>() {
+				{ "Item1", "ValueFor1" },
+				{ "Item2", "ValueFor2" },
+				{ "Item3", "ValueFor3" },
+				{ "Item4", "ValueFor4" },
+				{ "Item5", "ValueFor5" },
+				{ "Item6", "ValueFor6" },
+				{ "Item7", "ValueFor7" },
+				{ "Item8", "ValueFor8" },
+				{ "Item9", "ValueFor9" },
+				{ "Item10", "ValueFor10" },
+			};
+
+		public static readonly Dictionary<string, string>[] MultipleIndexChains = new Dictionary<string, string>[]
+			{ new Dictionary<string, string>() {
+				{ "Item1", "ValueFor1" },
+				{ "Item2", "ValueFor2" },
+				{ "Item3", "ValueFor3" },
+			}, new Dictionary<string, string>() {
+				{ "Item4", "ValueFor4" },
+				{ "Item5", "ValueFor5" },
+				{ "Item6", "ValueFor6" },
+			}, new Dictionary<string, string>() {
+				{ "Item7", "ValueFor7" },
+				{ "Item8", "ValueFor8" },
+				{ "Item9", "ValueFor9" },
+				{ "Item10", "ValueFor10" },
+			}
+		};
+
+		public static readonly Dictionary<string, string>[] RedundantValues = new Dictionary<string, string>[]
+			{ new Dictionary<string, string>() {
+				{ "Item1", "ValueFor1_1" },
+				{ "Item2", "ValueFor2_1" },
+				{ "Item3", "ValueFor3_1" },
+			}, new Dictionary<string, string>() {
+				{ "Item1", "ValueFor1_2" },
+				{ "Item2", "ValueFor2_2" },
+				{ "Item3", "ValueFor3_2" },
+			}, new Dictionary<string, string>() {
+				{ "Item1", "ValueFor1_3" },
+				{ "Item2", "ValueFor2_3" },
+				{ "Item3", "ValueFor3_3" },
+			}
+		};
+
+		//TODO: rename these unit tests they're awful
+
+		#region item tests
+		[Fact]
+		public void SingleItemTest() {
+			var rt = new ReaderTest(SingleItem);
+
+			rt.EnsureCanRead();
 		}
 
-		public SampleTest _sampleTest { get; set; }
-		public SampleTest _complexsampleTest { get; set; }
-		public Database _db { get; set; }
-		public Database _complexdb { get; set; }
-
 		[Fact]
-		public void GetsIndexesCorrectly() {
-			var indx = this._db.Indexes();
+		public void TenItems() {
+			var rt = new ReaderTest(OneIndexChain);
 
-			for (uint i = 0; i < indx.Length; i++)
-				Assert.True(this._sampleTest.Indexes[i] == indx[i], $"sampleTest.Indexes[{i}] ({this._sampleTest.Indexes[i]}) != indx[{i}] ({indx[i]})");
+			rt.EnsureCanRead();
 		}
 
 		[Fact]
-		public void ValuesAreCorrect() {
-			var indx = this._db.Indexes();
+		public void CanSeekToIndexChain() {
+			var rt = new ReaderTest(MultipleIndexChains);
 
-			for (uint i = 0; i < indx.Length; i++)
-				Assert.True(this._sampleTest.Datas[i] == this._db.GetValueOf(indx[i]), $"sampleTest.Datas[{i}] ({this._sampleTest.Datas[i]}) != db.Get(indx[{i}]) ({this._db.GetValueOf(indx[i])})");
+			rt.EnsureCanRead();
+		}
+		#endregion
+
+		#region Indexes works
+		[Fact]
+		public void SingleItemIndexesTest() {
+			var rt = new ReaderTest(SingleItem);
+
+			rt.IndexesAreCorrect();
 		}
 
 		[Fact]
-		public void ForeachWorks() {
-			var indx = this._db.Indexes();
+		public void TenIndexesItems() {
+			var rt = new ReaderTest(OneIndexChain);
 
-			uint c = 0;
-			foreach(var i in this._db) {
-				Assert.True(this._db.GetValueOf(indx[c]) == i.Value, $"db.Get(indx[c]) (db.Get(indx[{c}]) (db.Get({indx[c]})) != {i}");
+			rt.IndexesAreCorrect();
+		}
 
+		[Fact]
+		public void CanSeekToIndexIndexesChain() {
+			var rt = new ReaderTest(MultipleIndexChains);
+
+			rt.IndexesAreCorrect();
+		}
+		#endregion
+
+		#region GetValues works
+		[Fact]
+		public void GetValues() {
+			var rt = new ReaderTest(RedundantValues);
+
+			rt.GetValuesWorks();
+		}
+		#endregion
+
+		#region foreach index
+		[Fact]
+		public void ForeachLoopIndexInSingleItem() {
+			var rt = new ReaderTest(SingleItem);
+			
+			rt.ForeachLoopIndexCheck();
+		}
+
+		[Fact]
+		public void ForeachLoopIndexInOneIndexChain() {
+			var rt = new ReaderTest(OneIndexChain);
+			
+			rt.ForeachLoopIndexCheck();
+		}
+
+		[Fact]
+		public void ForeachLoopIndexInOneMultipleChains() {
+			var rt = new ReaderTest(MultipleIndexChains);
+			
+			rt.ForeachLoopIndexCheck();
+		}
+		#endregion
+
+		#region foreach value
+		[Fact]
+		public void ForeachLoopValueInSingleItem() {
+			var rt = new ReaderTest(SingleItem);
+			
+			rt.ForeachLoopValueCheck();
+		}
+
+		[Fact]
+		public void ForeachLoopValueInOneIndexChain() {
+			var rt = new ReaderTest(OneIndexChain);
+			
+			rt.ForeachLoopValueCheck();
+		}
+
+		[Fact]
+		public void ForeachLoopValueInOneMultipleChains() {
+			var rt = new ReaderTest(MultipleIndexChains);
+			
+			rt.ForeachLoopValueCheck();
+		}
+		#endregion
+
+		[Fact]
+		public void WriteAndReadWorks() {
+			var rt = new ReaderTest(new Dictionary<string, string>() {
+				{  "Example", "ExampleValue" }
+			});
+
+			rt.EnsureCanRead();
+			rt.ForeachLoopIndexCheck();
+			rt.ForeachLoopValueCheck();
+
+			rt.AddDict(new Dictionary<string, string>{
+				{ "NewTestValue1", "SpecialValue1" },
+				{ "NewTestValue2", "SpecialValue2" },
+				{ "NewTestValue3", "SpecialValue3" },
+			});
+
+			rt.EnsureCanRead();
+			rt.ForeachLoopIndexCheck();
+			rt.ForeachLoopValueCheck();
+
+			rt.AddDict(new Dictionary<string, string>{
+				{ "EvenNewTestValue1", "EvenSpecialValue1" },
+				{ "EvenNewTestValue2", "EvenSpecialValue2" },
+				{ "EvenNewTestValue3", "EvenSpecialValue3" },
+			});
+
+			rt.EnsureCanRead();
+			rt.ForeachLoopIndexCheck();
+			rt.ForeachLoopValueCheck();
+		}
+	}
+
+	public class ReaderTest {
+		public ReaderTest(params Dictionary<string, string>[] items) {
+			this.Items = items;
+			this.Db = new Database(new MemoryStream(), DatabaseMode.ReadWrite);
+
+			foreach (var i in items)
+				this.Db.InsertRange(i); //the writer unit tests have to pass :)
+		}
+
+		public Database Db { get; set; }
+		public Dictionary<string, string>[] Items { get; set; }
+
+		public void AddDict(Dictionary<string, string> dict) {
+			var vals = this.Items;
+
+			var newSet = new Dictionary<string, string>[vals.Length + 1];
+
+			for (var i = 0; i < vals.Length; i++)
+				newSet[i] = vals[i];
+
+			newSet[newSet.Length - 1] = dict;
+
+			this.Items = newSet;
+
+			this.Db.InsertRange(dict);
+		}
+
+		public void EnsureCanRead() {
+			foreach (var j in this.Items)
+				foreach (var i in j) {
+					var read = this.Db.GetValueOf(i.Key);
+
+					Assert.True(read == i.Value, $"read ({read}) != i.Value ({i.Value})");
+				}
+		}
+
+		public void GetValuesWorks() {
+			foreach(var i in this.Items[0]) {//todo: not a hacky workaround
+				var values = this.Db.GetValuesOf(i.Key);
+
+				Assert.True(values.Length == 3, $"values.Length ({values.Length}) != 3 ({3})");
+
+				for (var j = 0; j < 3; j++)
+					Assert.True(values[j] == $"ValueFor{i.Key.Substring(4)}_{j + 1}", $"values[{j}] ({values[j]}) != \"ValueFor{i.Key.Substring(4)}_{j + 1}\"");
+			}
+		}
+
+		public void IndexesAreCorrect() {
+			var indxesL = new List<string>();
+
+			foreach (var j in this.Items)
+				foreach (var i in j)
+					indxesL.Add(i.Key);
+
+			var indxes = indxesL.ToArray();
+
+			var dbIndxes = this.Db.Indexes();
+
+			Assert.True(indxes.Length == dbIndxes.Length, $"indxes.Length ({indxes.Length}) != dbIndxes.Length ({dbIndxes.Length})");
+
+			for (var i = 0; i < indxes.Length; i++)
+				Assert.True(indxes[i] == dbIndxes[i], $"indxes[{i}] ({indxes[i]}) != dbIndxes[{i}] ({dbIndxes[i]})");
+		}
+
+		public void ForeachLoopIndexCheck() {
+			var len = 0;
+			foreach (var i in this.Items)
+				len += i.Count;
+
+			var indexes = new string[len];
+
+			var c = 0;
+			foreach (var j in this.Items)
+				foreach (var i in j) {
+					indexes[c] = i.Key;
+					c++;
+				}
+
+			c = 0;
+			foreach (var i in this.Db) {
+				Assert.True(indexes[c] == i.Index, $"indexes[{c}] ({indexes[c]}) != i.Index ({i.Index})");
 				c++;
 			}
 		}
 
-		[Fact]
-		public void ComplexUsage() {
-			foreach (var i in this._db) {
-				for (uint fi = 0; fi < 10; fi++) {
-					this._db.FirstIndex();
-					this._db.Indexes();
-					this._db.GetValueOf(this._sampleTest.Indexes[0]);
+		public void ForeachLoopValueCheck() {
+			var len = 0;
+			foreach (var i in this.Items)
+				len += i.Count;
+
+			var indexes = new string[len];
+
+			var c = 0;
+			foreach (var j in this.Items)
+				foreach (var i in j) {
+					indexes[c] = i.Value;
+					c++;
 				}
+
+			c = 0;
+			foreach (var i in this.Db) {
+				Assert.True(indexes[c] == i.Value, $"indexes[{c}] ({indexes[c]}) != i.Value ({i.Value})");
+				c++;
 			}
-		}
-
-		[Fact]
-		public void MultipleIndexesAreFine() {
-			var vals = this._complexdb.GetValuesOf(this._complexsampleTest.Indexes[0]);
-
-			Assert.True(vals.Length == this._complexsampleTest.Indexes.Length, $"vals.Length ({vals.Length}) != complexsampleTest.Indexes.Length ({this._complexsampleTest.Indexes.Length})");
-
-			for (var i = 0; i < vals.Length; i++)
-				Assert.True(vals[i] == this._complexsampleTest.Datas[i], $"vals[{i}] ({vals[i]}) != complexsampleTest.Datas[{i}] ({this._complexsampleTest.Datas[i]})");
 		}
 	}
 }

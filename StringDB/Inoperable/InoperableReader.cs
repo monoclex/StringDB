@@ -1,8 +1,6 @@
 ﻿using StringDB.Inoperable;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace StringDB.Reader {
 	/// <summary>Inoperable class. Any method called will throw an InoperableException.</summary>

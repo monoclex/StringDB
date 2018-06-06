@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace StringDB.Reader {
+﻿namespace StringDB.Reader {
 	/// <summary>Some kind of interaction between an IReader and another class.</summary>
 	public interface IReaderInteraction {
 		/// <summary>The index of this interaction</summary>

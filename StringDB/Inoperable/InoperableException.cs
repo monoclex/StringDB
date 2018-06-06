@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace StringDB.Inoperable {
 	/// <summary>This exception gets thrown whenever you make a call to an inoperable class.</summary>

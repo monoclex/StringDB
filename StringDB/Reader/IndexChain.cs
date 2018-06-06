@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace StringDB.Reader {
+﻿namespace StringDB.Reader {
 	/// <summary>Shouldn't really be used unless you're implementing an IReader ( of which I ask you why????? )</summary>
 	public interface IReaderChain {
 		//TODO: make it not bad

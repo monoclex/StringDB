@@ -9,74 +9,74 @@ init:
   - cmd: git config --global core.autocrlf true
 build_script:
   - cmd: dotnet --version
-  - cmd: dotnet restore
-  #literally don't do net 2.0 because it's literally hitler in a box
-  - cmd: dotnet build -f net35 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f net40 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f net45 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f net451 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f net452 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f net46 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f net461 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f net462 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f net47 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f net471 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f net472 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netcoreapp1.0 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netcoreapp1.1 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netcoreapp2.0 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netstandard1.0 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netstandard1.1 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netstandard1.2 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netstandard1.3 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netstandard1.4 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netstandard1.5 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netstandard1.6 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -f netstandard2.0 "StringDB\StringDB.csproj"
+  - cmd: dotnet restore -v q
+  #don't do net 2.0 because it's hitler in a box
+  - cmd: dotnet build -c Debug -f net35 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f net40 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f net45 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f net451 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f net452 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f net46 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f net461 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f net462 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f net47 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f net471 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f net472 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netcoreapp1.0 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netcoreapp1.1 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netcoreapp2.0 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netstandard1.0 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netstandard1.1 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netstandard1.2 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netstandard1.3 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netstandard1.4 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netstandard1.5 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netstandard1.6 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Debug -f netstandard2.0 "StringDB\StringDB.csproj"
 artifacts:
- - path: 'bin\$(configuration)\netstandard2.0\'
+ - path: 'bin\Debug\netstandard2.0\'
    name: StringDB
- - path: 'bin\$(configuration)\netstandard1.6\'
+ - path: 'bin\Debug\netstandard1.6\'
    name: StringDB
- - path: 'bin\$(configuration)\netstandard1.5\'
+ - path: 'bin\Debug\netstandard1.5\'
    name: StringDB
- - path: 'bin\$(configuration)\netstandard1.4\'
+ - path: 'bin\Debug\netstandard1.4\'
    name: StringDB
- - path: 'bin\$(configuration)\netstandard1.3\'
+ - path: 'bin\Debug\netstandard1.3\'
    name: StringDB
- - path: 'bin\$(configuration)\netstandard1.2\'
+ - path: 'bin\Debug\netstandard1.2\'
    name: StringDB
- - path: 'bin\$(configuration)\netstandard1.1\'
+ - path: 'bin\Debug\netstandard1.1\'
    name: StringDB
- - path: 'bin\$(configuration)\netstandard1.0\'
+ - path: 'bin\Debug\netstandard1.0\'
    name: StringDB
- - path: 'bin\$(configuration)\netcoreapp2.0\'
+ - path: 'bin\Debug\netcoreapp2.0\'
    name: StringDB
- - path: 'bin\$(configuration)\netcoreapp1.1\'
+ - path: 'bin\Debug\netcoreapp1.1\'
    name: StringDB
- - path: 'bin\$(configuration)\netcoreapp1.0\'
+ - path: 'bin\Debug\netcoreapp1.0\'
    name: StringDB
- - path: 'bin\$(configuration)\net20\'
+ - path: 'bin\Debug\net20\'
    name: StringDB
- - path: 'bin\$(configuration)\net35\'
+ - path: 'bin\Debug\net35\'
    name: StringDB
- - path: 'bin\$(configuration)\net40\'
+ - path: 'bin\Debug\net40\'
    name: StringDB
- - path: 'bin\$(configuration)\net45\'
+ - path: 'bin\Debug\net45\'
    name: StringDB
- - path: 'bin\$(configuration)\net46\'
+ - path: 'bin\Debug\net46\'
    name: StringDB
- - path: 'bin\$(configuration)\net47\'
+ - path: 'bin\Debug\net47\'
    name: StringDB
- - path: 'bin\$(configuration)\net451\'
+ - path: 'bin\Debug\net451\'
    name: StringDB
- - path: 'bin\$(configuration)\net452\'
+ - path: 'bin\Debug\net452\'
    name: StringDB
- - path: 'bin\$(configuration)\net461\'
+ - path: 'bin\Debug\net461\'
    name: StringDB
- - path: 'bin\$(configuration)\net462\'
+ - path: 'bin\Debug\net462\'
    name: StringDB
- - path: 'bin\$(configuration)\net471\'
+ - path: 'bin\Debug\net471\'
    name: StringDB
- - path: 'bin\$(configuration)\net472\'
+ - path: 'bin\Debug\net472\'
    name: StringDB

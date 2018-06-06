@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace StringDB.Reader {
 	/// <summary>Pairs an index with a value. It only retrieves the value when it's called for, so it makes no wasted calls when iterating over in a foreach loop.</summary>
@@ -41,13 +39,12 @@ namespace StringDB.Reader {
 		private ulong _toSeek { get; set; }
 		private IReader _parent { get; set; }
 
-		//TODO: Reading the value of the index is resource heavy, especially if one is only iterating over it for the indexes. Should use some kind of class to fetch the value of the index for quicker reading.
 		/// <inheritdoc/>
 		public ReaderPair Current => new ReaderPair(this._parent, new ReaderInteraction(this._indexOn, 0, this._toSeek));
 
 		object IEnumerator.Current => this.Current; /// <inheritdoc/>
 
-		public bool MoveNext() { //TODO: not use IndexAfter. in the documentation we literally say not to call IndexAfter and that a foreach loop is better because the foreach loop doesnt - clearly we do.
+		public bool MoveNext() {
 			if (!this._first) {
 				this._first = true;
 				return true;
@@ -79,17 +76,21 @@ namespace StringDB.Reader {
 		protected virtual void Dispose(bool disposing) {
 			if (!this.disposedValue) {
 				if (disposing) {
-					//TODO: dispose managed state (managed objects).
+					//TO: dispose managed state (managed objects).
 				}
 
-				//TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-				//TODO: set large fields to null.
+				//TO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+				//TO: set large fields to null.
 
 				this.disposedValue = true;
+				this._parent = null;
+				this._toSeek = 0;
+				this._seekTo = 0;
+				this._first = false;
 			}
 		} /// <inheritdoc/>
 
-		//TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+		//TO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
 		// ~ReaderEnumerator() {
 		//   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
 		//   Dispose(false);
@@ -99,7 +100,7 @@ namespace StringDB.Reader {
 		public void Dispose() {
 			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
 			Dispose(true);
-			//TODO: uncomment the following line if the finalizer is overridden above.
+			//TO: uncomment the following line if the finalizer is overridden above.
 			// GC.SuppressFinalize(this);
 		}
 		#endregion

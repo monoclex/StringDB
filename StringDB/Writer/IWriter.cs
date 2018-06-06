@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace StringDB.Writer {
 	/// <summary>A writer. It writes additional pieces of data to the stream.</summary>
