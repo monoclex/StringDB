@@ -3,6 +3,7 @@ StringDB is a fast, powerful, lightweight archival-style DB that uses mainly (yo
 
 # Install
 Install from [nuget,](https://www.nuget.org/packages/StringDB) or from the [github releases page](https://github.com/SirJosh3917/StringDB/releases/latest)
+
 [```Install-Package StringDB```](https://www.nuget.org/packages/StringDB)
 
 ## Why make another DB engine?
