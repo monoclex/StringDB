@@ -19,8 +19,8 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>..\bin\Release\netstandard2.0\StringDB.xml</DocumentationFile>
-    <OutputPath>..\bin\Release\netstandard2.0\</OutputPath>
+    <DocumentationFile>bin\Release\netstandard2.0\StringDB.xml</DocumentationFile>
+    <OutputPath>bin\Release\netstandard2.0\</OutputPath>
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
