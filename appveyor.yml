@@ -10,7 +10,29 @@ init:
 build_script:
   - cmd: dotnet --version
   - cmd: dotnet restore
-  - cmd: dotnet msbuild /p:Configuration=Debug "StringDB\StringDB.csproj"
+  #literally don't do net 2.0 because it's literally hitler in a box
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net35 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net40 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net45 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net451 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net452 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net46 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net461 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net462 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net47 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net471 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=net472 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netcoreapp1.0 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netcoreapp1.1 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netcoreapp2.0 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netstandard1.0 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netstandard1.1 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netstandard1.2 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netstandard1.3 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netstandard1.4 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netstandard1.5 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netstandard1.6 "StringDB\StringDB.csproj"
+  - cmd: dotnet msbuild /p:Configuration=Debug /TargetFramework=netstandard2.0 "StringDB\StringDB.csproj"
 artifacts:
  - path: 'bin\$(configuration)\netstandard2.0\'
    name: StringDB
