@@ -1,6 +1,4 @@
-﻿#define USE_BREAKING_FEATURES
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -11,10 +9,14 @@ namespace StringDB.Reader {
 	public class StreamReader : IReader {
 		/// <summary>Create a new StreamReader.</summary>
 		/// <param name="streamUse">The stream to read . You may need to call the Load() void to set the indexChain data.</param>
-		public StreamReader(Stream streamUse) {
+		/// <param name="dbv">The database version to read from.</param>
+		public StreamReader(Stream streamUse, DatabaseVersion dbv) {
 			this._stream = streamUse;
 			this._br = new BinaryReader(this._stream);
+			this._dbv = dbv;
 		}
+
+		private DatabaseVersion _dbv { get; set; }
 
 		//public implementations of stuff
 
@@ -309,24 +311,22 @@ namespace StringDB.Reader {
 		}
 
 		private ulong GetNumber() {
-#if USE_BREAKING_FEATURES
-			var b = this._br.ReadByte();
+			if ((int)this._dbv >= (int)DatabaseVersion.Version110) {
+				var b = this._br.ReadByte();
 
-			switch(b) {
-				case Consts.IsByteValue:
-				return (ulong)this._br.ReadByte();
-				case Consts.IsUShortValue:
-				return (ulong)this._br.ReadUInt16();
-				case Consts.IsUIntValue:
-				return (ulong)this._br.ReadUInt32();
-				case Consts.IsULongValue:
-				return this._br.ReadUInt64();
-			}
+				switch (b) {
+					case Consts.IsByteValue:
+					return (ulong)this._br.ReadByte();
+					case Consts.IsUShortValue:
+					return (ulong)this._br.ReadUInt16();
+					case Consts.IsUIntValue:
+					return (ulong)this._br.ReadUInt32();
+					case Consts.IsULongValue:
+					return this._br.ReadUInt64();
+				}
 
-			throw new Exception("Invalid number");
-#else
-			return this._br.ReadInt32();
-#endif
+				throw new Exception("Invalid number");
+			} else return (ulong)this._br.ReadInt32();
 		}
 
 		//for compatability reasons

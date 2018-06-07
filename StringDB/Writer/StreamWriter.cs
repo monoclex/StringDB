@@ -1,6 +1,4 @@
-﻿#define USE_BREAKING_FEATURES
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -9,15 +7,18 @@ namespace StringDB.Writer {
 	public class StreamWriter : IWriter {
 		/// <summary>Create a new StreamWriter.</summary>
 		/// <param name="outputStream">The stream to write to. You may need to call the Load() void to set the indexChain data.</param>
-		public StreamWriter(Stream outputStream) {
+		/// <param name="dbv">The database version to write to.</param>
+		public StreamWriter(Stream outputStream, DatabaseVersion dbv) {
 			this._stream = outputStream;
 			this._bw = new BinaryWriter(this._stream);
 			this._indexChain = 0;
 			this._indexChainWrite = 0;
 
 			this._stream.Position = 0;
+			this._dbv = dbv;
 		}
 
+		private DatabaseVersion _dbv { get; set; }
 		private Stream _stream { get; set; }
 		private BinaryWriter _bw { get; set; }
 
@@ -137,23 +138,21 @@ namespace StringDB.Writer {
 		/// </summary>
 		/// <param name="value"></param>
 		private void WriteNumber(ulong value) {
-#if USE_BREAKING_FEATURES
-			if (value <= Byte.MaxValue) {
-				this._bw.Write(Consts.IsByteValue);
-				this._bw.Write((byte)value);
-			} else if (value <= UInt16.MaxValue) {
-				this._bw.Write(Consts.IsUShortValue);
-				this._bw.Write((ushort)value);
-			} else if (value <= UInt32.MaxValue) {
-				this._bw.Write(Consts.IsUIntValue);
-				this._bw.Write((uint)value);
-			} else {
-				this._bw.Write(Consts.IsULongValue);
-				this._bw.Write(value);
-			}
-#else
-			this._bw.Write(value);
-#endif
+			if ((int)this._dbv >= (int)DatabaseVersion.Version110) {
+				if (value <= Byte.MaxValue) {
+					this._bw.Write(Consts.IsByteValue);
+					this._bw.Write((byte)value);
+				} else if (value <= UInt16.MaxValue) {
+					this._bw.Write(Consts.IsUShortValue);
+					this._bw.Write((ushort)value);
+				} else if (value <= UInt32.MaxValue) {
+					this._bw.Write(Consts.IsUIntValue);
+					this._bw.Write((uint)value);
+				} else {
+					this._bw.Write(Consts.IsULongValue);
+					this._bw.Write(value);
+				}
+			} else this._bw.Write(value);
 		}
 
 		private void WriteNumber(byte value) =>

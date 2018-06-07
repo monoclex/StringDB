@@ -12,20 +12,20 @@ namespace StringDB {
 		/// <summary>Create a new StringDB database.</summary>
 		/// <param name="stream">The stream to read/write to.</param>
 		/// <param name="dbm">The DatabaseMode to be in.</param>
-		public Database(Stream stream, DatabaseMode dbm = DatabaseMode.ReadWrite) {
+		public Database(Stream stream, DatabaseMode dbm = DatabaseMode.ReadWrite, DatabaseVersion dbv = DatabaseVersion.Latest) {
 			this._stream = stream ?? throw new ArgumentNullException("stream");
 
 			if (this.Readable(dbm))
-				this._reader = new Reader.StreamReader(this._stream);
+				this._reader = new Reader.StreamReader(this._stream, dbv);
 			else this._reader = new InoperableReader(); //by using inoperable readers we prevent reading from ever happening
-
+			
 			if (this.Writable(dbm))
-				this._writer = new Writer.StreamWriter(this._stream);
+				this._writer = new Writer.StreamWriter(this._stream, dbv);
 			else this._writer = new InoperableWriter(); //by using inoperable writers we prevent writing from ever happening
 
 			if (this.Writable(dbm)) //if we're trying to write at all
 				if (this._stream.Length > 0) { //make sure there are indexes to be read
-						var reader = new Reader.StreamReader(this._stream); //we can't trust the reader to be set
+						var reader = new Reader.StreamReader(this._stream, dbv); //we can't trust the reader to be set
 						var indexChain = reader.GetReaderChain();
 
 						if (!(this._writer is Writer.StreamWriter))
@@ -102,5 +102,17 @@ namespace StringDB {
 		/// Attempting to read will succeed.
 		/// Attempting to write will FAIL.</summary>
 		Read = 4
+	}
+
+	/// <summary>The version of the database. This can't be inferred</summary>
+	public enum DatabaseVersion {
+		/// <summary>The most current database version.</summary>
+		Latest = 2,
+
+		/// <summary>The original database structure as of version 1.0.0</summary>
+		Version100 = 1,
+
+		/// <summary>The database structure as of version 1.0.0</summary>
+		Version110 = 2,
 	}
 }
