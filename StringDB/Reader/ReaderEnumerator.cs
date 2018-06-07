@@ -59,7 +59,7 @@ namespace StringDB.Reader {
 		private uint _passTimes { get; set; }
 
 		/// <inheritdoc/>
-		public ReaderPair Current => new ReaderPair(this._parent, new ReaderInteraction(this._indexOn, 0, this._dataPos, this._passTimes));
+		public ReaderPair Current => new ReaderPair(this._parent, new ReaderInteraction(this._indexOn, this._dataPos, 0, this._passTimes));
 
 		object IEnumerator.Current => this.Current; /// <inheritdoc/>
 

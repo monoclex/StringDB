@@ -16,7 +16,7 @@
 
 	/// <inheritdoc/>
 	public struct ReaderInteraction : IReaderInteraction { /// <inheritdoc/>
-		public ReaderInteraction(string index, ulong quickSeek = 0, ulong dataPos = 0, uint indexSkipped = 0) {
+		public ReaderInteraction(string index, ulong dataPos = 0, ulong quickSeek = 0, uint indexSkipped = 0) {
 			this.Index = index;
 			this.QuickSeek = quickSeek;
 			this.DataPos = dataPos;

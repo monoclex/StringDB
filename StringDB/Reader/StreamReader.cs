@@ -62,7 +62,7 @@ namespace StringDB.Reader {
 				overhead += i._indexchainPassTimes * 9;
 
 				overhead += 9;
-				
+
 				if ((int)this._dbv >= (int)DatabaseVersion.Version200) {
 					this._br.BaseStream.Seek((long)i._dataPos.DataPos, SeekOrigin.Begin);
 
@@ -256,7 +256,7 @@ namespace StringDB.Reader {
 			var indexName = this.GetString(this._br.ReadBytes((int)b));
 
 			return new ReaderInteraction(
-					indexName, (ulong)this._br.BaseStream.Position, dataPos, passedIndexChain
+					indexName, dataPos, (ulong)this._br.BaseStream.Position, passedIndexChain
 				);
 		}
 
@@ -293,9 +293,11 @@ namespace StringDB.Reader {
 					var p = this._br.BaseStream.Position;
 					var seekTo = (long)(this._br.ReadUInt64());
 
-					if (seekTo == 0)
+					if (seekTo == 0) {
+						icw = (ulong)p;// (ulong)p - 8;
+						ic = (ulong)this._br.BaseStream.Length;
 						shouldContinueLook = false;
-					else {
+					} else {
 						ic = (ulong)seekTo;
 						icw = (ulong)p;
 
@@ -305,11 +307,14 @@ namespace StringDB.Reader {
 					b = this._br.ReadByte();
 				}
 
+				if (this._br.BaseStream.Position >= this._br.BaseStream.Length)
+					break;
+
 				//stuff to pass the reader
 				this._br.ReadUInt64();
 				this._br.ReadBytes((int)b);
 
-				if (this._br.BaseStream.Position == this._br.BaseStream.Length)
+				if (this._br.BaseStream.Position >= this._br.BaseStream.Length)
 					break;
 
 				b = this._br.ReadByte();

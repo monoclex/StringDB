@@ -102,7 +102,7 @@ namespace StringDB.Writer {
 			this._bw.Write((ulong)0); //if we want to append more data, we'll link this to the next set of indexes. aka the index chain
 
 			//WRITE DATA
-			for (uint i = 0; i < dta.Length; i++) {
+			for (uint i = 0; i < indx.Length; i++) {
 				indxsShowsUpAt[i] = (ulong)this._stream.Position; //we wanna know when we'll see it again
 
 				this.WriteNumber(dta[i].Length);      //LENTH OF DATA
@@ -113,7 +113,7 @@ namespace StringDB.Writer {
 			for(uint i = 0; i < dta.Length; i++) {
 				var overwriteAt = indxsAt[i];
 				var locationShowsUp = indxsShowsUpAt[i];
-
+				
 				//overwrite this
 				this._bw.BaseStream.Seek((long)overwriteAt, SeekOrigin.Begin);
 				this._bw.Write(locationShowsUp); //overwrite the old data

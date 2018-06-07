@@ -178,6 +178,37 @@ namespace StringDB.Tests {
 
 			wt.EnsureEqual();
 		}
+
+		[Fact]
+		public void TwoInsertsTwoIndexChains_StopAndPickItBackUp() {
+			var wt = new WriterTest();
+
+			wt.InputWriter.Write((byte)5);
+			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 5 + 1 + 8);
+			wt.InputWriter.Write(Encoding.UTF8.GetBytes("Test1"));
+			wt.InputWriter.Write((byte)0xFF);
+			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 4 + 6);
+			wt.InputWriter.Write((byte)Consts.IsByteValue);
+			wt.InputWriter.Write((byte)8);
+			wt.InputWriter.Write(Encoding.UTF8.GetBytes("ValueOf1"));
+			wt.InputWriter.Write((byte)5);
+			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 5 + 1 + 8);
+			wt.InputWriter.Write(Encoding.UTF8.GetBytes("Test2"));
+			wt.InputWriter.Write((byte)0xFF);
+			wt.InputWriter.Write((ulong)0);
+			wt.InputWriter.Write((byte)Consts.IsByteValue);
+			wt.InputWriter.Write((byte)8);
+			wt.InputWriter.Write(Encoding.UTF8.GetBytes("ValueOf2"));
+
+			wt.Db.Insert("Test1", "ValueOf1");
+
+			wt.Db = null;
+			wt.Db = new Database(wt._output, DatabaseMode.Write);
+
+			wt.Db.Insert("Test2", "ValueOf2");
+
+			wt.EnsureEqual();
+		}
 	}
 
 	public class WriterTest {

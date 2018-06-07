@@ -186,7 +186,7 @@ namespace StringDB.Tests {
 
 			rt.EnsureCanRead();
 			rt.ForeachLoopIndexCheck();
-			rt.ForeachLoopValueCheck();
+			rt.ForeachLoopValueCheck(); 
 		}
 	}
 
