@@ -138,7 +138,7 @@ namespace StringDB.Writer {
 		/// </summary>
 		/// <param name="value"></param>
 		private void WriteNumber(ulong value) {
-			if ((int)this._dbv >= (int)DatabaseVersion.Version110) {
+			if ((int)this._dbv >= (int)DatabaseVersion.Version200) {
 				if (value <= Byte.MaxValue) {
 					this._bw.Write(Consts.IsByteValue);
 					this._bw.Write((byte)value);

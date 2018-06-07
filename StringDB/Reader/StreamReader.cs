@@ -311,7 +311,7 @@ namespace StringDB.Reader {
 		}
 
 		private ulong GetNumber() {
-			if ((int)this._dbv >= (int)DatabaseVersion.Version110) {
+			if ((int)this._dbv >= (int)DatabaseVersion.Version200) {
 				var b = this._br.ReadByte();
 
 				switch (b) {

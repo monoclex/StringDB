@@ -112,7 +112,9 @@ namespace StringDB {
 		/// <summary>The original database structure as of version 1.0.0</summary>
 		Version100 = 1,
 
-		/// <summary>The database structure as of version 1.0.0</summary>
-		Version110 = 2,
+		//anything that breaks how the database is structured should get a new major version number
+
+		/// <summary>The database structure as of version 2.0.0</summary>
+		Version200 = 2,
 	}
 }
