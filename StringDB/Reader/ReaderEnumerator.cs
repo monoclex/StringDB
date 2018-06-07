@@ -8,17 +8,19 @@ namespace StringDB.Reader {
 		internal ReaderPair(IReader parent, IReaderInteraction dataPos) {
 			this._parent = parent;
 			this._dataPos = dataPos;
+			this._indexchainPassTimes = dataPos.IndexChainPassedAmount;
 		}
 
 		private IReader _parent { get; }
-		private IReaderInteraction _dataPos { get; }
+		internal IReaderInteraction _dataPos { get; }
+		internal uint _indexchainPassTimes { get; }
 		private string ValueCached { get; set; }
 
 		/// <summary>The Index of this ReaderPair.</summary>
 		public string Index => this._dataPos.Index;
 		
 		/// <summary>The Value of this ReaderPair.<para>When called for the first time, it retrieves the value of it and stores it for later usage incase of multiple calls.</para></summary>
-		public string Value => (this.ValueCached ?? (this.ValueCached = this._parent.GetValueOf(this._dataPos)));
+		public string Value => (this.ValueCached ?? (this.ValueCached = this._parent.GetDirectValueOf(this._dataPos.DataPos)));
 
 		/// <summary>Check if this ReaderPair is equal to another ReaderPair</summary>
 		/// <param name="other">The other ReaderPair</param>
@@ -43,6 +45,8 @@ namespace StringDB.Reader {
 			this._seekTo = 0;
 			this._toSeek = start.QuickSeek;
 			this._first = false;
+
+			this._dataPos = start.DataPos;
 		}
 
 		private bool _first { get; set; }
@@ -50,10 +54,12 @@ namespace StringDB.Reader {
 		private string _indexOn { get; set; }
 		private ulong _seekTo { get; set; }
 		private ulong _toSeek { get; set; }
+		private ulong _dataPos { get; set; }
 		private IReader _parent { get; set; }
+		private uint _passTimes { get; set; }
 
 		/// <inheritdoc/>
-		public ReaderPair Current => new ReaderPair(this._parent, new ReaderInteraction(this._indexOn, 0, this._toSeek));
+		public ReaderPair Current => new ReaderPair(this._parent, new ReaderInteraction(this._indexOn, 0, this._dataPos, this._passTimes));
 
 		object IEnumerator.Current => this.Current; /// <inheritdoc/>
 
@@ -71,7 +77,9 @@ namespace StringDB.Reader {
 			this._indexOn = rr.Index;
 
 			this._seekTo = this._toSeek;
+			this._dataPos = rr.DataPos;
 			this._toSeek = rr.QuickSeek;
+			this._passTimes = rr.IndexChainPassedAmount;
 
 			return true;
 		} /// <inheritdoc/>
@@ -81,6 +89,7 @@ namespace StringDB.Reader {
 
 			this._indexOn = rr.Index;
 			this._seekTo = rr.QuickSeek;
+			this._dataPos = rr.DataPos;
 		}
 
 		#region IDisposable Support

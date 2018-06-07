@@ -6,6 +6,9 @@ namespace StringDB.Reader {
 	/// <summary>Inoperable class. Any method called will throw an InoperableException.</summary>
 	public class InoperableReader : IReader, IInoperable {
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
+		public ulong GetOverhead() => throw new InoperableException();
+
+		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
 		public IReaderInteraction FirstIndex() => throw new InoperableException();
 
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
@@ -43,5 +46,8 @@ namespace StringDB.Reader {
 
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
 		IEnumerator IEnumerable.GetEnumerator() => throw new InoperableException();
+
+		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
+		public string GetDirectValueOf(ulong dataPos) => throw new InoperableException();
 	}
 }

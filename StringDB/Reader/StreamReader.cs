@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define USE_BREAKING_FEATURES
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -17,14 +19,18 @@ namespace StringDB.Reader {
 		//public implementations of stuff
 
 		#region public implementations
+
 		/// <inheritdoc/>
-		public string[] GetIndexes() => _Indexes();/// <inheritdoc/>
+		public ulong GetOverhead() => _GetOverhead(); /// <inheritdoc/>
+		public string[] GetIndexes() => _Indexes(); /// <inheritdoc/>
 
 		public IEnumerator<ReaderPair> GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());/// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());/// <inheritdoc/>
 
 		public string GetValueOf(IReaderInteraction r, bool doSeek = true) => GetValueOf(r.Index, doSeek, r.QuickSeek);/// <inheritdoc/>
 		public string GetValueOf(string index, bool doSeek = true, ulong quickSeek = 0) => _ValueOf(index, doSeek, quickSeek);/// <inheritdoc/>
+			
+		public string GetDirectValueOf(ulong dataPos) => _DirectValueOf(dataPos);/// <inheritdoc/>
 
 		public string[] GetValuesOf(IReaderInteraction r, bool doSeek = true) => GetValuesOf(r.Index, doSeek, r.QuickSeek);/// <inheritdoc/>
 		public string[] GetValuesOf(string index, bool doSeek = true, ulong quickSeek = 0) => _ValuesOf(index, doSeek, quickSeek);/// <inheritdoc/>
@@ -46,6 +52,58 @@ namespace StringDB.Reader {
 		private BinaryReader _br { get; set; }
 
 		//TODO: somehow simplify all of these functions - they're very similar and or identical
+
+		private ulong _GetOverhead() {
+			ulong overhead = 0;
+
+			foreach (var i in this) {
+				overhead += i._indexchainPassTimes * 9;
+
+				overhead += 9;
+
+				this._br.BaseStream.Seek((long)i._dataPos.DataPos, SeekOrigin.Begin);
+				var b = this._br.BaseStream.ReadByte();
+
+				var doLoop = true;
+
+				while (doLoop)
+					switch (b) {
+						case Consts.IsByteValue: {
+							overhead += 2;
+							doLoop = false;
+						} break;
+						case Consts.IsUShortValue: {
+							overhead += 3;
+							doLoop = false;
+						} break;
+						case Consts.IsUIntValue: {
+							overhead += 5;
+							doLoop = false;
+						} break;
+						case Consts.IsULongValue: {
+							overhead += 9;
+							doLoop = false;
+						} break;
+						case Consts.IndexSeperator: {
+							b = this._br.ReadBytes(9)[8];
+							doLoop = true;
+						} break;
+						default: {
+							doLoop = false;
+							throw new Exception("Seeking to the data leads to finding nothing");
+						}
+					}
+			}
+
+			return overhead + 9;
+		}
+
+		private string _DirectValueOf(ulong pos) {
+			this._br.BaseStream.Seek((long)pos, SeekOrigin.Begin);
+			return GetString(
+					this._br.ReadBytes((int)GetNumber())
+				);
+		}
 
 		private string _ValueOf(string index, bool doSeek, ulong quickSeek) {
 			if (index == null)
@@ -169,8 +227,11 @@ namespace StringDB.Reader {
 				this._br.BaseStream.Seek((long)start, SeekOrigin.Begin);
 
 			var b = this._br.ReadByte();
+			var passedIndexChain = 0u;
 
 			while (b == Consts.IndexSeperator) { //hippety hoppity get off my property
+				passedIndexChain++;
+
 				var seekTo = (long)(this._br.ReadUInt64());
 
 				if (seekTo == 0)
@@ -185,7 +246,7 @@ namespace StringDB.Reader {
 			var indexName = this.GetString(this._br.ReadBytes((int)b));
 
 			return new ReaderInteraction(
-					indexName, (ulong)this._br.BaseStream.Position, dataPos
+					indexName, (ulong)this._br.BaseStream.Position, dataPos, passedIndexChain
 				);
 		}
 
@@ -248,6 +309,7 @@ namespace StringDB.Reader {
 		}
 
 		private ulong GetNumber() {
+#if USE_BREAKING_FEATURES
 			var b = this._br.ReadByte();
 
 			switch(b) {
@@ -262,6 +324,9 @@ namespace StringDB.Reader {
 			}
 
 			throw new Exception("Invalid number");
+#else
+			return this._br.ReadInt32();
+#endif
 		}
 
 		//for compatability reasons

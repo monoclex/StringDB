@@ -4,6 +4,10 @@ namespace StringDB.Reader {
 	/// <summary>A reader. It reads out a stream ( that should hold StringDB data )</summary>
 	public interface IReader : IEnumerable<ReaderPair> {
 
+		/// <summary>Gets the amount of bytes of overhead that StringDB is using.</summary>
+		/// <returns>A ulong that represents the amount bytes StringDB is overheading.</returns>
+		ulong GetOverhead();
+		
 		/// <summary>This should retrieve the value associated with an index.</summary>
 		/// <param name="r">The index and quickSeek position to use.</param>
 		/// <param name="doSeek">If the reader should seek to the quickSeek location specified.</param>
@@ -16,6 +20,11 @@ namespace StringDB.Reader {
 		/// <param name="quickSeek">The location to seek to</param>
 		/// <returns>A string that has the data in correlation to the index.</returns>
 		string GetValueOf(string index, bool doSeek = true, ulong quickSeek = 0);
+
+		/// <summary>Go straight to the position specified and read out the data</summary>
+		/// <param name="dataPos">The position of the data</param>
+		/// <returns>A string with the data</returns>
+		string GetDirectValueOf(ulong dataPos);
 
 		/// <summary>This will get all the values associated with an index</summary>
 		/// <param name="r">The index and quickSeek position to use.</param>

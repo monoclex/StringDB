@@ -35,12 +35,14 @@ namespace StringDB {
 						((Writer.StreamWriter)this._writer).Load(indexChain.IndexChainWrite, indexChain.IndexChain);
 					}
 		}
-
-		//private DatabaseMode _dbm { get; set; } //we generally don't need it after the initialization process
-
+		
 		private Stream _stream { get; set; }
 		private IReader _reader { get; set; }
 		private IWriter _writer { get; set; }
+
+		/// <summary>Will tell the reader to see how much of an overhead StringDB is using.</summary>
+		/// <returns></returns>
+		public ulong StringDBByteOverhead() => this._reader.GetOverhead();
 
 		/// <summary>Inserts a single piece of data into the database.<para>If you have multiple pieces of data to insert, it's best practice to use InsertRange whenever possible. The more data you can put into a single InsertRange, the less space the database file will take up.</para></summary>
 		/// <param name="index">The index to use so you can retrieve the data later.</param>
