@@ -19,9 +19,10 @@ namespace StringDB.Tests {
 			wt.InputWriter.Write((byte)4);
 			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 4 + 1 + 8);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("Test"));
-			wt.InputWriter.Write((byte)0xFF);
+			wt.InputWriter.Write((byte)Consts.IndexSeperator);
 			wt.InputWriter.Write((ulong)0);
-			wt.InputWriter.Write((int)8);
+			wt.InputWriter.Write((byte)Consts.IsByteValue);
+			wt.InputWriter.Write((byte)8);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("ValueKey"));
 
 			wt.Db.Insert("Test", "ValueKey");
@@ -37,18 +38,21 @@ namespace StringDB.Tests {
 			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + ((8 + 5 + 1) * 3) + 8);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("Test1"));
 			wt.InputWriter.Write((byte)5);
-			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + ((8 + 5 + 1) * 3) + 6);
+			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + ((8 + 5 + 1) * 3) + 4);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("Test2"));
 			wt.InputWriter.Write((byte)5);
-			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + ((8 + 5 + 1) * 3) + 4);
+			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + ((8 + 5 + 1) * 3) + 0);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("Test3"));
 			wt.InputWriter.Write((byte)0xFF);
 			wt.InputWriter.Write((ulong)0);
-			wt.InputWriter.Write((int)8);
+			wt.InputWriter.Write((byte)Consts.IsByteValue);
+			wt.InputWriter.Write((byte)8);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("ValueOf1"));
-			wt.InputWriter.Write((int)8);
+			wt.InputWriter.Write((byte)Consts.IsByteValue);
+			wt.InputWriter.Write((byte)8);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("ValueOf2"));
-			wt.InputWriter.Write((int)8);
+			wt.InputWriter.Write((byte)Consts.IsByteValue);
+			wt.InputWriter.Write((byte)8);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("ValueOf3"));
 
 			wt.Db.InsertRange(new Dictionary<string, string>() {
@@ -68,15 +72,17 @@ namespace StringDB.Tests {
 			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 5 + 1 + 8);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("Test1"));
 			wt.InputWriter.Write((byte)0xFF);
-			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 4 + 8);
-			wt.InputWriter.Write((int)8);
+			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 4 + 6);
+			wt.InputWriter.Write((byte)Consts.IsByteValue);
+			wt.InputWriter.Write((byte)8);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("ValueOf1"));
 			wt.InputWriter.Write((byte)5);
 			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 5 + 1 + 8);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("Test2"));
 			wt.InputWriter.Write((byte)0xFF);
 			wt.InputWriter.Write((ulong)0);
-			wt.InputWriter.Write((int)8);
+			wt.InputWriter.Write((byte)Consts.IsByteValue);
+			wt.InputWriter.Write((byte)8);
 			wt.InputWriter.Write(Encoding.UTF8.GetBytes("ValueOf2"));
 
 			wt.Db.Insert("Test1", "ValueOf1");

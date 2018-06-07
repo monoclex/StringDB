@@ -196,7 +196,7 @@ namespace StringDB.Reader {
 			this._br.BaseStream.Seek((long)readerInteraction.DataPos, SeekOrigin.Begin);
 
 			return this.GetString(
-					this._br.ReadBytes(this._br.ReadInt32())
+					this._br.ReadBytes((int)this.GetNumber())
 				);
 		}
 
@@ -204,7 +204,7 @@ namespace StringDB.Reader {
 			this._br.BaseStream.Seek((long)location, SeekOrigin.Begin);
 
 			return this.GetString(
-					this._br.ReadBytes(this._br.ReadInt32())
+					this._br.ReadBytes((int)this.GetNumber())
 				);
 		}
 
@@ -245,6 +245,23 @@ namespace StringDB.Reader {
 			}
 
 			return new ReaderChain(ic, icw);
+		}
+
+		private ulong GetNumber() {
+			var b = this._br.ReadByte();
+
+			switch(b) {
+				case Consts.IsByteValue:
+				return (ulong)this._br.ReadByte();
+				case Consts.IsUShortValue:
+				return (ulong)this._br.ReadUInt16();
+				case Consts.IsUIntValue:
+				return (ulong)this._br.ReadUInt32();
+				case Consts.IsULongValue:
+				return this._br.ReadUInt64();
+			}
+
+			throw new Exception("Invalid number");
 		}
 
 		//for compatability reasons

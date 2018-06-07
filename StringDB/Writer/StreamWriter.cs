@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define USE_BREAKING_FEATURES
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -34,7 +36,7 @@ namespace StringDB.Writer {
 
 			this.InsertRange(new ICollection<KeyValuePair<string, string>>[] { data });
 		}
-		
+
 		//TODO: not use new List<KeyValuePair> that seems just a *little bit* awful
 		/// <inheritdoc/>
 		public void Insert(string index, string data) => InsertRange(new ICollection<KeyValuePair<string, string>>[] { new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>(index, data) } });
@@ -67,13 +69,13 @@ namespace StringDB.Writer {
 			//SET DATA
 			{
 				var counter = 0u;
-				foreach(var j in data)
-					foreach(var i in j) {
-					indx[counter] = i.Key;
-					dta[counter] = i.Value;
+				foreach (var j in data)
+					foreach (var i in j) {
+						indx[counter] = i.Key;
+						dta[counter] = i.Value;
 
-					counter++;
-				}
+						counter++;
+					}
 			}
 
 			//SET INDEX CHAIN
@@ -101,12 +103,12 @@ namespace StringDB.Writer {
 			for (uint i = 0; i < dta.Length; i++) {
 				indxsShowsUpAt[indx[i]] = (ulong)this._stream.Position; //we wanna know when we'll see it again
 
-				this._bw.Write(dta[i].Length);		//LENTH OF DATA
-				WriteStringRaw(dta[i]);			//THE DATA ITSELF
+				this.WriteNumber(dta[i].Length);      //LENTH OF DATA
+				WriteStringRaw(dta[i]);         //THE DATA ITSELF
 			}
-			
+
 			//REWRITE INDEXES TO POINT TO THE DATA
-			foreach(var i in indxsAt) {
+			foreach (var i in indxsAt) {
 				var overwriteAt = i.Value;
 				var locationShowsUp = indxsShowsUpAt[i.Key];
 
@@ -116,7 +118,7 @@ namespace StringDB.Writer {
 			}
 
 			//INDEX CHAIN THIS NEW DATA WITH THE OLD INDEXES
-			if(this._indexChainWrite != 0) { //if the place to overwrite the old index chain exists
+			if (this._indexChainWrite != 0) { //if the place to overwrite the old index chain exists
 				this._bw.BaseStream.Seek((long)this._indexChainWrite, SeekOrigin.Begin); //go to it
 				this._bw.Write(indxChain); //write the start of the new index chain
 			}
@@ -129,5 +131,47 @@ namespace StringDB.Writer {
 		}
 
 		private void WriteStringRaw(string raw) { if (raw == null) throw new ArgumentNullException("an index within the data"); foreach (var i in raw) this._bw.Write(i); }
+
+		/// <summary>
+		/// Write the smallest version possible of this number. Adds 1 byte to the overhead if it's longer, otherwise it saves quite a few bytes.
+		/// </summary>
+		/// <param name="value"></param>
+		private void WriteNumber(ulong value) {
+#if USE_BREAKING_FEATURES
+			if (value <= Byte.MaxValue) {
+				this._bw.Write(Consts.IsByteValue);
+				this._bw.Write((byte)value);
+			} else if (value <= UInt16.MaxValue) {
+				this._bw.Write(Consts.IsUShortValue);
+				this._bw.Write((ushort)value);
+			} else if (value <= UInt32.MaxValue) {
+				this._bw.Write(Consts.IsUIntValue);
+				this._bw.Write((uint)value);
+			} else {
+				this._bw.Write(Consts.IsULongValue);
+				this._bw.Write(value);
+			}
+#else
+			this._bw.Write(value);
+#endif
+		}
+
+		private void WriteNumber(byte value) =>
+			WriteNumber((ulong)value);
+
+		private void WriteNumber(ushort value) =>
+			WriteNumber((ulong)value);
+
+		private void WriteNumber(short value) =>
+			WriteNumber((ulong)value);
+
+		private void WriteNumber(uint value) =>
+			WriteNumber((ulong)value);
+
+		private void WriteNumber(int value) =>
+			WriteNumber((ulong)value);
+
+		private void WriteNumber(long value) =>
+			WriteNumber((ulong)value);
 	}
 }

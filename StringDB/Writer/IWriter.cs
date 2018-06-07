@@ -12,9 +12,5 @@ namespace StringDB.Writer {
 		/// <summary>Inserts a range of data into the database.</summary>
 		/// <param name="data">The pieces of data to insert.</param>
 		void InsertRange(ICollection<KeyValuePair<string, string>> data);
-
-		/// <summary>Inserts a range of data into the database.</summary>
-		/// <param name="data">The pieces of data to insert.</param>
-		void InsertRange(params ICollection<KeyValuePair<string, string>>[] data);
 	}
 }

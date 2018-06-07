@@ -51,9 +51,6 @@ namespace StringDB {
 		/// <param name="range">The pieces of data to insert.</param>
 		public void InsertRange(ICollection<KeyValuePair<string, string>> range) => this._writer.InsertRange(range);
 
-		/// <summary>Inserts a range of data into the database.</summary>
-		/// <param name="range">The pieces of data to insert.</param>
-		public void InsertRange(params ICollection<KeyValuePair<string, string>>[] range) => this._writer.InsertRange(range);
 		/// <summary>Gets the value of a specific index.</summary>
 		/// <param name="index">The index to use when looking for the data.</param>
 		/// <returns>A string that holds the data correlating to the index specified.</returns>
