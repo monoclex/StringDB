@@ -62,39 +62,47 @@ namespace StringDB.Reader {
 				overhead += i._indexchainPassTimes * 9;
 
 				overhead += 9;
+				
+				if ((int)this._dbv >= (int)DatabaseVersion.Version200) {
+					this._br.BaseStream.Seek((long)i._dataPos.DataPos, SeekOrigin.Begin);
 
-				this._br.BaseStream.Seek((long)i._dataPos.DataPos, SeekOrigin.Begin);
-				var b = this._br.BaseStream.ReadByte();
+					var b = this._br.BaseStream.ReadByte();
 
-				var doLoop = true;
+					var doLoop = true;
 
-				while (doLoop)
-					switch (b) {
-						case Consts.IsByteValue: {
-							overhead += 2;
-							doLoop = false;
-						} break;
-						case Consts.IsUShortValue: {
-							overhead += 3;
-							doLoop = false;
-						} break;
-						case Consts.IsUIntValue: {
-							overhead += 5;
-							doLoop = false;
-						} break;
-						case Consts.IsULongValue: {
-							overhead += 9;
-							doLoop = false;
-						} break;
-						case Consts.IndexSeperator: {
-							b = this._br.ReadBytes(9)[8];
-							doLoop = true;
-						} break;
-						default: {
-							doLoop = false;
-							throw new Exception("Seeking to the data leads to finding nothing");
+					while (doLoop)
+						switch (b) {
+							case Consts.IsByteValue: {
+								overhead += 2;
+								doLoop = false;
+							}
+							break;
+							case Consts.IsUShortValue: {
+								overhead += 3;
+								doLoop = false;
+							}
+							break;
+							case Consts.IsUIntValue: {
+								overhead += 5;
+								doLoop = false;
+							}
+							break;
+							case Consts.IsULongValue: {
+								overhead += 9;
+								doLoop = false;
+							}
+							break;
+							case Consts.IndexSeperator: {
+								b = this._br.ReadBytes(9)[8];
+								doLoop = true;
+							}
+							break;
+							default: {
+								doLoop = false;
+								throw new Exception("Seeking to the data leads to finding nothing");
+							}
 						}
-					}
+				} else overhead += 4;
 			}
 
 			return overhead + 9;

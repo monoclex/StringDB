@@ -54,6 +54,8 @@ namespace StringDB.Writer {
 
 			string[] indx;
 			string[] dta;
+			ulong[] indxsAt;
+			ulong[] indxsShowsUpAt;
 
 			{
 				var c = 0;
@@ -62,10 +64,9 @@ namespace StringDB.Writer {
 
 				indx = new string[c];
 				dta = new string[c];
+				indxsAt = new ulong[c];
+				indxsShowsUpAt = new ulong[c];
 			}
-
-			var indxsAt = new Dictionary<string, ulong>();
-			var indxsShowsUpAt = new Dictionary<string, ulong>();
 
 			//SET DATA
 			{
@@ -88,7 +89,7 @@ namespace StringDB.Writer {
 					throw new Exception($"Index cannot be longer then 254 chars. 0xFF is reserved for the index chain. {indx[i]}");
 
 				this._bw.Write(Convert.ToByte(indx[i].Length));  //LENGTH OF INDEXER
-				indxsAt[indx[i]] = (ulong)this._stream.Position;
+				indxsAt[i] = (ulong)this._stream.Position;
 				this._bw.Write((ulong)0);                //WHERE IT WILL SHOW UP IN THE FILE
 
 				WriteStringRaw(indx[i]);
@@ -102,16 +103,16 @@ namespace StringDB.Writer {
 
 			//WRITE DATA
 			for (uint i = 0; i < dta.Length; i++) {
-				indxsShowsUpAt[indx[i]] = (ulong)this._stream.Position; //we wanna know when we'll see it again
+				indxsShowsUpAt[i] = (ulong)this._stream.Position; //we wanna know when we'll see it again
 
 				this.WriteNumber(dta[i].Length);      //LENTH OF DATA
 				WriteStringRaw(dta[i]);         //THE DATA ITSELF
 			}
 
 			//REWRITE INDEXES TO POINT TO THE DATA
-			foreach (var i in indxsAt) {
-				var overwriteAt = i.Value;
-				var locationShowsUp = indxsShowsUpAt[i.Key];
+			for(uint i = 0; i < dta.Length; i++) {
+				var overwriteAt = indxsAt[i];
+				var locationShowsUp = indxsShowsUpAt[i];
 
 				//overwrite this
 				this._bw.BaseStream.Seek((long)overwriteAt, SeekOrigin.Begin);
