@@ -13,7 +13,7 @@ namespace StringDB {
 		/// <param name="stream">The stream to read/write to.</param>
 		/// <param name="dbm">The DatabaseMode to be in.</param>
 		/// <param name="dbv">The version of the database to read/write in</param>
-		/// <param name="keepStreamOpen">If the stream should be kept open.<para>Note that in NET 2.0, 3.5, or 4.0, this is not guarenteed to work.</para></param>
+		/// <param name="keepStreamOpen">If the stream should be kept open.<para>Note that in NET 2.0, 3.5, or 4.0, this is not guaranteed to work.</para></param>
 		public Database(Stream stream, DatabaseMode dbm = DatabaseMode.ReadWrite, DatabaseVersion dbv = DatabaseVersion.Latest, bool keepStreamOpen = false) {
 			this._stream = stream ?? throw new ArgumentNullException("stream");
 
