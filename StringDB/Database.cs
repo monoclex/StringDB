@@ -213,7 +213,7 @@ namespace StringDB {
 	/// <summary>The version of the database. This can't be inferred</summary>
 	public enum DatabaseVersion {
 		/// <summary>The most current database version.</summary>
-		Latest = (int)DatabaseVersion.Verson210,
+		Latest = (int)DatabaseVersion.Verson300,
 
 		/// <summary>The original database structure as of version 1.0.0</summary>
 		Version100 = 1,
@@ -225,5 +225,8 @@ namespace StringDB {
 
 		/// <summary>The database structure as of version 2.1.0</summary>
 		Verson210 = 3,
+
+		/// <summary>The database structure as of version 3.0.0</summary>
+		Version300 = 4
 	}
 }

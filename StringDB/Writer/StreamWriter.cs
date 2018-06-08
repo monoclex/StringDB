@@ -104,8 +104,13 @@ namespace StringDB.Writer {
 
 			//WRITE EACH INDEX
 			for (uint i = 0; i < indx.Length; i++) {
-				if (indx[i].Length > 250)
-					throw new Exception($"Index cannot be longer then 250 chars. Use a SHA256 hash or something you mad man. ({indx[i]})");
+				if ((int)_dbv >= (int)DatabaseVersion.Version300) {
+					if (indx[i].Length > 250)
+						throw new Exception($"Index cannot be longer then 250 chars. Use a SHA256 hash or something you mad man. ({indx[i]})");
+				} else {
+					if (indx[i].Length > 254)
+						throw new Exception($"Index cannot be longer then 254 chars. 0xFF is reserved for the index chain. {indx[i]}");
+				}
 
 				this._bw.Write(Convert.ToByte(indx[i].Length));  //LENGTH OF INDEXER
 				indxsAt[i] = (ulong)this._stream.Position;
