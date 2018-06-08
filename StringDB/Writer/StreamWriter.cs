@@ -8,16 +8,23 @@ namespace StringDB.Writer {
 		/// <summary>Create a new StreamWriter.</summary>
 		/// <param name="outputStream">The stream to write to. You may need to call the Load() void to set the indexChain data.</param>
 		/// <param name="dbv">The database version to write to.</param>
-		public StreamWriter(Stream outputStream, DatabaseVersion dbv) {
+		/// <param name="disposeStream">Whether or not the stream should be disposed after it's done being used.<para>Note that in NET 2.0, 3.5, or 4.0, this is not guarenteed to work.</para></param>
+		public StreamWriter(Stream outputStream, DatabaseVersion dbv, bool disposeStream) {
 			this._stream = outputStream;
-			this._bw = new BinaryWriter(this._stream);
+#if NET20 || NET35 || NET40
+			this._bw = new BinaryWriter(this._stream, System.Text.Encoding.UTF8);
+#else
+			this._bw = new BinaryWriter(this._stream, System.Text.Encoding.UTF8, disposeStream);
+#endif
 			this._indexChain = 0;
 			this._indexChainWrite = 0;
 
 			this._stream.Position = 0;
 			this._dbv = dbv;
+			this._disposeStream = disposeStream;
 		}
 
+		private bool _disposeStream { get; set; }
 		private DatabaseVersion _dbv { get; set; }
 		private Stream _stream { get; set; }
 		private BinaryWriter _bw { get; set; }
@@ -173,5 +180,41 @@ namespace StringDB.Writer {
 
 		private void WriteNumber(long value) =>
 			WriteNumber((ulong)value);
+
+#region IDisposable Support
+		private bool disposedValue = false;
+
+		/// <summary>Dispose this object</summary>
+		/// <param name="disposing"></param>
+		protected virtual void Dispose(bool disposing) {
+			if (!this.disposedValue) {
+				if (disposing) {
+					if(this._disposeStream)
+						this._stream.Dispose();
+
+					((IDisposable)this._bw).Dispose();
+				}
+
+				this._stream = null;
+				this._bw = null;
+
+				this._dbv = DatabaseVersion.Version100;
+				this._indexChain = 0;
+				this._indexChainWrite = 0;
+
+				this.disposedValue = true;
+			}
+		}
+
+		/// <summary>Finalize this</summary>
+		~StreamWriter() =>
+			Dispose(false);
+		
+		/// <summary>Dispose this</summary>
+		public void Dispose() {
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+#endregion
 	}
 }

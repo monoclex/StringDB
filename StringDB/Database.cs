@@ -7,25 +7,27 @@ using System.IO;
 
 namespace StringDB {
 	/// <summary>A StringDB Database.</summary>
-	public class Database : IEnumerable<ReaderPair> {
+	public class Database : IEnumerable<ReaderPair>, IDisposable {
 
 		/// <summary>Create a new StringDB database.</summary>
 		/// <param name="stream">The stream to read/write to.</param>
 		/// <param name="dbm">The DatabaseMode to be in.</param>
-		public Database(Stream stream, DatabaseMode dbm = DatabaseMode.ReadWrite, DatabaseVersion dbv = DatabaseVersion.Latest) {
+		/// <param name="dbv">The version of the database to read/write in</param>
+		/// <param name="keepStreamOpen">If the stream should be kept open.<para>Note that in NET 2.0, 3.5, or 4.0, this is not guarenteed to work.</para></param>
+		public Database(Stream stream, DatabaseMode dbm = DatabaseMode.ReadWrite, DatabaseVersion dbv = DatabaseVersion.Latest, bool keepStreamOpen = false) {
 			this._stream = stream ?? throw new ArgumentNullException("stream");
 
 			if (this.Readable(dbm))
-				this._reader = new Reader.StreamReader(this._stream, dbv);
+				this._reader = new Reader.StreamReader(this._stream, dbv, keepStreamOpen);
 			else this._reader = new InoperableReader(); //by using inoperable readers we prevent reading from ever happening
 			
 			if (this.Writable(dbm))
-				this._writer = new Writer.StreamWriter(this._stream, dbv);
+				this._writer = new Writer.StreamWriter(this._stream, dbv, keepStreamOpen);
 			else this._writer = new InoperableWriter(); //by using inoperable writers we prevent writing from ever happening
 
 			if (this.Writable(dbm)) //if we're trying to write at all
-				if (this._stream.Length > 0) { //make sure there are indexes to be read
-						var reader = new Reader.StreamReader(this._stream, dbv); //we can't trust the reader to be set
+				if (this._stream.Length > 0) //make sure there are indexes to be read
+					using (var reader = new Reader.StreamReader(this._stream, dbv, true)) { //we can't trust the reader to be set
 						var indexChain = reader.GetReaderChain();
 
 						if (!(this._writer is Writer.StreamWriter))
@@ -84,6 +86,40 @@ namespace StringDB {
 
 		private bool ReadAndWriteable(DatabaseMode e) =>
 			Readable(e) && Writable(e);
+
+		#region IDisposable Support
+		private bool disposedValue = false; // To detect redundant calls
+
+		/// <summary>Dispose this class</summary>
+		/// <param name="disposing">Dispose it!!!</param>
+		protected virtual void Dispose(bool disposing) {
+			if (!this.disposedValue) {
+				if (disposing) {
+					this._stream.Flush();
+					this._stream.Dispose();
+					this._reader.Dispose();
+					this._writer.Dispose();
+				}
+
+				this._stream = null;
+				this._reader = null;
+				this._writer = null;
+
+				this.disposedValue = true;
+			}
+		}
+		
+		/// <summary>Finalizer</summary>
+		~Database() {
+			Dispose(false);
+		}
+		
+		/// <summary>Dispose </summary>
+		public void Dispose() {
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
 	}
 
 	/// <summary>The mode to read/write a database in. Attempting to do an operation not permitted will throw exceptions.</summary>

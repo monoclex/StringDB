@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace StringDB.Reader {
 	/// <summary>A reader. It reads out a stream ( that should hold StringDB data )</summary>
-	public interface IReader : IEnumerable<ReaderPair> {
+	public interface IReader : IEnumerable<ReaderPair>, IDisposable {
 
 		/// <summary>Gets the amount of bytes of overhead that StringDB is using.</summary>
 		/// <returns>A ulong that represents the amount bytes StringDB is overheading.</returns>

@@ -49,5 +49,8 @@ namespace StringDB.Reader {
 
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
 		public string GetDirectValueOf(ulong dataPos) => throw new InoperableException();
+
+		/// <summary>Does absolutely nothing - doesn't even throw an inoperable exception. We *want* to go away, we're inoperable.</summary>
+		public void Dispose() { }
 	}
 }

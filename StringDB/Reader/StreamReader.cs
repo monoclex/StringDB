@@ -10,13 +10,20 @@ namespace StringDB.Reader {
 		/// <summary>Create a new StreamReader.</summary>
 		/// <param name="streamUse">The stream to read . You may need to call the Load() void to set the indexChain data.</param>
 		/// <param name="dbv">The database version to read from.</param>
-		public StreamReader(Stream streamUse, DatabaseVersion dbv) {
+		/// <param name="disposeStream">Whether or not the stream is to be disposed after using it.</param>
+		public StreamReader(Stream streamUse, DatabaseVersion dbv, bool disposeStream) {
 			this._stream = streamUse;
-			this._br = new BinaryReader(this._stream);
+#if NET20 || NET35 || NET40
+			this._br = new BinaryReader(this._stream, System.Text.Encoding.UTF8);
+#else
+			this._br = new BinaryReader(this._stream, System.Text.Encoding.UTF8, disposeStream);
+#endif
 			this._dbv = dbv;
+			this._disposeStream = disposeStream;
 		}
 
 		private DatabaseVersion _dbv { get; set; }
+		private bool _disposeStream { get; set; }
 
 		//public implementations of stuff
 
@@ -297,6 +304,7 @@ namespace StringDB.Reader {
 						icw = (ulong)p;// (ulong)p - 8;
 						ic = (ulong)this._br.BaseStream.Length;
 						shouldContinueLook = false;
+						break;
 					} else {
 						ic = (ulong)seekTo;
 						icw = (ulong)p;
@@ -306,6 +314,9 @@ namespace StringDB.Reader {
 
 					b = this._br.ReadByte();
 				}
+
+				if (!shouldContinueLook)
+					break;
 
 				if (this._br.BaseStream.Position >= this._br.BaseStream.Length)
 					break;
@@ -354,5 +365,41 @@ namespace StringDB.Reader {
 							);
 #endif
 		}
+
+		#region IDisposable Support
+		private bool disposedValue = false;
+
+		/// <summary>Dispose this object</summary>
+		/// <param name="disposing"></param>
+		protected virtual void Dispose(bool disposing) {
+			if (!this.disposedValue) {
+				if (disposing) {
+					if(this._disposeStream)
+						this._stream.Dispose();
+
+					((IDisposable)this._br).Dispose();
+				}
+
+				this._stream = null;
+				this._br = null;
+
+				this._dbv = DatabaseVersion.Version100;
+				this._disposeStream = true;
+
+				this.disposedValue = true;
+			}
+		}
+		
+		/// <summary>Finalize this object</summary>
+		~StreamReader() {
+			Dispose(false);
+		}
+
+		/// <summary>Dispose this object</summary>
+		public void Dispose() {
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
 	}
 }

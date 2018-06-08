@@ -202,10 +202,35 @@ namespace StringDB.Tests {
 
 			wt.Db.Insert("Test1", "ValueOf1");
 
-			wt.Db = null;
-			wt.Db = new Database(wt._output, DatabaseMode.Write);
+			wt.Db.Dispose();
+
+			wt.InputWriter.Dispose();
+			wt._stream.Dispose();
+			wt._output.Dispose();
+			wt._stream = new MemoryStream();
+			wt._output = new MemoryStream();
+			wt.InputWriter = new BinaryWriter(wt._stream);
+
+			wt.Db = new Database(wt._output, DatabaseMode.Write, DatabaseVersion.Latest, true);
 
 			wt.Db.Insert("Test2", "ValueOf2");
+			
+			wt.InputWriter.Write((byte)5);
+			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 5 + 1 + 8);
+			wt.InputWriter.Write(Encoding.UTF8.GetBytes("Test1"));
+			wt.InputWriter.Write((byte)0xFF);
+			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 4 + 6);
+			wt.InputWriter.Write((byte)Consts.IsByteValue);
+			wt.InputWriter.Write((byte)8);
+			wt.InputWriter.Write(Encoding.UTF8.GetBytes("ValueOf1"));
+			wt.InputWriter.Write((byte)5);
+			wt.InputWriter.Write((ulong)wt.InputWriter.BaseStream.Position + 8 + 5 + 1 + 8);
+			wt.InputWriter.Write(Encoding.UTF8.GetBytes("Test2"));
+			wt.InputWriter.Write((byte)0xFF);
+			wt.InputWriter.Write((ulong)0);
+			wt.InputWriter.Write((byte)Consts.IsByteValue);
+			wt.InputWriter.Write((byte)8);
+			wt.InputWriter.Write(Encoding.UTF8.GetBytes("ValueOf2"));
 
 			wt.EnsureEqual();
 		}
@@ -222,9 +247,9 @@ namespace StringDB.Tests {
 			if (this._output == null)
 				this._output = new MemoryStream();
 
-			this.Db = new Database(this._output, type);
+			this.Db = new Database(this._output, type, DatabaseVersion.Latest, true);
 
-			this.InputWriter = new BinaryWriter(this._stream);
+			this.InputWriter = new BinaryWriter(this._stream, System.Text.Encoding.UTF8, true);
 		}
 
 		public BinaryWriter InputWriter { get; set; }

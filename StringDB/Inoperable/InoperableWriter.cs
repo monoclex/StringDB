@@ -13,5 +13,8 @@ namespace StringDB.Writer {
 
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
 		public void InsertRange(params ICollection<KeyValuePair<string, string>>[] data) => throw new InoperableException();
+
+		/// <summary>Does absolutely nothing - doesn't even throw an inoperable exception. We *want* to go away, we're inoperable.</summary>
+		public void Dispose() { }
 	}
 }
