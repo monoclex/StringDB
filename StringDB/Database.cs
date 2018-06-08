@@ -39,6 +39,11 @@ namespace StringDB {
 
 		/// <summary>Create a new StringDB database.</summary>
 		/// <param name="stream">The stream to read/write to.</param>
+		public static Database FromStream(Stream stream) =>
+			new Database(stream);
+
+		/// <summary>Create a new StringDB database.</summary>
+		/// <param name="stream">The stream to read/write to.</param>
 		/// <param name="dbm">The DatabaseMode to be in.</param>
 		/// <param name="dbv">The version of the database to read/write in</param>
 		/// <param name="keepStreamOpen">If the stream should be kept open.<para>Note that in NET 2.0, 3.5, or 4.0, this is not guaranteed to work.</para></param>

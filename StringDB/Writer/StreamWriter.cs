@@ -8,23 +8,23 @@ namespace StringDB.Writer {
 		/// <summary>Create a new StreamWriter.</summary>
 		/// <param name="outputStream">The stream to write to. You may need to call the Load() void to set the indexChain data.</param>
 		/// <param name="dbv">The database version to write to.</param>
-		/// <param name="disposeStream">Whether or not the stream should be disposed after it's done being used.<para>Note that in NET 2.0, 3.5, or 4.0, this is not guarenteed to work.</para></param>
-		public StreamWriter(Stream outputStream, DatabaseVersion dbv, bool disposeStream) {
+		/// <param name="keepStreamOpen">Whether or not the stream should be disposed after it's done being used.<para>Note that in NET 2.0, 3.5, or 4.0, this is not guarenteed to work.</para></param>
+		public StreamWriter(Stream outputStream, DatabaseVersion dbv, bool keepStreamOpen) {
 			this._stream = outputStream;
 #if NET20 || NET35 || NET40
 			this._bw = new BinaryWriter(this._stream, System.Text.Encoding.UTF8);
 #else
-			this._bw = new BinaryWriter(this._stream, System.Text.Encoding.UTF8, disposeStream);
+			this._bw = new BinaryWriter(this._stream, System.Text.Encoding.UTF8, keepStreamOpen);
 #endif
 			this._indexChain = 0;
 			this._indexChainWrite = 0;
 
 			this._stream.Position = 0;
 			this._dbv = dbv;
-			this._disposeStream = disposeStream;
+			this._keepStreamOpen = keepStreamOpen;
 		}
 
-		private bool _disposeStream;
+		private bool _keepStreamOpen;
 		private DatabaseVersion _dbv;
 		private Stream _stream;
 		private BinaryWriter _bw;
@@ -117,10 +117,10 @@ namespace StringDB.Writer {
 			}
 
 			//REWRITE INDEXES TO POINT TO THE DATA
-			for(uint i = 0; i < dta.Length; i++) {
+			for (uint i = 0; i < dta.Length; i++) {
 				var overwriteAt = indxsAt[i];
 				var locationShowsUp = indxsShowsUpAt[i];
-				
+
 				//overwrite this
 				this._bw.BaseStream.Seek((long)overwriteAt, SeekOrigin.Begin);
 				this._bw.Write(locationShowsUp); //overwrite the old data
@@ -181,7 +181,7 @@ namespace StringDB.Writer {
 		private void WriteNumber(long value) =>
 			WriteNumber((ulong)value);
 
-#region IDisposable Support
+		#region IDisposable Support
 		private bool disposedValue = false;
 
 		/// <summary>Dispose this object</summary>
@@ -189,10 +189,12 @@ namespace StringDB.Writer {
 		protected virtual void Dispose(bool disposing) {
 			if (!this.disposedValue) {
 				if (disposing) {
-					if(this._disposeStream)
+					if (!this._keepStreamOpen)
 						this._stream.Dispose();
 
-					((IDisposable)this._bw).Dispose();
+					//Probably isn't needed ( for the writer only ) but mine as well to keep consistency with the reader :p
+					if(!this._keepStreamOpen)
+						((IDisposable)this._bw).Dispose();
 				}
 
 				this._stream = null;
@@ -209,12 +211,12 @@ namespace StringDB.Writer {
 		/// <summary>Finalize this</summary>
 		~StreamWriter() =>
 			Dispose(false);
-		
+
 		/// <summary>Dispose this</summary>
 		public void Dispose() {
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-#endregion
+		#endregion
 	}
 }
