@@ -10,20 +10,20 @@ namespace StringDB.Reader {
 		/// <summary>Create a new StreamReader.</summary>
 		/// <param name="streamUse">The stream to read . You may need to call the Load() void to set the indexChain data.</param>
 		/// <param name="dbv">The database version to read from.</param>
-		/// <param name="disposeStream">Whether or not the stream is to be disposed after using it.</param>
-		public StreamReader(Stream streamUse, DatabaseVersion dbv, bool disposeStream) {
+		/// <param name="keepStreamOpen">Whether or not the stream is to be disposed after using it.</param>
+		public StreamReader(Stream streamUse, DatabaseVersion dbv, bool keepStreamOpen) {
 			this._stream = streamUse;
 #if NET20 || NET35 || NET40
 			this._br = new BinaryReader(this._stream, System.Text.Encoding.UTF8);
 #else
-			this._br = new BinaryReader(this._stream, System.Text.Encoding.UTF8, disposeStream);
+			this._br = new BinaryReader(this._stream, System.Text.Encoding.UTF8, keepStreamOpen);
 #endif
 			this._dbv = dbv;
-			this._disposeStream = disposeStream;
+			this._keepStreamOpen = keepStreamOpen;
 		}
 
 		private DatabaseVersion _dbv;
-		private bool _disposeStream;
+		private bool _keepStreamOpen;
 
 		//public implementations of stuff
 
@@ -31,18 +31,18 @@ namespace StringDB.Reader {
 
 		/// <inheritdoc/>
 		public ulong GetOverhead() => _GetOverhead(); /// <inheritdoc/>
-		public string[] GetIndexes() => _Indexes(); /// <inheritdoc/>
+		public byte[][] GetIndexes() => _Indexes(); /// <inheritdoc/>
 
 		public IEnumerator<ReaderPair> GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());/// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());/// <inheritdoc/>
 
-		public string GetValueOf(IReaderInteraction r, bool doSeek = true) => GetValueOf(r.Index, doSeek, r.QuickSeek);/// <inheritdoc/>
-		public string GetValueOf(string index, bool doSeek = true, ulong quickSeek = 0) => _ValueOf(index, doSeek, quickSeek);/// <inheritdoc/>
+		public byte[] GetValueOf(IReaderInteraction r, bool doSeek = true) => GetValueOf(r.Index, doSeek, r.QuickSeek);/// <inheritdoc/>
+		public byte[] GetValueOf(string index, bool doSeek = true, ulong quickSeek = 0) => _ValueOf(index, doSeek, quickSeek);/// <inheritdoc/>
 			
-		public string GetDirectValueOf(ulong dataPos) => _DirectValueOf(dataPos);/// <inheritdoc/>
+		public byte[] GetDirectValueOf(ulong dataPos) => _DirectValueOf(dataPos);/// <inheritdoc/>
 
-		public string[] GetValuesOf(IReaderInteraction r, bool doSeek = true) => GetValuesOf(r.Index, doSeek, r.QuickSeek);/// <inheritdoc/>
-		public string[] GetValuesOf(string index, bool doSeek = true, ulong quickSeek = 0) => _ValuesOf(index, doSeek, quickSeek);/// <inheritdoc/>
+		public byte[][] GetValuesOf(IReaderInteraction r, bool doSeek = true) => GetValuesOf(r.Index, doSeek, r.QuickSeek);/// <inheritdoc/>
+		public byte[][] GetValuesOf(string index, bool doSeek = true, ulong quickSeek = 0) => _ValuesOf(index, doSeek, quickSeek);/// <inheritdoc/>
 
 		public bool IsIndexAfter(IReaderInteraction r, bool doSeek = true) => IsIndexAfter(r.Index, doSeek, r.QuickSeek);/// <inheritdoc/>
 		public bool IsIndexAfter(string index, bool doSeek = true, ulong quickSeek = 0) => _IsIndexAfter(index, doSeek, quickSeek);/// <inheritdoc/>
@@ -115,14 +115,12 @@ namespace StringDB.Reader {
 			return overhead + 9;
 		}
 
-		private string _DirectValueOf(ulong pos) {
+		private byte[] _DirectValueOf(ulong pos) {
 			this._br.BaseStream.Seek((long)pos, SeekOrigin.Begin);
-			return GetString(
-					this._br.ReadBytes((int)GetNumber())
-				);
+			return this._br.ReadBytes((int)GetNumber());
 		}
 
-		private string _ValueOf(string index, bool doSeek, ulong quickSeek) {
+		private byte[] _ValueOf(string index, bool doSeek, ulong quickSeek) {
 			if (index == null)
 				throw new ArgumentNullException("index");
 
@@ -142,7 +140,7 @@ namespace StringDB.Reader {
 			return _ReadValue(i);
 		}
 
-		private string[] _ValuesOf(string index, bool doSeek, ulong quickSeek) {
+		private byte[][] _ValuesOf(string index, bool doSeek, ulong quickSeek) {
 			if (index == null)
 				throw new ArgumentNullException("index");
 
@@ -150,7 +148,7 @@ namespace StringDB.Reader {
 
 			var i = _ReadIndex(doSeek, quickSeek);
 
-			var valuesOf = new List<string>();
+			var valuesOf = new List<byte[]>();
 
 			var lastpos = this._br.BaseStream.Position;
 
@@ -220,15 +218,17 @@ namespace StringDB.Reader {
 			return rs;
 		}
 
-		private string[] _Indexes() {
+		private byte[][] _Indexes() {
 			var _curPos = this._br.BaseStream.Position;
 
-			var indexes = new List<string>();
+			var indexes = new List<byte[]>();
 
 			var rs = _ReadIndex(true, 0);
 
 			while (rs != null) {
-				indexes.Add(rs.Index);
+				indexes.Add(
+					Database.GetBytes(rs.Index)
+					);
 				rs = _ReadIndex();
 			}
 
@@ -260,30 +260,26 @@ namespace StringDB.Reader {
 
 			var dataPos = this._br.ReadUInt64();
 			
-			var indexName = this.GetString(this._br.ReadBytes((int)b));
+			var indexName = this._br.ReadBytes((int)b);
 
 			return new ReaderInteraction(
-					indexName, dataPos, (ulong)this._br.BaseStream.Position, passedIndexChain
+					Database.GetString(indexName), dataPos, (ulong)this._br.BaseStream.Position, passedIndexChain
 				);
 		}
 
-		private string _ReadValue(IReaderInteraction readerInteraction) {
+		private byte[] _ReadValue(IReaderInteraction readerInteraction) {
 			if (readerInteraction == null)
 				throw new ArgumentNullException("readerInteraction");
 
 			this._br.BaseStream.Seek((long)readerInteraction.DataPos, SeekOrigin.Begin);
 
-			return this.GetString(
-					this._br.ReadBytes((int)this.GetNumber())
-				);
+			return this._br.ReadBytes((int)this.GetNumber());
 		}
 
-		private string _ReadValue(ulong location) {
+		private byte[] _ReadValue(ulong location) {
 			this._br.BaseStream.Seek((long)location, SeekOrigin.Begin);
 
-			return this.GetString(
-					this._br.ReadBytes((int)this.GetNumber())
-				);
+			return this._br.ReadBytes((int)this.GetNumber());
 		}
 
 		private IReaderChain _ReadChain() {
@@ -353,19 +349,6 @@ namespace StringDB.Reader {
 			} else return (ulong)this._br.ReadInt32();
 		}
 
-		//for compatability reasons
-		private string GetString(byte[] bytes) {
-#if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD1_2
-			return Encoding.UTF8.GetString(
-								bytes, 0, bytes.Length
-							);
-#else
-			return Encoding.UTF8.GetString(
-								bytes
-							);
-#endif
-		}
-
 		#region IDisposable Support
 		private bool disposedValue = false;
 
@@ -374,9 +357,12 @@ namespace StringDB.Reader {
 		protected virtual void Dispose(bool disposing) {
 			if (!this.disposedValue) {
 				if (disposing) {
-					if(this._disposeStream)
+					if(!this._keepStreamOpen)
 						this._stream.Dispose();
 
+#if NET20 || NET35 || NET40
+					if(!this._keepStreamOpen)
+# endif
 					((IDisposable)this._br).Dispose();
 				}
 
@@ -384,7 +370,7 @@ namespace StringDB.Reader {
 				this._br = null;
 
 				this._dbv = DatabaseVersion.Version100;
-				this._disposeStream = true;
+				this._keepStreamOpen = true;
 
 				this.disposedValue = true;
 			}
@@ -400,6 +386,6 @@ namespace StringDB.Reader {
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-		#endregion
+#endregion
 	}
 }

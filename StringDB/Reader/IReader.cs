@@ -8,37 +8,37 @@ namespace StringDB.Reader {
 		/// <summary>Gets the amount of bytes of overhead that StringDB is using.</summary>
 		/// <returns>A ulong that represents the amount bytes StringDB is overheading.</returns>
 		ulong GetOverhead();
-		
+
 		/// <summary>This should retrieve the value associated with an index.</summary>
 		/// <param name="r">The index and quickSeek position to use.</param>
 		/// <param name="doSeek">If the reader should seek to the quickSeek location specified.</param>
 		/// <returns>A string that has the data in correlation to the index.</returns>
-		string GetValueOf(IReaderInteraction r, bool doSeek = true);
+		byte[] GetValueOf(IReaderInteraction r, bool doSeek = true);
 
 		/// <summary>This should retrieve the value associated with an index.</summary>
 		/// <param name="index">The index to look for.</param>
 		/// <param name="doSeek">If the reader should seek to the quickSeek location specified.</param>
 		/// <param name="quickSeek">The location to seek to</param>
 		/// <returns>A string that has the data in correlation to the index.</returns>
-		string GetValueOf(string index, bool doSeek = true, ulong quickSeek = 0);
+		byte[] GetValueOf(string index, bool doSeek = true, ulong quickSeek = 0);
 
 		/// <summary>Go straight to the position specified and read out the data</summary>
 		/// <param name="dataPos">The position of the data</param>
 		/// <returns>A string with the data</returns>
-		string GetDirectValueOf(ulong dataPos);
+		byte[] GetDirectValueOf(ulong dataPos);
 
 		/// <summary>This will get all the values associated with an index</summary>
 		/// <param name="r">The index and quickSeek position to use.</param>
 		/// <param name="doSeek">If the reader should seek to the quickSeek location specified.</param>
 		/// <returns>The pieces of data that correlate with the index</returns>
-		string[] GetValuesOf(IReaderInteraction r, bool doSeek = true);
+		byte[][] GetValuesOf(IReaderInteraction r, bool doSeek = true);
 
 		/// <summary>This will get all the values associated with an index</summary>
 		/// <param name="index">The index to look for.</param>
 		/// <param name="doSeek">If the reader should seek to the quickSeek location specified.</param>
 		/// <param name="quickSeek">The location to seek to</param>
 		/// <returns>The pieces of data that correlate with the index</returns>
-		string[] GetValuesOf(string index, bool doSeek = true, ulong quickSeek = 0);
+		byte[][] GetValuesOf(string index, bool doSeek = true, ulong quickSeek = 0);
 
 		/// <summary>Checks if there's an index after a location.<para>Generally not recommended, as it is expensive to call this and then read the next index, and internally we don't call this anyways.</para></summary>
 		/// <param name="r">The index and quickSeek position to use.</param>
@@ -72,7 +72,7 @@ namespace StringDB.Reader {
 
 		/// <summary>Reads the entire document to empty the indexes into a string[].</summary>
 		/// <returns>A string[] containing every index.</returns>
-		string[] GetIndexes();
+		byte[][] GetIndexes();
 
 		/// <summary>Gets the very last place in the IndexChain.<para>If you're using this for some reason, you shouldn't.</para></summary>
 		/// <returns>The last IndexChain and IndexChainWrite to use for an IWriter.</returns>

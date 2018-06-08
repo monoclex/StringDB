@@ -20,7 +20,7 @@ namespace StringDB.Reader {
 		public string Index => this._dataPos.Index;
 		
 		/// <summary>The Value of this ReaderPair.<para>When called for the first time, it retrieves the value of it and stores it for later usage incase of multiple calls.</para></summary>
-		public string Value => (this.ValueCached ?? (this.ValueCached = this._parent.GetDirectValueOf(this._dataPos.DataPos)));
+		public string Value => (this.ValueCached ?? (this.ValueCached = Database.GetString(this._parent.GetDirectValueOf(this._dataPos.DataPos))));
 
 		/// <summary>Check if this ReaderPair is equal to another ReaderPair</summary>
 		/// <param name="other">The other ReaderPair</param>
