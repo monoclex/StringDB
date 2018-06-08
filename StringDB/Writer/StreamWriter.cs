@@ -50,6 +50,18 @@ namespace StringDB.Writer {
 		public void Insert(string index, string data) => InsertRange(new ICollection<KeyValuePair<string, string>>[] { new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>(index, data) } });
 
 		/// <inheritdoc/>
+		public void Insert(string index, byte[] data) => throw new NotImplementedException();
+
+		/// <inheritdoc/>
+		public void Insert(string index, Stream data) => throw new NotImplementedException();
+
+		/// <inheritdoc/>
+		public void InsertRange(ICollection<KeyValuePair<string, byte[]>> data) => throw new NotImplementedException();
+
+		/// <inheritdoc/>
+		public void InsertRange(ICollection<KeyValuePair<string, Stream>> data) => throw new NotImplementedException();
+		
+		/// <inheritdoc/>
 		public void InsertRange(params ICollection<KeyValuePair<string, string>>[] data) {
 			if (data == null)
 				throw new ArgumentNullException("data");
@@ -92,8 +104,8 @@ namespace StringDB.Writer {
 
 			//WRITE EACH INDEX
 			for (uint i = 0; i < indx.Length; i++) {
-				if (indx[i].Length > 254)
-					throw new Exception($"Index cannot be longer then 254 chars. 0xFF is reserved for the index chain. {indx[i]}");
+				if (indx[i].Length > 250)
+					throw new Exception($"Index cannot be longer then 250 chars. Use a SHA256 hash or something you mad man. ({indx[i]})");
 
 				this._bw.Write(Convert.ToByte(indx[i].Length));  //LENGTH OF INDEXER
 				indxsAt[i] = (ulong)this._stream.Position;
