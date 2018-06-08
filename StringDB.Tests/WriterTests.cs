@@ -180,7 +180,7 @@ namespace StringDB.Tests {
 		}
 
 		[Fact]
-		public void TwoInsertsTwoIndexChains_StopAndPickItBackUp() {
+		public void TwoInsertsTwoIndexChains_StopAndPickItBackUp() { //TODO: fix this and not have it be hacky
 			var wt = new WriterTest();
 
 			wt.InputWriter.Write((byte)5);

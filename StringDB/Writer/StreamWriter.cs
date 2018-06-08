@@ -24,13 +24,13 @@ namespace StringDB.Writer {
 			this._disposeStream = disposeStream;
 		}
 
-		private bool _disposeStream { get; set; }
-		private DatabaseVersion _dbv { get; set; }
-		private Stream _stream { get; set; }
-		private BinaryWriter _bw { get; set; }
+		private bool _disposeStream;
+		private DatabaseVersion _dbv;
+		private Stream _stream;
+		private BinaryWriter _bw;
 
-		private ulong _indexChainWrite { get; set; } //stores WHERE to overwrite stuff to link TO the start of a collection of indexes.
-		private ulong _indexChain { get; set; } //stores the START of a collection of indexes
+		private ulong _indexChainWrite; //stores WHERE to overwrite stuff to link TO the start of a collection of indexes.
+		private ulong _indexChain; //stores the START of a collection of indexes
 
 		internal void Load(ulong indexChainWrite, ulong indexChain) {
 			this._indexChainWrite = indexChainWrite;

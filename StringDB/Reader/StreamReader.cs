@@ -22,8 +22,8 @@ namespace StringDB.Reader {
 			this._disposeStream = disposeStream;
 		}
 
-		private DatabaseVersion _dbv { get; set; }
-		private bool _disposeStream { get; set; }
+		private DatabaseVersion _dbv;
+		private bool _disposeStream;
 
 		//public implementations of stuff
 
@@ -57,8 +57,8 @@ namespace StringDB.Reader {
 
 		//nitty gritty part
 
-		private Stream _stream { get; set; }
-		private BinaryReader _br { get; set; }
+		private Stream _stream;
+		private BinaryReader _br;
 
 		//TODO: somehow simplify all of these functions - they're very similar and or identical
 
