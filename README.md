@@ -15,7 +15,7 @@ It's very straight forward - and the library is documented so you shouldn't need
 
 First, make a new database.
 
-```var db = new Database(File.Open("mydb.db"));```
+```var db = Database.FromStream(File.Open("mydb.db", FileMode.OpenOrCreate));```
 
 Next, look at the [available methods](https://github.com/SirJosh3917/StringDB/blob/master/StringDB/Database.cs)!
 
