@@ -5,33 +5,11 @@ using System.Text;
 using Xunit;
 
 namespace StringDB.Tests {
-	public class test {
-		[Fact]
-		public void Test() {
-			var ms = new MemoryStream();
-			var w = new StringDB.Writer.StreamWriter(ms, DatabaseVersion.Latest, true);
-
-			//w.InsertRange(new List<KeyValuePair<string, string>>(){
-			//	new KeyValuePair<string, string>("Test1", "TestValue1"),
-			//	new KeyValuePair<string, string>("Test2", "TestValue2")
-			//});
-
-			//var gs = StreamConsts.TwoPerOne();
-
-			w.Insert("Test1", "TestValue1");
-
-			var gs = StreamConsts.OnePerOne();
-
-			ms.Flush();
-			gs.CompareAgainst(ms);
-		}
-	}
-
 	public static class StreamConsts {
 		public static Stream BlankStream() =>
 			new MemoryStream();
 
-		public static GeneratedStream OnePerOne() {
+		public static GeneratedStream OnePerOne(string index, object value) {
 			//_one_ value per _one_ index chain
 			var s = new MemoryStream();
 			var gs = new GeneratedStream() {
@@ -41,15 +19,15 @@ namespace StringDB.Tests {
 			var sw = new BinaryWriter(s);
 
 			s.Seek(0, SeekOrigin.Begin);
-			WriteIndex("Test1", (ulong)s.Position + Judge_WriteIndex("Test1") + Judge_WriteIndexSeperator, sw, gs);
+			WriteIndex(index, (ulong)s.Position + Judge_WriteIndexSeperator + Judge_WriteIndex(index), sw, gs);
 			WriteIndexSeperator(0, sw); // (ulong)s.Position + Judge_WriteIndexSeperator, sw);
-			WriteValue("TestValue1", sw, gs);
+			WriteValue(value, sw, gs);
 			sw.Flush();
 			return gs;
 
 		}
 
-		public static GeneratedStream TwoPerOne() {
+		public static GeneratedStream TwoPerOne(string index1, object value1, string index2, object value2) {
 			//_two_ values per _one_ index chain
 			var s = new MemoryStream();
 			var gs = new GeneratedStream() {
@@ -59,11 +37,57 @@ namespace StringDB.Tests {
 			var sw = new BinaryWriter(s);
 
 			s.Seek(0, SeekOrigin.Begin);
-			WriteIndex("Test1", (ulong)s.Position + Judge_WriteIndex("Test1") + Judge_WriteIndex("Test2") + Judge_WriteIndexSeperator, sw, gs);
-			WriteIndex("Test2", (ulong)s.Position + Judge_WriteIndex("Test2") + Judge_WriteIndexSeperator + Judge_WriteValue("TestValue1"), sw, gs);
+			WriteIndex(index1, (ulong)s.Position + Judge_WriteIndex(index1) + Judge_WriteIndex(index2) + Judge_WriteIndexSeperator, sw, gs);
+			WriteIndex(index2, (ulong)s.Position + Judge_WriteIndex(index2) + Judge_WriteIndexSeperator + Judge_WriteValue(value1), sw, gs);
 			WriteIndexSeperator(0, sw); // (ulong)s.Position + Judge_WriteIndexSeperator, sw);
-			WriteValue("TestValue1", sw, gs);
-			WriteValue("TestValue2", sw, gs);
+			WriteValue(value1, sw, gs);
+			WriteValue(value2, sw, gs);
+			sw.Flush();
+			return gs;
+
+		}
+
+		public static GeneratedStream OnePerTwo(string index1, object value1, string index2, object value2) {
+			//_two_ values per _one_ index chain
+			var s = new MemoryStream();
+			var gs = new GeneratedStream() {
+				Stream = s
+			};
+
+			var sw = new BinaryWriter(s);
+
+			s.Seek(0, SeekOrigin.Begin);
+			WriteIndex(index1, (ulong)s.Position + Judge_WriteIndex(index1) + Judge_WriteIndexSeperator, sw, gs);
+			WriteIndexSeperator((ulong)s.Position + Judge_WriteIndexSeperator + Judge_WriteValue(value1), sw); // (ulong)s.Position + Judge_WriteIndexSeperator, sw);
+			WriteValue(value1, sw, gs);
+			WriteIndex(index2, (ulong)s.Position + Judge_WriteIndex(index2) + Judge_WriteIndexSeperator, sw, gs);
+			WriteIndexSeperator(0, sw);
+			WriteValue(value2, sw, gs);
+			sw.Flush();
+			return gs;
+
+		}
+
+		public static GeneratedStream TwoPerTwo(string index1, object value1, string index2, object value2, string index3, object value3, string index4, string value4) {
+			//_two_ values per _one_ index chain
+			var s = new MemoryStream();
+			var gs = new GeneratedStream() {
+				Stream = s
+			};
+
+			var sw = new BinaryWriter(s);
+
+			s.Seek(0, SeekOrigin.Begin);
+			WriteIndex(index1, (ulong)s.Position + Judge_WriteIndex(index1) + Judge_WriteIndex(index2) + Judge_WriteIndexSeperator, sw, gs);
+			WriteIndex(index2, (ulong)s.Position + Judge_WriteIndex(index2) + Judge_WriteIndexSeperator + Judge_WriteValue(value1), sw, gs);
+			WriteIndexSeperator((ulong)s.Position + Judge_WriteIndexSeperator + Judge_WriteValue(value1) + Judge_WriteValue(value2), sw); // (ulong)s.Position + Judge_WriteIndexSeperator, sw);
+			WriteValue(value1, sw, gs);
+			WriteValue(value2, sw, gs);
+			WriteIndex(index3, (ulong)s.Position + Judge_WriteIndex(index3) + Judge_WriteIndex(index4) + Judge_WriteIndexSeperator, sw, gs);
+			WriteIndex(index4, (ulong)s.Position + Judge_WriteIndex(index4) + Judge_WriteIndexSeperator + Judge_WriteValue(value3), sw, gs);
+			WriteIndexSeperator(0, sw); // (ulong)s.Position + Judge_WriteIndexSeperator, sw);
+			WriteValue(value3, sw, gs);
+			WriteValue(value4, sw, gs);
 			sw.Flush();
 			return gs;
 
@@ -77,13 +101,20 @@ namespace StringDB.Tests {
 			gs.AddIndex(indexName);
 		}
 
-		private static ulong Judge_WriteIndex(string indexName) =>
+		private static ulong Judge_WriteIndex(object indexName) =>
+			indexName is string ?
+				Judge_WriteIndex_((string)indexName)
+				: indexName is byte[] ?
+					Judge_WriteIndex_((byte[])indexName)
+					: Judge_WriteIndex_((Stream)indexName);
+
+		private static ulong Judge_WriteIndex_(string indexName) =>
 			Judge_WriteIndex_ConstBegin + (ulong)indexName.Length;
 
-		private static ulong Judge_WriteIndex(byte[] indexName) =>
+		private static ulong Judge_WriteIndex_(byte[] indexName) =>
 			Judge_WriteIndex_ConstBegin + (ulong)indexName.Length;
 
-		private static ulong Judge_WriteIndex(Stream indexName) =>
+		private static ulong Judge_WriteIndex_(Stream indexName) =>
 			Judge_WriteIndex_ConstBegin + (ulong)indexName.Length;
 
 		private static ulong Judge_WriteIndex_ConstBegin =>
@@ -189,17 +220,34 @@ namespace StringDB.Tests {
 		public object[] Values { get; set; } = new object[0];
 
 		public void CompareAgainst(Stream other) {
-			//Assert.True(this.Stream.Length == other.Length, $"The streams lengths aren't equal! ({this.Stream.Length}) v.s. ({other.Length})");
+			Assert.True(this.Stream.Length == other.Length, $"The streams lengths aren't equal! ({this.Stream.Length}) v.s. ({other.Length})");
 
 			this.Stream.Seek(0, SeekOrigin.Begin);
 			other.Seek(0, SeekOrigin.Begin);
+
+			var right = new List<char>();
 
 			for(var i = 0; i < this.Stream.Length; i++) {
 				var byteA = this.Stream.ReadByte();
 				var byteB = other.ReadByte();
 
-				Assert.True(byteA == byteB, $"The streams did not match at '{i}'. Stream[{i}] = ({byteA}), other[{i}] = ({byteB})");
+				Assert.True(byteA == byteB, $"The streams did not match at '{i}'. Stream[{i}] = ({byteA}), other[{i}] = ({byteB}) . . . {GetCharList(right)}");
+
+				right.Add(Convert.ToChar(byteA));
 			}
+		}
+
+		private string GetCharList(List<char> chrs) {
+			var strb = new StringBuilder();
+
+			strb.Append("[");
+
+			foreach (var i in chrs)
+				strb.Append(i);
+
+			strb.Append("]");
+
+			return strb.ToString();
 		}
 	}
 }
