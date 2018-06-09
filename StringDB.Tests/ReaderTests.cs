@@ -193,7 +193,7 @@ namespace StringDB.Tests {
 	public class ReaderTest {
 		public ReaderTest(params Dictionary<string, string>[] items) {
 			this.Items = items;
-			this.Db = Database.FromStream(new MemoryStream(), DatabaseMode.ReadWrite);
+			this.Db = Database.FromStream(StreamConsts.BlankStream(), DatabaseMode.ReadWrite);
 
 			foreach (var i in items)
 				this.Db.InsertRange(i); //the writer unit tests have to pass :)

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace StringDB.Writer {
+
+
 	/// <inheritdoc/>
 	public class StreamWriter : IWriter {
 		/// <summary>Create a new StreamWriter.</summary>
@@ -104,7 +106,7 @@ namespace StringDB.Writer {
 
 			//WRITE EACH INDEX
 			for (uint i = 0; i < indx.Length; i++) {
-				if ((int)_dbv >= (int)DatabaseVersion.Version300) {
+				if ((int)this._dbv >= (int)DatabaseVersion.Version300) {
 					if (indx[i].Length > 250)
 						throw new Exception($"Index cannot be longer then 250 chars. Use a SHA256 hash or something you mad man. ({indx[i]})");
 				} else {

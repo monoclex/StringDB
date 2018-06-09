@@ -9,7 +9,7 @@ namespace StringDB.Tests.NullTests
     public class StreamReaderTests {
 		private StreamReader _reader = null;
 		private IReader Reader =>
-			_reader ?? (_reader = new StreamReader(new System.IO.MemoryStream(), DatabaseVersion.Latest, false));
+			this._reader ?? (this._reader = new StreamReader(StreamConsts.BlankStream(), DatabaseVersion.Latest, false));
 
 		[Fact]
 		public void GetOverhead() =>

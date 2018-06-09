@@ -13,7 +13,7 @@ namespace StringDB.Tests.NullTests {
 
 		private Database _testDb;
 		private Database TestDB =>
-			_testDb ?? (_testDb = Database.FromStream(new MemoryStream()));
+			this._testDb ?? (this._testDb = Database.FromStream(StreamConsts.BlankStream()));
 
 		[Fact]
 		public void GetValueOf() =>

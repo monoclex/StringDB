@@ -7,32 +7,32 @@ namespace StringDB.Tests.NullTests {
 	public partial class StreamWriterTests {
 		[Fact]
 		public void InsertRange_Null() {
-			Assert.Throws<ArgumentNullException>(() => { Writer.InsertRange((ICollection<KeyValuePair<string, string>>)null); });
-			Assert.Throws<ArgumentNullException>(() => { Writer.InsertRange((ICollection<KeyValuePair<string, byte[]>>)null); });
-			Assert.Throws<ArgumentNullException>(() => { Writer.InsertRange((ICollection<KeyValuePair<string, System.IO.Stream>>)null); });
+			Assert.Throws<ArgumentNullException>(() => { this.Writer.InsertRange((ICollection<KeyValuePair<string, string>>)null); });
+			Assert.Throws<ArgumentNullException>(() => { this.Writer.InsertRange((ICollection<KeyValuePair<string, byte[]>>)null); });
+			Assert.Throws<ArgumentNullException>(() => { this.Writer.InsertRange((ICollection<KeyValuePair<string, System.IO.Stream>>)null); });
 		}
 
 		[Fact]
 		public void InsertRange_EmptyCollection() {
-			Assert.Throws<ArgumentException>(() => { Writer.InsertRange(new List<KeyValuePair<string, string>>() { }); });
-			Assert.Throws<ArgumentException>(() => { Writer.InsertRange(new List<KeyValuePair<string, byte[]>>() { }); });
-			Assert.Throws<ArgumentException>(() => { Writer.InsertRange(new List<KeyValuePair<string, System.IO.Stream>>() { }); });
+			Assert.Throws<ArgumentException>(() => { this.Writer.InsertRange(new List<KeyValuePair<string, string>>() { }); });
+			Assert.Throws<ArgumentException>(() => { this.Writer.InsertRange(new List<KeyValuePair<string, byte[]>>() { }); });
+			Assert.Throws<ArgumentException>(() => { this.Writer.InsertRange(new List<KeyValuePair<string, System.IO.Stream>>() { }); });
 		}
 
 		[Fact]
 		public void InsertRange_CollectionHasNull() {
 			Assert.Throws<ArgumentNullException>(() => {
-				Writer.InsertRange(new List<KeyValuePair<string, string>>() {
+				this.Writer.InsertRange(new List<KeyValuePair<string, string>>() {
 					new KeyValuePair<string, string>(null, null)
 				});
 			});
 			Assert.Throws<ArgumentNullException>(() => {
-				Writer.InsertRange(new List<KeyValuePair<string, byte[]>>() {
+				this.Writer.InsertRange(new List<KeyValuePair<string, byte[]>>() {
 					new KeyValuePair<string, byte[]>(null, null)
 				});
 			});
 			Assert.Throws<ArgumentNullException>(() => {
-				Writer.InsertRange(new List<KeyValuePair<string, System.IO.Stream>>() {
+				this.Writer.InsertRange(new List<KeyValuePair<string, System.IO.Stream>>() {
 					new KeyValuePair<string, System.IO.Stream>(null, null)
 				});
 			});
@@ -41,17 +41,17 @@ namespace StringDB.Tests.NullTests {
 		[Fact]
 		public void InsertRange_CollectionHasNullValues() {
 			Assert.Throws<ArgumentNullException>(() => {
-				Writer.InsertRange(new List<KeyValuePair<string, string>>() {
+				this.Writer.InsertRange(new List<KeyValuePair<string, string>>() {
 					new KeyValuePair<string, string>("index_1", null)
 				});
 			});
 			Assert.Throws<ArgumentNullException>(() => {
-				Writer.InsertRange(new List<KeyValuePair<string, byte[]>>() {
+				this.Writer.InsertRange(new List<KeyValuePair<string, byte[]>>() {
 					new KeyValuePair<string, byte[]>("index_2", null)
 				});
 			});
 			Assert.Throws<ArgumentNullException>(() => {
-				Writer.InsertRange(new List<KeyValuePair<string, System.IO.Stream>>() {
+				this.Writer.InsertRange(new List<KeyValuePair<string, System.IO.Stream>>() {
 					new KeyValuePair<string, System.IO.Stream>("index_3", null)
 				});
 			});
@@ -60,18 +60,18 @@ namespace StringDB.Tests.NullTests {
 		[Fact]
 		public void InsertRange_CollectionHasNullIndexes() {
 			Assert.Throws<ArgumentNullException>(() => {
-				Writer.InsertRange(new List<KeyValuePair<string, string>>() {
+				this.Writer.InsertRange(new List<KeyValuePair<string, string>>() {
 					new KeyValuePair<string, string>(null, "value_1")
 				});
 			});
 			Assert.Throws<ArgumentNullException>(() => {
-				Writer.InsertRange(new List<KeyValuePair<string, byte[]>>() {
+				this.Writer.InsertRange(new List<KeyValuePair<string, byte[]>>() {
 					new KeyValuePair<string, byte[]>(null, new byte[]{ 0x76, 0x61, 0x6c, 0x75, 0x65, 0x5f, 0x32 })
 				});
 			});
 			Assert.Throws<ArgumentNullException>(() => {
-				Writer.InsertRange(new List<KeyValuePair<string, System.IO.Stream>>() {
-					new KeyValuePair<string, System.IO.Stream>(null, new System.IO.MemoryStream())
+				this.Writer.InsertRange(new List<KeyValuePair<string, System.IO.Stream>>() {
+					new KeyValuePair<string, System.IO.Stream>(null, StreamConsts.BlankStream())
 				});
 			});
 		}

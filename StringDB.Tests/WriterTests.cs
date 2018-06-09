@@ -208,8 +208,8 @@ namespace StringDB.Tests {
 
 			wt.Db.Insert("Test1", "ValueOf1");
 
-			var ms_stream = new MemoryStream();
-			var ms_output = new MemoryStream();
+			var ms_stream = StreamConsts.BlankStream();
+			var ms_output = StreamConsts.BlankStream();
 
 			wt._stream.Flush();
 			wt._output.Flush();
@@ -275,10 +275,10 @@ namespace StringDB.Tests {
 			this._output = output;
 
 			if (this._stream == null)
-				this._stream = new MemoryStream();
+				this._stream = StreamConsts.BlankStream();
 
 			if (this._output == null)
-				this._output = new MemoryStream();
+				this._output = StreamConsts.BlankStream();
 
 			this.Db = Database.FromStream(this._output, type, DatabaseVersion.Latest, true);
 

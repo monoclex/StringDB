@@ -18,7 +18,7 @@ namespace StringDB.Tests.NullTests {
 		public void Insert_IndexesNull() {
 			Assert.Throws<InoperableException>(() => { this.Writer.Insert(null, "E"); });
 			Assert.Throws<InoperableException>(() => { this.Writer.Insert(null, new byte[] { 0x68, 0x69 }); });
-			Assert.Throws<InoperableException>(() => { this.Writer.Insert(null, (System.IO.Stream)new System.IO.MemoryStream()); });
+			Assert.Throws<InoperableException>(() => { this.Writer.Insert(null, (System.IO.Stream)StreamConsts.BlankStream()); });
 		}
 
 		[Fact]

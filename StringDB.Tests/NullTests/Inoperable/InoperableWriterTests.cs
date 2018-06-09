@@ -7,8 +7,6 @@ namespace StringDB.Tests.NullTests {
 	public partial class InoperableWriterTests {
 		private InoperableWriter _inopWriter = null;
 		private IWriter Writer =>
-			_inopWriter == null ?
-				(_inopWriter = new InoperableWriter())
-				: _inopWriter;
+			this._inopWriter ?? (this._inopWriter = new InoperableWriter());
 	}
 }
