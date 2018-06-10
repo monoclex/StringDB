@@ -8,68 +8,68 @@ namespace StringDB.Tests.Writer {
 	//todo: not awful
 
 	public class WriterTests {
-		public static List<List<List<KeyValuePair<string, string>>>> Data = new List<List<List<KeyValuePair<string, string>>>>() {
-			new List<List<KeyValuePair<string, string>>>() {
-				new List<KeyValuePair<string, string>>() {
-					new KeyValuePair<string, string>("Test1", "Value1")
-				}
-			},
-			new List<List<KeyValuePair<string, string>>>() {
-				new List<KeyValuePair<string, string>>() {
-					new KeyValuePair<string, string>("Test1", "Value1")
-				},
-				new List<KeyValuePair<string, string>>() {
-					new KeyValuePair<string, string>("Test2", "Value2")
-				}
-			},
-			new List<List<KeyValuePair<string, string>>>() {
-				new List<KeyValuePair<string, string>>() {
-					new KeyValuePair<string, string>("Test1", "Value1"),
-					new KeyValuePair<string, string>("Test2", "Value2")
-				}
-			},
-			new List<List<KeyValuePair<string, string>>>() {
-				new List<KeyValuePair<string, string>>() {
-					new KeyValuePair<string, string>("Test1", "Value1"),
-					new KeyValuePair<string, string>("Test2", "Value2")
-				},
-				new List<KeyValuePair<string, string>>() {
-					new KeyValuePair<string, string>("Test3", "Value3"),
-					new KeyValuePair<string, string>("Test4", "Value4")
-				}
-			}
-		};
+		[Fact]
+		public void OnePerOne_String() =>
+			TestWriter(StreamConsts.GetBy(1, 1, StreamConsts.Type.String));
 
 		[Fact]
-		public void OnePerOne() =>
-			TestWriter(
-				StreamConsts.OnePerOne(Data[0][0][0].Key, Data[0][0][0].Value),
-				Data[0]);
+		public void OnePerOne_Bytes() =>
+			TestWriter(StreamConsts.GetBy(1, 1, StreamConsts.Type.Bytes));
 
 		[Fact]
-		public void OnePerTwo() =>
-			TestWriter(
-				StreamConsts.OnePerTwo(Data[1][0][0].Key, Data[1][0][0].Value, Data[1][1][0].Key, Data[1][1][0].Value),
-				Data[1]);
+		public void OnePerOne_Stream() =>
+			TestWriter(StreamConsts.GetBy(1, 1, StreamConsts.Type.Stream));
 
 		[Fact]
-		public void TwoPerOne() =>
-			TestWriter(
-				StreamConsts.TwoPerOne(Data[2][0][0].Key, Data[2][0][0].Value, Data[2][0][1].Key, Data[2][0][1].Value),
-				Data[2]);
+		public void OnePerTwo_String() =>
+			TestWriter(StreamConsts.GetBy(1, 2, StreamConsts.Type.String));
 
 		[Fact]
-		public void TwoPerTwo() =>
-			TestWriter(
-				StreamConsts.TwoPerTwo(Data[3][0][0].Key, Data[3][0][0].Value, Data[3][0][1].Key, Data[3][0][1].Value, Data[3][1][0].Key, Data[3][1][0].Value, Data[3][1][1].Key, Data[3][1][1].Value),
-				Data[3]);
+		public void OnePerTwo_Bytes() =>
+			TestWriter(StreamConsts.GetBy(1, 2, StreamConsts.Type.Bytes));
 
-		private void TestWriter(GeneratedStream gs, List<List<KeyValuePair<string, string>>> data) {
+		[Fact]
+		public void OnePerTwo_Stream() =>
+			TestWriter(StreamConsts.GetBy(1, 2, StreamConsts.Type.Stream));
+
+		[Fact]
+		public void TwoPerOne_String() =>
+			TestWriter(StreamConsts.GetBy(2, 1, StreamConsts.Type.String));
+
+		[Fact]
+		public void TwoPerOne_Bytes() =>
+			TestWriter(StreamConsts.GetBy(2, 1, StreamConsts.Type.Bytes));
+
+		[Fact]
+		public void TwoPerOne_Stream() =>
+			TestWriter(StreamConsts.GetBy(2, 1, StreamConsts.Type.Stream));
+
+		[Fact]
+		public void TwoPerTwo_String() =>
+			TestWriter(StreamConsts.GetBy(2, 2, StreamConsts.Type.String));
+
+		[Fact]
+		public void TwoPerTwo_Bytes() =>
+			TestWriter(StreamConsts.GetBy(2, 2, StreamConsts.Type.Bytes));
+
+		[Fact]
+		public void TwoPerTwo_Stream() =>
+			TestWriter(StreamConsts.GetBy(2, 2, StreamConsts.Type.Stream));
+
+		private void TestWriter(GeneratedStream gs) {
 			var ms = new System.IO.MemoryStream();
 			var w = new StreamWriter(ms, DatabaseVersion.Latest, true);
 
-			foreach (var i in data)
-				w.InsertRange(i);
+			if (gs.StreamDat.Data_String() != null)
+				foreach (var i in gs.StreamDat.Data_String())
+					w.InsertRange(i);
+			else if (gs.StreamDat.Data_Bytes() != null)
+				foreach (var i in gs.StreamDat.Data_Bytes())
+					w.InsertRange(i);
+			else if (gs.StreamDat.Data_Stream() != null)
+				foreach (var i in gs.StreamDat.Data_Stream())
+					w.InsertRange(i);
+			else Assert.False(true, $"Unable to find a suitable version of data to insert.");
 
 			gs.CompareAgainst(ms);
 		}
