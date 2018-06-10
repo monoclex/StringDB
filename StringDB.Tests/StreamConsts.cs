@@ -122,6 +122,115 @@ namespace StringDB.Tests {
 				}
 			);
 		#endregion
+
+
+		#region dupes
+		#region string
+		public static readonly StreamData<object> Dupe_OnePerOne_String = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", "TestValue1")
+				}
+			);
+
+		public static readonly StreamData<object> Dupe_OnePerTwo_String = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", "TestValue1")
+				},
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", "TestValue2")
+				}
+			);
+
+		public static readonly StreamData<object> Dupe_TwoPerOne_String = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", "TestValue1"),
+					new KeyValuePair<string, object>("Test1", "TestValue2")
+				}
+			);
+
+		public static readonly StreamData<object> Dupe_TwoPerTwo_String = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", "TestValue1"),
+					new KeyValuePair<string, object>("Test1", "TestValue2")
+				},
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", "TestValue3"),
+					new KeyValuePair<string, object>("Test1", "TestValue4")
+				}
+			);
+		#endregion
+
+		#region byte
+		public static readonly StreamData<object> Dupe_OnePerOne_Bytes = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetBytesOf("TestValue1"))
+				}
+			);
+
+		public static readonly StreamData<object> Dupe_OnePerTwo_Bytes = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetBytesOf("TestValue1"))
+				},
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetBytesOf("TestValue2"))
+				}
+			);
+
+		public static readonly StreamData<object> Dupe_TwoPerOne_Bytes = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetBytesOf("TestValue1")),
+					new KeyValuePair<string, object>("Test1", GetBytesOf("TestValue2"))
+				}
+			);
+
+		public static readonly StreamData<object> Dupe_TwoPerTwo_Bytes = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetBytesOf("TestValue1")),
+					new KeyValuePair<string, object>("Test1", GetBytesOf("TestValue2"))
+				},
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetBytesOf("TestValue3")),
+					new KeyValuePair<string, object>("Test1", GetBytesOf("TestValue4"))
+				}
+			);
+		#endregion
+
+		#region stream
+		public static readonly StreamData<object> Dupe_OnePerOne_Stream = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetStreamOf("TestValue1"))
+				}
+			);
+
+		public static readonly StreamData<object> Dupe_OnePerTwo_Stream = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetStreamOf("TestValue1"))
+				},
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetStreamOf("TestValue2"))
+				}
+			);
+
+		public static readonly StreamData<object> Dupe_TwoPerOne_Stream = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetStreamOf("TestValue1")),
+					new KeyValuePair<string, object>("Test1", GetStreamOf("TestValue2"))
+				}
+			);
+
+		public static readonly StreamData<object> Dupe_TwoPerTwo_Stream = new StreamData<object>(
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetStreamOf("TestValue1")),
+					new KeyValuePair<string, object>("Test1", GetStreamOf("TestValue2"))
+				},
+				new List<KeyValuePair<string, object>>() {
+					new KeyValuePair<string, object>("Test1", GetStreamOf("TestValue3")),
+					new KeyValuePair<string, object>("Test1", GetStreamOf("TestValue4"))
+				}
+			);
+		#endregion
+		#endregion
+
 		#endregion
 
 		public StreamData(params List<KeyValuePair<string, T>>[] defaultValues) {
@@ -251,43 +360,83 @@ namespace StringDB.Tests {
 			Stream = 2
 		}
 
-		public static GeneratedStream GetBy(int something, int persomething, Type type) {
-			if (something == 1) {
-				if (persomething == 1)
-					switch (type) {
-						case Type.String:
-						return OnePerOne(StreamData<object>.OnePerOne_String);
-						case Type.Bytes:
-						return OnePerOne(StreamData<object>.OnePerOne_Bytes);
-						case Type.Stream:
-						return OnePerOne(StreamData<object>.OnePerOne_Stream);
-					} else if (persomething == 2)
-					switch (type) {
-						case Type.String:
-						return OnePerTwo(StreamData<object>.OnePerTwo_String);
-						case Type.Bytes:
-						return OnePerTwo(StreamData<object>.OnePerTwo_Bytes);
-						case Type.Stream:
-						return OnePerTwo(StreamData<object>.OnePerTwo_Stream);
-					}
-			} else if (something == 2) {
-				if (persomething == 1)
-					switch (type) {
-						case Type.String:
-						return TwoPerOne(StreamData<object>.TwoPerOne_String);
-						case Type.Bytes:
-						return TwoPerOne(StreamData<object>.TwoPerOne_Bytes);
-						case Type.Stream:
-						return TwoPerOne(StreamData<object>.TwoPerOne_Stream);
-					} else if (persomething == 2)
-					switch (type) {
-						case Type.String:
-						return TwoPerTwo(StreamData<object>.TwoPerTwo_String);
-						case Type.Bytes:
-						return TwoPerTwo(StreamData<object>.TwoPerTwo_Bytes);
-						case Type.Stream:
-						return TwoPerTwo(StreamData<object>.TwoPerTwo_Stream);
-					}
+		public static GeneratedStream GetBy(int something, int persomething, Type type, bool dupe = false) {
+			if (!dupe) {
+				if (something == 1) {
+					if (persomething == 1)
+						switch (type) {
+							case Type.String:
+							return OnePerOne(StreamData<object>.OnePerOne_String);
+							case Type.Bytes:
+							return OnePerOne(StreamData<object>.OnePerOne_Bytes);
+							case Type.Stream:
+							return OnePerOne(StreamData<object>.OnePerOne_Stream);
+						} else if (persomething == 2)
+						switch (type) {
+							case Type.String:
+							return OnePerTwo(StreamData<object>.OnePerTwo_String);
+							case Type.Bytes:
+							return OnePerTwo(StreamData<object>.OnePerTwo_Bytes);
+							case Type.Stream:
+							return OnePerTwo(StreamData<object>.OnePerTwo_Stream);
+						}
+				} else if (something == 2) {
+					if (persomething == 1)
+						switch (type) {
+							case Type.String:
+							return TwoPerOne(StreamData<object>.TwoPerOne_String);
+							case Type.Bytes:
+							return TwoPerOne(StreamData<object>.TwoPerOne_Bytes);
+							case Type.Stream:
+							return TwoPerOne(StreamData<object>.TwoPerOne_Stream);
+						} else if (persomething == 2)
+						switch (type) {
+							case Type.String:
+							return TwoPerTwo(StreamData<object>.TwoPerTwo_String);
+							case Type.Bytes:
+							return TwoPerTwo(StreamData<object>.TwoPerTwo_Bytes);
+							case Type.Stream:
+							return TwoPerTwo(StreamData<object>.TwoPerTwo_Stream);
+						}
+				}
+			} else {
+				if (something == 1) {
+					if (persomething == 1)
+						switch (type) {
+							case Type.String:
+							return OnePerOne(StreamData<object>.Dupe_OnePerOne_String);
+							case Type.Bytes:
+							return OnePerOne(StreamData<object>.Dupe_OnePerOne_Bytes);
+							case Type.Stream:
+							return OnePerOne(StreamData<object>.Dupe_OnePerOne_Stream);
+						} else if (persomething == 2)
+						switch (type) {
+							case Type.String:
+							return OnePerTwo(StreamData<object>.Dupe_OnePerTwo_String);
+							case Type.Bytes:
+							return OnePerTwo(StreamData<object>.Dupe_OnePerTwo_Bytes);
+							case Type.Stream:
+							return OnePerTwo(StreamData<object>.Dupe_OnePerTwo_Stream);
+						}
+				} else if (something == 2) {
+					if (persomething == 1)
+						switch (type) {
+							case Type.String:
+							return TwoPerOne(StreamData<object>.Dupe_TwoPerOne_String);
+							case Type.Bytes:
+							return TwoPerOne(StreamData<object>.Dupe_TwoPerOne_Bytes);
+							case Type.Stream:
+							return TwoPerOne(StreamData<object>.Dupe_TwoPerOne_Stream);
+						} else if (persomething == 2)
+						switch (type) {
+							case Type.String:
+							return TwoPerTwo(StreamData<object>.Dupe_TwoPerTwo_String);
+							case Type.Bytes:
+							return TwoPerTwo(StreamData<object>.Dupe_TwoPerTwo_Bytes);
+							case Type.Stream:
+							return TwoPerTwo(StreamData<object>.Dupe_TwoPerTwo_Stream);
+						}
+				}
 			}
 
 			return null;
@@ -306,7 +455,9 @@ namespace StringDB.Tests {
 			s.Seek(0, SeekOrigin.Begin);
 			WriteIndex(dat.Indexes[0], (ulong)s.Position + Judge_WriteIndexSeperator + Judge_WriteIndex(dat.Indexes[0]), sw, gs);
 			WriteIndexSeperator(0, sw); // (ulong)s.Position + Judge_WriteIndexSeperator, sw);
+			gs.IndexChainWrite = (ulong)s.Position - Judge_WriteIndexSeperator + 1uL;
 			WriteValue(dat.Values[0], sw, gs);
+			gs.IndexChain = (ulong)s.Position;
 			sw.Flush();
 
 			gs.Overhead = CalculateOverhead(s.Length, dat);
@@ -329,8 +480,10 @@ namespace StringDB.Tests {
 			WriteIndex(dat.Indexes[0], (ulong)s.Position + Judge_WriteIndex(dat.Indexes[0]) + Judge_WriteIndex(dat.Indexes[1]) + Judge_WriteIndexSeperator, sw, gs);
 			WriteIndex(dat.Indexes[1], (ulong)s.Position + Judge_WriteIndex(dat.Indexes[1]) + Judge_WriteIndexSeperator + Judge_WriteValue(dat.Values[0]), sw, gs);
 			WriteIndexSeperator(0, sw); // (ulong)s.Position + Judge_WriteIndexSeperator, sw);
+			gs.IndexChainWrite = (ulong)s.Position - Judge_WriteIndexSeperator + 1uL;
 			WriteValue(dat.Values[0], sw, gs);
 			WriteValue(dat.Values[1], sw, gs);
+			gs.IndexChain = (ulong)s.Position;
 			sw.Flush();
 
 			gs.Overhead = CalculateOverhead(s.Length, dat);
@@ -354,7 +507,9 @@ namespace StringDB.Tests {
 			WriteValue(dat.Values[0], sw, gs);
 			WriteIndex(dat.Indexes[1], (ulong)s.Position + Judge_WriteIndex(dat.Indexes[1]) + Judge_WriteIndexSeperator, sw, gs);
 			WriteIndexSeperator(0, sw);
+			gs.IndexChainWrite = (ulong)s.Position - Judge_WriteIndexSeperator + 1uL;
 			WriteValue(dat.Values[1], sw, gs);
+			gs.IndexChain = (ulong)s.Position;
 			sw.Flush();
 
 			gs.Overhead = CalculateOverhead(s.Length, dat);
@@ -381,8 +536,10 @@ namespace StringDB.Tests {
 			WriteIndex(dat.Indexes[2], (ulong)s.Position + Judge_WriteIndex(dat.Indexes[2]) + Judge_WriteIndex(dat.Indexes[3]) + Judge_WriteIndexSeperator, sw, gs);
 			WriteIndex(dat.Indexes[3], (ulong)s.Position + Judge_WriteIndex(dat.Indexes[3]) + Judge_WriteIndexSeperator + Judge_WriteValue(dat.Values[2]), sw, gs);
 			WriteIndexSeperator(0, sw); // (ulong)s.Position + Judge_WriteIndexSeperator, sw);
+			gs.IndexChainWrite = (ulong)s.Position - Judge_WriteIndexSeperator + 1uL;
 			WriteValue(dat.Values[2], sw, gs);
 			WriteValue(dat.Values[3], sw, gs);
+			gs.IndexChain = (ulong)s.Position;
 			sw.Flush();
 
 			gs.Overhead = CalculateOverhead(s.Length, dat);
@@ -395,7 +552,7 @@ namespace StringDB.Tests {
 			sw.Write((ulong)dataPos);
 			sw.Write(Encoding.UTF8.GetBytes(indexName));
 
-			gs.AddIndex(indexName, (ulong)sw.BaseStream.Position - (ulong)indexName.Length - 8uL - 1uL);
+			gs.AddIndex(indexName, (ulong)sw.BaseStream.Position - (ulong)indexName.Length - 8uL - 1uL, dataPos);
 		}
 
 		private static ulong Judge_WriteIndex(object indexName) =>
@@ -488,7 +645,7 @@ namespace StringDB.Tests {
 	public class GeneratedStream {
 		public GeneratedStream() { }
 
-		public void AddIndex(string index, ulong dataPos) {
+		public void AddIndex(string index, ulong dataPos, ulong actualDP) {
 			var newInd = new string[this.Indexes.Length + 1];
 			this.Indexes.CopyTo(newInd, 0);
 
@@ -502,6 +659,13 @@ namespace StringDB.Tests {
 			newDP[this.DataPos.Length] = dataPos;
 
 			this.DataPos = newDP;
+
+			var newdp = new ulong[this.DataStoredPos.Length + 1];
+			this.DataStoredPos.CopyTo(newdp, 0);
+
+			newdp[this.DataStoredPos.Length] = actualDP;
+
+			this.DataStoredPos = newdp;
 		}
 
 		public void AddValue(object value) {
@@ -523,8 +687,12 @@ namespace StringDB.Tests {
 		public Stream Stream { get; set; }
 		public string[] Indexes { get; set; } = new string[0];
 		public ulong[] DataPos { get; set; } = new ulong[0];
+		public ulong[] DataStoredPos { get; set; } = new ulong[0];
 		public object[] Values { get; set; } = new object[0];
 		public ulong Overhead { get; set; }
+
+		public ulong IndexChain { get; set; }
+		public ulong IndexChainWrite { get; set; }
 
 		public void CompareAgainst(Stream other) {
 			Assert.True(this.Stream.Length == other.Length, $"The streams lengths aren't equal! ({this.Stream.Length}) v.s. ({other.Length})");
