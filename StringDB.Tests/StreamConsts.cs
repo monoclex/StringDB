@@ -617,13 +617,13 @@ namespace StringDB.Tests {
 		public static ulong Judge_WriteIndexSeperator => 1uL + 8uL;
 
 		private static void WriteNumber(ulong num, BinaryWriter sw) {
-			if (num <= Byte.MaxValue) {
+			if (num <= byte.MaxValue) {
 				sw.Write(Consts.IsByteValue);
 				sw.Write((byte)num);
-			} else if (num <= UInt16.MaxValue) {
+			} else if (num <= ushort.MaxValue) {
 				sw.Write(Consts.IsUShortValue);
 				sw.Write((ushort)num);
-			} else if (num <= UInt32.MaxValue) {
+			} else if (num <= uint.MaxValue) {
 				sw.Write(Consts.IsUIntValue);
 				sw.Write((uint)num);
 			} else {
@@ -633,11 +633,11 @@ namespace StringDB.Tests {
 		}
 
 		private static ulong Judge_WriteNumber(ulong num) =>
-			num <= Byte.MaxValue ?
+			num <= byte.MaxValue ?
 				1uL + 1uL
-				: num <= UInt16.MaxValue ?
+				: num <= ushort.MaxValue ?
 					1uL + 2uL
-					: num <= UInt32.MaxValue ?
+					: num <= uint.MaxValue ?
 						1uL + 4uL
 						: 1uL + 8uL;
 	}

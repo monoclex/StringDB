@@ -46,6 +46,9 @@ namespace StringDB.Writer {
 		public void InsertRange(ICollection<KeyValuePair<string, string>> data) => InsertRangeGrunt(data); /// <inheritdoc/>
 		public void InsertRange(ICollection<KeyValuePair<string, Stream>> data) => InsertRangeGrunt(data);
 
+		/// <summary>Load the index chain into the writer</summary>
+		/// <param name="indexChainWrite">The index chain write</param>
+		/// <param name="indexChain">The index chain</param>
 		public void Load(ulong indexChainWrite, ulong indexChain) {
 			this._indexChain = indexChain;
 			this._indexChainWrite = indexChainWrite;
@@ -54,6 +57,7 @@ namespace StringDB.Writer {
 		#region nitty gritty
 
 		#region code
+		/*
 		//for now this'll go unused
 		//i don't want to have to deal with managing 2 versions of the writer
 		private void InsertGrunt(string index, object data) {
@@ -72,6 +76,10 @@ namespace StringDB.Writer {
 
 			WriteValue_Object(data);
 		}
+		*/
+
+		#region helper functions for InsertRangeGrunt
+		//TODO: not this ~~make another list with all the data as a copy in memory~~
 
 		private void InsertRangeGrunt(ICollection<KeyValuePair<string, byte[]>> data) {
 			var l = new List<KeyValuePair<string, object>>(data.Count);
@@ -99,6 +107,7 @@ namespace StringDB.Writer {
 
 			InsertRangeGrunt(l);
 		}
+		#endregion
 
 		private void InsertRangeGrunt(ICollection<KeyValuePair<string, object>> data) {
 			this._indexChain = (ulong)this._stream.Position;
@@ -109,7 +118,7 @@ namespace StringDB.Writer {
 				this._bw.BaseStream.Seek((long)this._indexChain, SeekOrigin.Begin);
 			}
 
-			ulong totalJudgement = Judge_WriteIndexSeperator();
+			var totalJudgement = Judge_WriteIndexSeperator();
 
 			foreach (var i in data)
 				totalJudgement += Judge_WriteIndex(i.Key);
@@ -130,9 +139,8 @@ namespace StringDB.Writer {
 		#endregion
 
 		#region helper functions
+
 		//index
-
-
 		private void WriteIndex(string index, ulong dataPos) {
 			if (index == null)
 				throw new ArgumentNullException("index");
@@ -177,7 +185,7 @@ namespace StringDB.Writer {
 
 			data.Seek(0, SeekOrigin.Begin);
 
-			int bufferLen = 4096;
+			var bufferLen = 4096;
 			if (data.Length < bufferLen)
 				bufferLen = (int)data.Length;
 
@@ -253,13 +261,13 @@ namespace StringDB.Writer {
 		#region IDisposable Support
 		/// <inheritdoc/>
 		protected virtual void Dispose(bool disposing) {
-			if (!disposedValue) {
-				if (disposing) {
+			if (!this.disposedValue) {
+				if (disposing && !this._leaveOpen) {
 					this._stream.Dispose();
-					((IDisposable)_bw).Dispose();
+					((IDisposable)this._bw).Dispose();
 				}
-				
-				disposedValue = true;
+
+				this.disposedValue = true;
 			}
 		} /// <inheritdoc/>
 			
@@ -267,6 +275,6 @@ namespace StringDB.Writer {
 			Dispose(true);
 
 		private bool disposedValue = false; // To detect redundant calls
-#endregion
+		#endregion
 	}
 }
