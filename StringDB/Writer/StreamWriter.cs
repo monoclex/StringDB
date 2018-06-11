@@ -1,241 +1,272 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace StringDB.Writer {
-
-
+	
 	/// <inheritdoc/>
 	public class StreamWriter : IWriter {
-		/// <summary>Create a new StreamWriter.</summary>
-		/// <param name="outputStream">The stream to write to. You may need to call the Load() void to set the indexChain data.</param>
-		/// <param name="dbv">The database version to write to.</param>
-		/// <param name="keepStreamOpen">Whether or not the stream should be disposed after it's done being used.<para>Note that in NET 2.0, 3.5, or 4.0, this is not guarenteed to work.</para></param>
-		public StreamWriter(Stream outputStream, DatabaseVersion dbv, bool keepStreamOpen) {
-			this._stream = outputStream;
+
+		/// <summary>The rewritten version of the StreamWriter</summary>
+		/// <param name="s">The stream to write to</param>
+		/// <param name="dbv">The database version of the stream</param>
+		/// <param name="leaveOpen">If the stream should be left open</param>
+		public StreamWriter(Stream s, DatabaseVersion dbv = DatabaseVersion.Latest, bool leaveOpen = false) {
+			this._stream = s;
+			this._dbv = DatabaseVersion.Latest;
+			this._leaveOpen = leaveOpen;
+
+			var l = new List<int>();
+
+			l.ToArray();
+
 #if NET20 || NET35 || NET40
-			this._bw = new BinaryWriter(this._stream, System.Text.Encoding.UTF8);
+			this._bw = new BinaryWriter(this._stream);
 #else
-			this._bw = new BinaryWriter(this._stream, System.Text.Encoding.UTF8, keepStreamOpen);
+			this._bw = new BinaryWriter(this._stream, Encoding.UTF8, this._leaveOpen);
 #endif
+
 			this._indexChain = 0;
 			this._indexChainWrite = 0;
-
-			this._stream.Position = 0;
-			this._dbv = dbv;
-			this._keepStreamOpen = keepStreamOpen;
 		}
 
-		private bool _keepStreamOpen;
-		private DatabaseVersion _dbv;
 		private Stream _stream;
 		private BinaryWriter _bw;
+		private DatabaseVersion _dbv;
+		private bool _leaveOpen;
+		private ulong _indexChain; //stores where the start of the new indexes are
+		private ulong _indexChainWrite; //stores where to go to overwrite the old index chain
 
-		private ulong _indexChainWrite; //stores WHERE to overwrite stuff to link TO the start of a collection of indexes.
-		private ulong _indexChain; //stores the START of a collection of indexes
+		/// <inheritdoc/>
+		public void Insert(string index, string data) => InsertRangeGrunt(new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(index, data) }); /// <inheritdoc/>
+		public void Insert(string index, byte[] data) => InsertRangeGrunt(new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(index, data) }); /// <inheritdoc/>
+		public void Insert(string index, Stream data) => InsertRangeGrunt(new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(index, data) }); /// <inheritdoc/>
+		public void InsertRange(ICollection<KeyValuePair<string, byte[]>> data) => InsertRangeGrunt(data); /// <inheritdoc/>
+		public void InsertRange(ICollection<KeyValuePair<string, string>> data) => InsertRangeGrunt(data); /// <inheritdoc/>
+		public void InsertRange(ICollection<KeyValuePair<string, Stream>> data) => InsertRangeGrunt(data);
 
-		internal void Load(ulong indexChainWrite, ulong indexChain) {
-			this._indexChainWrite = indexChainWrite;
+		public void Load(ulong indexChainWrite, ulong indexChain) {
 			this._indexChain = indexChain;
+			this._indexChainWrite = indexChainWrite;
 		}
 
-		/// <inheritdoc/>
-		public void InsertRange(ICollection<KeyValuePair<string, string>> data) {
-			if (data == null)
-				throw new ArgumentNullException("data");
+		#region nitty gritty
 
-			this.InsertRange(new ICollection<KeyValuePair<string, string>>[] { data });
+		#region code
+		//for now this'll go unused
+		//i don't want to have to deal with managing 2 versions of the writer
+		private void InsertGrunt(string index, object data) {
+			this._indexChain = (ulong)this._stream.Position;
+
+			if (this._indexChainWrite != 0) {
+				this._bw.BaseStream.Seek((long)this._indexChainWrite, SeekOrigin.Begin);
+				this._bw.Write(this._indexChain);
+				this._bw.BaseStream.Seek((long)this._indexChain, SeekOrigin.Begin);
+			}
+
+			WriteIndex(index, (ulong)this._stream.Position + Judge_WriteIndex(index) + Judge_WriteIndexSeperator());
+
+			this._indexChainWrite = (ulong)this._stream.Position + 1uL;
+			WriteIndexSeperator(0);
+
+			WriteValue_Object(data);
 		}
 
-		//TODO: not use new List<KeyValuePair> that seems just a *little bit* awful
-		/// <inheritdoc/>
-		public void Insert(string index, string data) => InsertRange(new ICollection<KeyValuePair<string, string>>[] { new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>(index, data) } });
+		private void InsertRangeGrunt(ICollection<KeyValuePair<string, byte[]>> data) {
+			var l = new List<KeyValuePair<string, object>>(data.Count);
 
-		/// <inheritdoc/>
-		public void Insert(string index, byte[] data) => throw new NotImplementedException();
+			foreach (var i in data)
+				l.Add(new KeyValuePair<string, object>(i.Key, i.Value));
 
-		/// <inheritdoc/>
-		public void Insert(string index, Stream data) => throw new NotImplementedException();
-
-		/// <inheritdoc/>
-		public void InsertRange(ICollection<KeyValuePair<string, byte[]>> data) => throw new NotImplementedException();
-
-		/// <inheritdoc/>
-		public void InsertRange(ICollection<KeyValuePair<string, Stream>> data) => throw new NotImplementedException();
-		
-		/// <inheritdoc/>
-		public void InsertRange(params ICollection<KeyValuePair<string, string>>[] data) {
-			if (data == null)
-				throw new ArgumentNullException("data");
-
-			this._bw.Seek(0, SeekOrigin.End); //goto the end of the stream to append data
-
-			var indxChain = (ulong)0; //responsible for storing the start of the index
-			var indxChainWrite = (ulong)0; //responsible for storing the location of where to overwrite the indexChain
-
-			string[] indx;
-			string[] dta;
-			ulong[] indxsAt;
-			ulong[] indxsShowsUpAt;
-
-			{
-				var c = 0;
-				for (var i = 0u; i < data.Length; i++)
-					c += data[i].Count;
-
-				indx = new string[c];
-				dta = new string[c];
-				indxsAt = new ulong[c];
-				indxsShowsUpAt = new ulong[c];
-			}
-
-			//SET DATA
-			{
-				var counter = 0u;
-				foreach (var j in data)
-					foreach (var i in j) {
-						indx[counter] = i.Key;
-						dta[counter] = i.Value;
-
-						counter++;
-					}
-			}
-
-			//SET INDEX CHAIN
-			indxChain = (ulong)this._stream.Position;
-
-			//WRITE EACH INDEX
-			for (uint i = 0; i < indx.Length; i++) {
-				if ((int)this._dbv >= (int)DatabaseVersion.Version300) {
-					if (indx[i].Length > 250)
-						throw new Exception($"Index cannot be longer then 250 chars. Use a SHA256 hash or something you mad man. ({indx[i]})");
-				} else {
-					if (indx[i].Length > 254)
-						throw new Exception($"Index cannot be longer then 254 chars. 0xFF is reserved for the index chain. {indx[i]}");
-				}
-
-				this._bw.Write(Convert.ToByte(indx[i].Length));  //LENGTH OF INDEXER
-				indxsAt[i] = (ulong)this._stream.Position;
-				this._bw.Write((ulong)0);                //WHERE IT WILL SHOW UP IN THE FILE
-
-				WriteStringRaw(indx[i]);
-			}
-
-			//SEPERATE INDEXES
-			this._bw.Write(Consts.IndexSeperator);
-
-			indxChainWrite = (ulong)this._stream.Position;
-			this._bw.Write((ulong)0); //if we want to append more data, we'll link this to the next set of indexes. aka the index chain
-
-			//WRITE DATA
-			for (uint i = 0; i < indx.Length; i++) {
-				indxsShowsUpAt[i] = (ulong)this._stream.Position; //we wanna know when we'll see it again
-
-				this.WriteNumber(dta[i].Length);      //LENTH OF DATA
-				WriteStringRaw(dta[i]);         //THE DATA ITSELF
-			}
-
-			//REWRITE INDEXES TO POINT TO THE DATA
-			for (uint i = 0; i < dta.Length; i++) {
-				var overwriteAt = indxsAt[i];
-				var locationShowsUp = indxsShowsUpAt[i];
-
-				//overwrite this
-				this._bw.BaseStream.Seek((long)overwriteAt, SeekOrigin.Begin);
-				this._bw.Write(locationShowsUp); //overwrite the old data
-			}
-
-			//INDEX CHAIN THIS NEW DATA WITH THE OLD INDEXES
-			if (this._indexChainWrite != 0) { //if the place to overwrite the old index chain exists
-				this._bw.BaseStream.Seek((long)this._indexChainWrite, SeekOrigin.Begin); //go to it
-				this._bw.Write(indxChain); //write the start of the new index chain
-			}
-
-			//SET NEW INDEX CHAIN
-			this._indexChain = indxChain;
-			this._indexChainWrite = indxChainWrite;
-
-			//DONE
+			InsertRangeGrunt(l);
 		}
 
-		private void WriteStringRaw(string raw) { if (raw == null) throw new ArgumentNullException("an index within the data"); foreach (var i in raw) this._bw.Write(i); }
+		private void InsertRangeGrunt(ICollection<KeyValuePair<string, string>> data) {
+			var l = new List<KeyValuePair<string, object>>(data.Count);
 
-		/// <summary>
-		/// Write the smallest version possible of this number. Adds 1 byte to the overhead if it's longer, otherwise it saves quite a few bytes.
-		/// </summary>
-		/// <param name="value"></param>
-		private void WriteNumber(ulong value) {
-			if ((int)this._dbv >= (int)DatabaseVersion.Version200) {
-				if (value <= Byte.MaxValue) {
-					this._bw.Write(Consts.IsByteValue);
-					this._bw.Write((byte)value);
-				} else if (value <= UInt16.MaxValue) {
-					this._bw.Write(Consts.IsUShortValue);
-					this._bw.Write((ushort)value);
-				} else if (value <= UInt32.MaxValue) {
-					this._bw.Write(Consts.IsUIntValue);
-					this._bw.Write((uint)value);
-				} else {
-					this._bw.Write(Consts.IsULongValue);
-					this._bw.Write(value);
-				}
-			} else this._bw.Write(value);
+			foreach (var i in data)
+				l.Add(new KeyValuePair<string, object>(i.Key, i.Value));
+
+			InsertRangeGrunt(l);
 		}
 
-		private void WriteNumber(byte value) =>
-			WriteNumber((ulong)value);
+		private void InsertRangeGrunt(ICollection<KeyValuePair<string, Stream>> data) {
+			var l = new List<KeyValuePair<string, object>>(data.Count);
 
-		private void WriteNumber(ushort value) =>
-			WriteNumber((ulong)value);
+			foreach (var i in data)
+				l.Add(new KeyValuePair<string, object>(i.Key, i.Value));
 
-		private void WriteNumber(short value) =>
-			WriteNumber((ulong)value);
+			InsertRangeGrunt(l);
+		}
 
-		private void WriteNumber(uint value) =>
-			WriteNumber((ulong)value);
+		private void InsertRangeGrunt(ICollection<KeyValuePair<string, object>> data) {
+			this._indexChain = (ulong)this._stream.Position;
 
-		private void WriteNumber(int value) =>
-			WriteNumber((ulong)value);
-
-		private void WriteNumber(long value) =>
-			WriteNumber((ulong)value);
-
-		#region IDisposable Support
-		private bool disposedValue = false;
-
-		/// <summary>Dispose this object</summary>
-		/// <param name="disposing"></param>
-		protected virtual void Dispose(bool disposing) {
-			if (!this.disposedValue) {
-				if (disposing) {
-					if (!this._keepStreamOpen)
-						this._stream.Dispose();
-
-					//Probably isn't needed ( for the writer only ) but mine as well to keep consistency with the reader :p
-					if(!this._keepStreamOpen)
-						((IDisposable)this._bw).Dispose();
-				}
-
-				this._stream = null;
-				this._bw = null;
-
-				this._dbv = DatabaseVersion.Version100;
-				this._indexChain = 0;
-				this._indexChainWrite = 0;
-
-				this.disposedValue = true;
+			if (this._indexChainWrite != 0) {
+				this._bw.BaseStream.Seek((long)this._indexChainWrite, SeekOrigin.Begin);
+				this._bw.Write(this._indexChain);
+				this._bw.BaseStream.Seek((long)this._indexChain, SeekOrigin.Begin);
 			}
-		}
 
-		/// <summary>Finalize this</summary>
-		~StreamWriter() =>
-			Dispose(false);
+			ulong totalJudgement = Judge_WriteIndexSeperator();
 
-		/// <summary>Dispose this</summary>
-		public void Dispose() {
-			Dispose(true);
-			GC.SuppressFinalize(this);
+			foreach (var i in data)
+				totalJudgement += Judge_WriteIndex(i.Key);
+
+			foreach (var i in data) {
+				WriteIndex(i.Key, (ulong)this._stream.Position + totalJudgement);
+
+				totalJudgement += Judge_WriteValue_Object(i.Value);
+				totalJudgement -= Judge_WriteIndex(i.Key);
+			}
+
+			this._indexChainWrite = (ulong)this._stream.Position + 1uL;
+			WriteIndexSeperator(0);
+
+			foreach (var i in data)
+				WriteValue_Object(i.Value);
 		}
 		#endregion
+
+		#region helper functions
+		//index
+
+
+		private void WriteIndex(string index, ulong dataPos) {
+			if (index == null)
+				throw new ArgumentNullException("index");
+
+			if (index.Length >= Consts.MaxLength)
+				throw new ArgumentOutOfRangeException(nameof(index));
+
+			this._bw.Write((byte)index.Length);
+			this._bw.Write(dataPos);
+			this.WriteString(index);
+		}
+
+		//seperator
+		private void WriteIndexSeperator(ulong pos) {
+			this._bw.Write(Consts.IndexSeperator);
+			this._bw.Write(pos);
+		}
+
+		//values
+		private void WriteValue_Object(object data) {
+			if (data is byte[])
+				WriteValue(data as byte[]);
+			else if (data is string)
+				WriteValue(data as string);
+			else if (data is Stream)
+				WriteValue(data as Stream);
+			else throw new ArgumentException("data isn't string, byte[], or Stream");
+		}
+
+		private void WriteValue(byte[] data) {
+			this.WriteNumber((ulong)data.Length);
+			this._bw.Write(data);
+		}
+
+		private void WriteValue(string data) {
+			this.WriteNumber((ulong)data.Length);
+			this.WriteString(data);
+		}
+		
+		private void WriteValue(Stream data) {
+			this.WriteNumber((ulong)data.Length);
+
+			data.Seek(0, SeekOrigin.Begin);
+
+			int bufferLen = 4096;
+			if (data.Length < bufferLen)
+				bufferLen = (int)data.Length;
+
+			int num;
+			var buffer = new byte[bufferLen];
+			while ((num = data.Read(buffer, 0, buffer.Length)) != 0)
+				this._bw.Write(buffer);
+		}
+		
+		//#
+		private void WriteNumber(ulong val) {
+			if (val <= byte.MaxValue) {
+				this._bw.Write(Consts.IsByteValue);
+				this._bw.Write((byte)val);
+			} else if (val <= ushort.MaxValue) {
+				this._bw.Write(Consts.IsUShortValue);
+				this._bw.Write((ushort)val);
+			} else if (val <= uint.MaxValue) {
+				this._bw.Write(Consts.IsUIntValue);
+				this._bw.Write((uint)val);
+			} else {
+				this._bw.Write(Consts.IsULongValue);
+				this._bw.Write(val);
+			}
+		}
+
+		private void WriteString(string data) =>
+			this._bw.Write(Encoding.UTF8.GetBytes(data));
+
+		//judging
+
+		//index
+		private ulong Judge_WriteIndex(string index) =>
+			1uL + 8uL + (ulong)index.Length;
+
+		//seperator
+		private ulong Judge_WriteIndexSeperator() =>
+			1uL + 8uL;
+
+		//write value
+		private ulong Judge_WriteValue_Object(object data) =>
+			data is byte[] ?
+				Judge_WriteValue(data as byte[])
+				: data is string ?
+					Judge_WriteValue(data as string)
+					: data is Stream ?
+						Judge_WriteValue(data as Stream)
+						: throw new ArgumentException("data isn't byte[], string, or Stream");
+
+		private ulong Judge_WriteValue(byte[] data) =>
+			Judge_WriteNumber((ulong)data.Length) + (ulong)data.Length;
+
+		private ulong Judge_WriteValue(string data) =>
+			Judge_WriteNumber((ulong)data.Length) + (ulong)data.Length;
+
+		private ulong Judge_WriteValue(Stream data) =>
+			Judge_WriteNumber((ulong)data.Length) + (ulong)data.Length;
+
+		//#
+		private ulong Judge_WriteNumber(ulong val) =>
+			1uL
+			+ (val <= byte.MaxValue ?
+				1uL
+				: val <= ushort.MaxValue ?
+					2uL
+					: val <= uint.MaxValue ?
+						4uL
+						: 8uL);
+		#endregion
+
+		#endregion
+
+		#region IDisposable Support
+		/// <inheritdoc/>
+		protected virtual void Dispose(bool disposing) {
+			if (!disposedValue) {
+				if (disposing) {
+					this._stream.Dispose();
+					((IDisposable)_bw).Dispose();
+				}
+				
+				disposedValue = true;
+			}
+		} /// <inheritdoc/>
+			
+		public void Dispose() =>
+			Dispose(true);
+
+		private bool disposedValue = false; // To detect redundant calls
+#endregion
 	}
 }

@@ -305,7 +305,7 @@ namespace StringDB.Tests {
 				var l = new List<KeyValuePair<string, byte[]>>();
 
 				foreach (var j in i) {
-					if (!(j.Value is string))
+					if (!(j.Value is byte[]))
 						return null;
 
 					l.Add(new KeyValuePair<string, byte[]>(j.Key, j.Value as byte[]));
@@ -324,7 +324,7 @@ namespace StringDB.Tests {
 				var l = new List<KeyValuePair<string, Stream>>();
 
 				foreach (var j in i) {
-					if (!(j.Value is string))
+					if (!(j.Value is Stream))
 						return null;
 
 					l.Add(new KeyValuePair<string, Stream>(j.Key, j.Value as Stream));
@@ -700,15 +700,29 @@ namespace StringDB.Tests {
 			this.Stream.Seek(0, SeekOrigin.Begin);
 			other.Seek(0, SeekOrigin.Begin);
 
+			var wrong = new List<char>();
 			var right = new List<char>();
 
-			for(var i = 0; i < this.Stream.Length; i++) {
+			var total_right = new List<char>();
+			var total_wrong = new List<char>();
+
+			for (var i = 0; i < this.Stream.Length; i++)
+				total_right.Add(Convert.ToChar(this.Stream.ReadByte()));
+
+			for (var i = 0; i < other.Length; i++)
+				total_wrong.Add(Convert.ToChar(other.ReadByte()));
+
+			this.Stream.Seek(0, SeekOrigin.Begin);
+			other.Seek(0, SeekOrigin.Begin);
+
+			for (var i = 0; i < this.Stream.Length; i++) {
 				var byteA = this.Stream.ReadByte();
 				var byteB = other.ReadByte();
 
-				Assert.True(byteA == byteB, $"The streams did not match at '{i}'. Stream[{i}] = ({byteA}), other[{i}] = ({byteB}) . . . {GetCharList(right)}");
+				Assert.True(byteA == byteB, $"The streams did not match at '{i}'. Stream[{i}] = ({byteA}), other[{i}] = ({byteB}) . . . {GetCharList(right)}, {GetCharList(wrong)} \r\n {GetCharList(total_right)} \r\n {GetCharList(total_wrong)}");
 
 				right.Add(Convert.ToChar(byteA));
+				wrong.Add(Convert.ToChar(byteB));
 			}
 		}
 
