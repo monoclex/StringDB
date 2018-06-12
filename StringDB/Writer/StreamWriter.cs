@@ -52,6 +52,8 @@ namespace StringDB.Writer {
 		public void Load(ulong indexChainWrite, ulong indexChain) {
 			this._indexChain = indexChain;
 			this._indexChainWrite = indexChainWrite;
+
+			this._stream.Seek((long)this._indexChain, SeekOrigin.Begin);
 		}
 
 		private void InsertString(string index, string data) {
@@ -152,6 +154,8 @@ namespace StringDB.Writer {
 		private void InsertRangeGrunt(ICollection<KeyValuePair<string, object>> data) {
 			if (data == null) throw new ArgumentNullException(nameof(data));
 			if (data.Count == 0) throw new ArgumentException("Collection is empty", nameof(data));
+
+			this._stream.Seek(0, SeekOrigin.End);
 
 			this._indexChain = (ulong)this._stream.Position;
 
