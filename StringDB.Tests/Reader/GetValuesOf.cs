@@ -97,7 +97,7 @@ namespace StringDB.Tests.Reader {
 				else if (gs.Values[i] is byte[])
 					Assert.Equal(vals[i], gs.Values[i]);
 				else if (gs.Values[i] is System.IO.Stream)
-					Assert.Equal(gs.Values[i], StreamData<object>.GetStreamOf(Encoding.UTF8.GetString(vals[i])));
+					GeneratedStream.CompareStreams(gs.Values[i] as System.IO.Stream, StreamData<object>.GetStreamOf(Encoding.UTF8.GetString(vals[i])));
 		}
 
 		private StreamReader GetSR(System.IO.Stream s) =>

@@ -66,7 +66,7 @@ namespace StringDB.Tests.Reader {
 						else if (i.Value is byte[])
 							Assert.Equal((byte[])i.Value, sr.GetDirectValueOf(dp));
 						else if (i.Value is System.IO.Stream)
-							Assert.Equal((System.IO.Stream)i.Value, StreamData<object>.GetStreamOf(Encoding.UTF8.GetString(sr.GetDirectValueOf(dp))));
+							GeneratedStream.CompareStreams((System.IO.Stream)i.Value, StreamData<object>.GetStreamOf(Encoding.UTF8.GetString(sr.GetDirectValueOf(dp))));
 						else throw new Exception("not");
 
 					}

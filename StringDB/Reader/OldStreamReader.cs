@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
+using System.IO;
 
 namespace StringDB.Reader {
 	/// <inheritdoc/>
-	public class StreamReader : IReader {
+	public class OldStreamReader : IReader {
 		/// <summary>Create a new StreamReader.</summary>
 		/// <param name="streamUse">The stream to read . You may need to call the Load() void to set the indexChain data.</param>
 		/// <param name="dbv">The database version to read from.</param>
 		/// <param name="keepStreamOpen">Whether or not the stream is to be disposed after using it.</param>
-		public StreamReader(Stream streamUse, DatabaseVersion dbv, bool keepStreamOpen) {
+		public OldStreamReader(System.IO.Stream streamUse, DatabaseVersion dbv, bool keepStreamOpen) {
 			this._stream = streamUse;
 #if NET20 || NET35 || NET40
-			this._br = new BinaryReader(this._stream, System.Text.Encoding.UTF8);
+			this._br = new System.IO.BinaryReader(this._stream, Encoding.UTF8);
 #else
-			this._br = new BinaryReader(this._stream, System.Text.Encoding.UTF8, keepStreamOpen);
+			this._br = new System.IO.BinaryReader(this._stream, Encoding.UTF8, keepStreamOpen);
 #endif
 			this._dbv = dbv;
 			this._keepStreamOpen = keepStreamOpen;
@@ -32,6 +32,8 @@ namespace StringDB.Reader {
 		/// <inheritdoc/>
 		public ulong GetOverhead() => _GetOverhead(); /// <inheritdoc/>
 		public byte[][] GetIndexes() => _Indexes(); /// <inheritdoc/>
+
+		public bool Empty() => this._stream.Length == 0; /// <inheritdoc/>
 
 		public IEnumerator<ReaderPair> GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());/// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => new ReaderEnumerator(this, this.FirstIndex());/// <inheritdoc/>
@@ -51,6 +53,7 @@ namespace StringDB.Reader {
 		public IReaderInteraction IndexAfter(string index, bool doSeek = true, ulong quickSeek = 0) => _IndexAfter(index, doSeek, quickSeek);/// <inheritdoc/>
 
 		public IReaderInteraction FirstIndex() => IndexAfter(null, true, 0);/// <inheritdoc/>
+		public IReaderInteraction LastIndex() => throw new NotImplementedException(); /// <inheritdoc/>
 
 		public IReaderChain GetReaderChain() => _ReadChain();
 		#endregion
@@ -71,7 +74,7 @@ namespace StringDB.Reader {
 				overhead += 9;
 
 				if ((int)this._dbv >= (int)DatabaseVersion.Version200) {
-					this._br.BaseStream.Seek((long)i._dataPos.DataPos, SeekOrigin.Begin);
+					this._br.BaseStream.Seek((long)i._dataPos.DataPosition, SeekOrigin.Begin);
 
 					var b = this._br.BaseStream.ReadByte();
 
@@ -271,7 +274,7 @@ namespace StringDB.Reader {
 			if (readerInteraction == null)
 				throw new ArgumentNullException("readerInteraction");
 
-			this._br.BaseStream.Seek((long)readerInteraction.DataPos, SeekOrigin.Begin);
+			this._br.BaseStream.Seek((long)readerInteraction.DataPosition, SeekOrigin.Begin);
 
 			return this._br.ReadBytes((int)this.GetNumber());
 		}
@@ -377,7 +380,7 @@ namespace StringDB.Reader {
 		}
 		
 		/// <summary>Finalize this object</summary>
-		~StreamReader() {
+		~OldStreamReader() {
 			Dispose(false);
 		}
 

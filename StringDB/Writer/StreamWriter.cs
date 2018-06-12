@@ -39,9 +39,9 @@ namespace StringDB.Writer {
 		private ulong _indexChainWrite; //stores where to go to overwrite the old index chain
 
 		/// <inheritdoc/>
-		public void Insert(string index, string data) => InsertRangeGrunt(new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(index, data) }); /// <inheritdoc/>
-		public void Insert(string index, byte[] data) => InsertRangeGrunt(new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(index, data) }); /// <inheritdoc/>
-		public void Insert(string index, Stream data) => InsertRangeGrunt(new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(index, data) }); /// <inheritdoc/>
+		public void Insert(string index, string data) => InsertString(index, data); /// <inheritdoc/>
+		public void Insert(string index, byte[] data) => InsertByteArray(index, data); /// <inheritdoc/>
+		public void Insert(string index, Stream data) => InsertStream(index, data); /// <inheritdoc/>
 		public void InsertRange(ICollection<KeyValuePair<string, byte[]>> data) => InsertRangeGrunt(data); /// <inheritdoc/>
 		public void InsertRange(ICollection<KeyValuePair<string, string>> data) => InsertRangeGrunt(data); /// <inheritdoc/>
 		public void InsertRange(ICollection<KeyValuePair<string, Stream>> data) => InsertRangeGrunt(data);
@@ -54,9 +54,27 @@ namespace StringDB.Writer {
 			this._indexChainWrite = indexChainWrite;
 		}
 
-		#region nitty gritty
+		private void InsertString(string index, string data) {
+			if (index == null) throw new ArgumentNullException(nameof(index));
+			if (data == null) throw new ArgumentNullException(nameof(data));
 
-		#region code
+			InsertRangeGrunt(new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(index, data) });
+		}
+
+		private void InsertByteArray(string index, byte[] data) {
+			if (index == null) throw new ArgumentNullException(nameof(index));
+			if (data == null) throw new ArgumentNullException(nameof(data));
+
+			InsertRangeGrunt(new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(index, data) });
+		}
+
+		private void InsertStream(string index, Stream stream) {
+			if (index == null) throw new ArgumentNullException(nameof(index));
+			if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+			InsertRangeGrunt(new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(index, stream) });
+		}
+
 		/*
 		//for now this'll go unused
 		//i don't want to have to deal with managing 2 versions of the writer
@@ -78,38 +96,63 @@ namespace StringDB.Writer {
 		}
 		*/
 
-		#region helper functions for InsertRangeGrunt
 		//TODO: not this ~~make another list with all the data as a copy in memory~~
 
 		private void InsertRangeGrunt(ICollection<KeyValuePair<string, byte[]>> data) {
+			if (data == null) throw new ArgumentNullException(nameof(data));
+			if (data.Count == 0) throw new ArgumentException("Collection is empty", nameof(data));
+
 			var l = new List<KeyValuePair<string, object>>(data.Count);
 
 			foreach (var i in data)
-				l.Add(new KeyValuePair<string, object>(i.Key, i.Value));
+				if (i.Key == null)
+					throw new ArgumentNullException(nameof(i.Key), "Key is null.");
+				else if (i.Value == null)
+					throw new ArgumentNullException(nameof(i.Value), "Value is null");
+				else
+					l.Add(new KeyValuePair<string, object>(i.Key, i.Value));
 
 			InsertRangeGrunt(l);
 		}
 
 		private void InsertRangeGrunt(ICollection<KeyValuePair<string, string>> data) {
+			if (data == null) throw new ArgumentNullException(nameof(data));
+			if (data.Count == 0) throw new ArgumentException("Collection is empty", nameof(data));
+
 			var l = new List<KeyValuePair<string, object>>(data.Count);
 
 			foreach (var i in data)
-				l.Add(new KeyValuePair<string, object>(i.Key, i.Value));
+				if (i.Key == null)
+					throw new ArgumentNullException(nameof(i.Key), "Key is null.");
+				else if (i.Value == null)
+					throw new ArgumentNullException(nameof(i.Value), "Value is null");
+				else
+					l.Add(new KeyValuePair<string, object>(i.Key, i.Value));
 
 			InsertRangeGrunt(l);
 		}
 
 		private void InsertRangeGrunt(ICollection<KeyValuePair<string, Stream>> data) {
+			if (data == null) throw new ArgumentNullException(nameof(data));
+			if (data.Count == 0) throw new ArgumentException("Collection is empty", nameof(data));
+
 			var l = new List<KeyValuePair<string, object>>(data.Count);
 
 			foreach (var i in data)
-				l.Add(new KeyValuePair<string, object>(i.Key, i.Value));
+				if (i.Key == null)
+					throw new ArgumentNullException(nameof(i.Key), "Key is null.");
+				else if (i.Value == null)
+					throw new ArgumentNullException(nameof(i.Value), "Value is null");
+				else
+					l.Add(new KeyValuePair<string, object>(i.Key, i.Value));
 
 			InsertRangeGrunt(l);
 		}
-		#endregion
 
 		private void InsertRangeGrunt(ICollection<KeyValuePair<string, object>> data) {
+			if (data == null) throw new ArgumentNullException(nameof(data));
+			if (data.Count == 0) throw new ArgumentException("Collection is empty", nameof(data));
+
 			this._indexChain = (ulong)this._stream.Position;
 
 			if (this._indexChainWrite != 0) {
@@ -136,14 +179,10 @@ namespace StringDB.Writer {
 			foreach (var i in data)
 				WriteValue_Object(i.Value);
 		}
-		#endregion
-
-		#region helper functions
-
+		
 		//index
 		private void WriteIndex(string index, ulong dataPos) {
-			if (index == null)
-				throw new ArgumentNullException("index");
+			if (index == null) throw new ArgumentNullException(nameof(index));
 
 			if (index.Length >= Consts.MaxLength)
 				throw new ArgumentOutOfRangeException(nameof(index));
@@ -254,11 +293,8 @@ namespace StringDB.Writer {
 					: val <= uint.MaxValue ?
 						4uL
 						: 8uL);
-		#endregion
 
-		#endregion
 
-		#region IDisposable Support
 		/// <inheritdoc/>
 		protected virtual void Dispose(bool disposing) {
 			if (!this.disposedValue) {
@@ -275,6 +311,5 @@ namespace StringDB.Writer {
 			Dispose(true);
 
 		private bool disposedValue = false; // To detect redundant calls
-		#endregion
 	}
 }

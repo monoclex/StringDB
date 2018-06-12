@@ -50,9 +50,9 @@ namespace StringDB.Tests.Reader {
 			var sr = GetSR(gs.Stream);
 
 			Assert.True(sr.FirstIndex().Index == gs.Indexes[0], $"sr.FirstIndex().Index != gs.Indexes[0]");
-			Assert.True(sr.FirstIndex().IndexChainPassedAmount == 0, $"sr.FirstIndex().IndexChainPassedAmount != 0");
-			Assert.True(sr.FirstIndex().DataPos == gs.DataStoredPos[0], $"sr.FirstIndex().DataPos ({sr.FirstIndex().DataPos}) != gs.DataStoredPos[0] ({gs.DataStoredPos[0]})");
-			Assert.True(sr.FirstIndex().QuickSeek == gs.DataPos[0] + (ulong)gs.Indexes[0].Length + 9uL, $"sr.FirstIndex().QuickSeek ({sr.FirstIndex().QuickSeek}) != gs.DataPos[0] ({gs.DataPos[0] + (ulong)gs.Indexes[0].Length + 9uL})");
+			Assert.True(((ReaderInteraction)sr.FirstIndex()).IndexChainPassedAmount == 0, $"sr.FirstIndex().IndexChainPassedAmount != 0");
+			Assert.True(sr.FirstIndex().DataPosition == gs.DataStoredPos[0], $"sr.FirstIndex().DataPos ({sr.FirstIndex().DataPosition}) != gs.DataStoredPos[0] ({gs.DataStoredPos[0]})");
+			Assert.True(sr.FirstIndex().QuickSeek == gs.DataPos[0], $"sr.FirstIndex().QuickSeek ({sr.FirstIndex().QuickSeek}) != gs.DataPos[0] ({gs.DataPos[0]})");
 		}
 
 		private StreamReader GetSR(System.IO.Stream s) =>

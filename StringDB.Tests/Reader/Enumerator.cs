@@ -59,7 +59,7 @@ namespace StringDB.Tests.Reader {
 				if(mn) {
 					var rp = p.Current;
 
-					Assert.True(rp.Index == gs.Indexes[i], $"rp.Index ({rp.Index}) != gs.Indexes[i] ({gs.Indexes[i]})");
+					Assert.True(rp.Index == gs.Indexes[i], $"rp.Index ({rp.Index}) != gs.Indexes[{i}] (i = {i}) ({gs.Indexes[i]})");
 
 					var val = gs.Values[i];
 					string newVal = "";

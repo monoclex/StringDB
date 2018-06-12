@@ -694,11 +694,11 @@ namespace StringDB.Tests {
 		public ulong IndexChain { get; set; }
 		public ulong IndexChainWrite { get; set; }
 
-		public void CompareAgainst(Stream other) {
-			Assert.True(this.Stream.Length == other.Length, $"The streams lengths aren't equal! ({this.Stream.Length}) v.s. ({other.Length})");
+		public static void CompareStreams(Stream thisStream, Stream otherStream) {
+			Assert.True(thisStream.Length == otherStream.Length, $"The streams lengths aren't equal! ({thisStream.Length}) v.s. ({otherStream.Length})");
 
-			this.Stream.Seek(0, SeekOrigin.Begin);
-			other.Seek(0, SeekOrigin.Begin);
+			thisStream.Seek(0, SeekOrigin.Begin);
+			otherStream.Seek(0, SeekOrigin.Begin);
 
 			var wrong = new List<char>();
 			var right = new List<char>();
@@ -706,27 +706,31 @@ namespace StringDB.Tests {
 			var total_right = new List<char>();
 			var total_wrong = new List<char>();
 
-			for (var i = 0; i < this.Stream.Length; i++)
-				total_right.Add(Convert.ToChar(this.Stream.ReadByte()));
+			for (var i = 0; i < thisStream.Length; i++)
+				total_right.Add(Convert.ToChar(thisStream.ReadByte()));
 
-			for (var i = 0; i < other.Length; i++)
-				total_wrong.Add(Convert.ToChar(other.ReadByte()));
+			for (var i = 0; i < otherStream.Length; i++)
+				total_wrong.Add(Convert.ToChar(otherStream.ReadByte()));
 
-			this.Stream.Seek(0, SeekOrigin.Begin);
-			other.Seek(0, SeekOrigin.Begin);
+			thisStream.Seek(0, SeekOrigin.Begin);
+			otherStream.Seek(0, SeekOrigin.Begin);
 
-			for (var i = 0; i < this.Stream.Length; i++) {
-				var byteA = this.Stream.ReadByte();
-				var byteB = other.ReadByte();
+			for (var i = 0; i < thisStream.Length; i++) {
+				var byteA = thisStream.ReadByte();
+				var byteB = otherStream.ReadByte();
 
-				Assert.True(byteA == byteB, $"The streams did not match at '{i}'. Stream[{i}] = ({byteA}), other[{i}] = ({byteB}) . . . {GetCharList(right)}, {GetCharList(wrong)} \r\n {GetCharList(total_right)} \r\n {GetCharList(total_wrong)}");
+				Assert.True(byteA == byteB, $"The streams did not match at '{i}'. Stream[{i}] = ({byteA}), otherStream[{i}] = ({byteB}) . . . {GetCharList(right)}, {GetCharList(wrong)} \r\n {GetCharList(total_right)} \r\n {GetCharList(total_wrong)}");
 
 				right.Add(Convert.ToChar(byteA));
 				wrong.Add(Convert.ToChar(byteB));
 			}
 		}
 
-		private string GetCharList(List<char> chrs) {
+		public void CompareAgainst(Stream other) {
+			GeneratedStream.CompareStreams(this.Stream, other);
+		}
+
+		private static string GetCharList(List<char> chrs) {
 			var strb = new StringBuilder();
 
 			strb.Append("[");

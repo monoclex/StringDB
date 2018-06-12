@@ -52,7 +52,7 @@ namespace StringDB.Tests.Reader {
 			var indxes = sr.GetIndexes();
 
 			for (var i = 0u; i < gs.Indexes.Length; i++)
-				Assert.True(gs.Indexes[i] == Encoding.UTF8.GetString(indxes[i]), $"gs.Indexes[i] ({gs.Indexes[i]}) != indxes[i] ({indxes[i]})");
+				Assert.True(gs.Indexes[i] == Encoding.UTF8.GetString(indxes[i]), $"gs.Indexes[i] ({gs.Indexes[i]}) != indxes[i] ({Encoding.UTF8.GetString(indxes[i])})");
 		}
 
 		private StreamReader GetSR(System.IO.Stream s) =>

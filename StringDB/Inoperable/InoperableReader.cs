@@ -9,7 +9,13 @@ namespace StringDB.Reader {
 		public ulong GetOverhead() => throw new InoperableException();
 
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
+		public bool Empty() => throw new InoperableException();
+
+		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
 		public IReaderInteraction FirstIndex() => throw new InoperableException();
+
+		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
+		public IReaderInteraction LastIndex() => throw new InoperableException();
 
 		/// <summary>Throws an InoperableException</summary><returns>Throws an InoperableException</returns>
 		public IEnumerator<ReaderPair> GetEnumerator() => throw new InoperableException();

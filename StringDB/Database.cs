@@ -114,7 +114,7 @@ namespace StringDB {
 		
 		/// <summary>Gets the first index of the StringDB</summary>
 		/// <returns>A string, that is the first index.</returns>
-		public string FirstIndex() => this._reader.FirstIndex().Index; /// <inheritdoc/>
+		public string FirstIndex() => this._reader.FirstIndex()?.Index; /// <inheritdoc/>
 			
 		public IEnumerator<ReaderPair> GetEnumerator() => this._reader.GetEnumerator(); /// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => this._reader.GetEnumerator();
@@ -133,6 +133,9 @@ namespace StringDB {
 		//for compatability reasons
 		//TODO: put it somewhere else
 		internal static string GetString(byte[] bytes) {
+			if (bytes.Length == 0)
+				return null;
+
 #if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD1_2
 			return System.Text.Encoding.UTF8.GetString(
 								bytes, 0, bytes.Length
@@ -146,9 +149,17 @@ namespace StringDB {
 
 		//TODO: put it somewhere else
 		internal static byte[] GetBytes(string @string) =>
-			System.Text.Encoding.UTF8.GetBytes(@string);
+			(@string == null ?
+				null
+				: System.Text.Encoding.UTF8.GetBytes(@string));
 
 		private static string[] GetStringArray(byte[][] bytes) {
+			if (bytes == null)
+				return null;
+
+			if (bytes.Length == 0)
+				return null;
+
 			var res = new string[bytes.Length];
 
 			for (var i = 0u; i < bytes.Length; i++)
@@ -219,6 +230,7 @@ namespace StringDB {
 		Version100 = 1,
 
 		//anything that breaks how the database is structured should get a new major version number
+		//as well as complete rewrites
 
 		/// <summary>The database structure as of version 2.0.0</summary>
 		Version200 = 2,

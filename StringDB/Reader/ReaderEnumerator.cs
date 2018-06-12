@@ -8,7 +8,7 @@ namespace StringDB.Reader {
 		internal ReaderPair(IReader parent, IReaderInteraction dataPos) {
 			this._parent = parent;
 			this._dataPos = dataPos;
-			this._indexchainPassTimes = dataPos.IndexChainPassedAmount;
+			this._indexchainPassTimes = ((ReaderInteraction)dataPos).IndexChainPassedAmount;
 		}
 
 		private IReader _parent { get; }
@@ -20,7 +20,7 @@ namespace StringDB.Reader {
 		public string Index => this._dataPos.Index;
 		
 		/// <summary>The Value of this ReaderPair.<para>When called for the first time, it retrieves the value of it and stores it for later usage incase of multiple calls.</para></summary>
-		public string Value => (this.ValueCached ?? (this.ValueCached = Database.GetString(this._parent.GetDirectValueOf(this._dataPos.DataPos))));
+		public string Value => (this.ValueCached ?? (this.ValueCached = Database.GetString(this._parent.GetDirectValueOf(this._dataPos.DataPosition))));
 
 		/// <summary>Check if this ReaderPair is equal to another ReaderPair</summary>
 		/// <param name="other">The other ReaderPair</param>
@@ -46,7 +46,7 @@ namespace StringDB.Reader {
 			this._toSeek = start.QuickSeek;
 			this._first = false;
 
-			this._dataPos = start.DataPos;
+			this._dataPos = start.DataPosition;
 		}
 
 		private bool _first { get; set; }
@@ -66,10 +66,11 @@ namespace StringDB.Reader {
 		public bool MoveNext() {
 			if (!this._first) {
 				this._first = true;
-				return true;
+
+				return !this._parent.Empty();
 			}
 
-			var rr = this._parent.IndexAfter(this._indexOn, true, this._seekTo);
+			var rr = this._parent.IndexAfter(this._indexOn, true, this._toSeek);
 
 			if (rr == null)
 				return false;
@@ -77,9 +78,9 @@ namespace StringDB.Reader {
 			this._indexOn = rr.Index;
 
 			this._seekTo = this._toSeek;
-			this._dataPos = rr.DataPos;
+			this._dataPos = rr.DataPosition;
 			this._toSeek = rr.QuickSeek;
-			this._passTimes = rr.IndexChainPassedAmount;
+			this._passTimes = ((ReaderInteraction)rr).IndexChainPassedAmount;
 
 			return true;
 		} /// <inheritdoc/>
@@ -89,7 +90,7 @@ namespace StringDB.Reader {
 
 			this._indexOn = rr.Index;
 			this._seekTo = rr.QuickSeek;
-			this._dataPos = rr.DataPos;
+			this._dataPos = rr.DataPosition;
 		}
 
 		#region IDisposable Support

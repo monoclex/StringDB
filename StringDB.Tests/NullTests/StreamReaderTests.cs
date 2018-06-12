@@ -31,9 +31,11 @@ namespace StringDB.Tests.NullTests
 			Assert.Throws<ArgumentNullException>(() => { this.Reader.GetValuesOf((IReaderInteraction)null); });
 		}
 
+		/*
 		[Fact]
 		public void GetDirectValueOf() =>
 			Assert.Null(this.Reader.GetDirectValueOf(0));
+		*/
 
 		[Fact]
 		public void IsIndexAfter() {
@@ -45,10 +47,10 @@ namespace StringDB.Tests.NullTests
 
 		[Fact]
 		public void IndexAfter() {
-			Assert.Null(this.Reader.IndexAfter((string)null, true));
+			Assert.Throws<ArgumentNullException>(() => { this.Reader.IndexAfter((string)null, true); });
 
-			Assert.Null(this.Reader.IndexAfter((IReaderInteraction)new ReaderInteraction(null)));
-			Assert.Null(this.Reader.IndexAfter((IReaderInteraction)null));
+			Assert.Throws<ArgumentNullException>(() => { this.Reader.IndexAfter((IReaderInteraction)new ReaderInteraction(null)); });
+			//Assert.Null(this.Reader.IndexAfter((IReaderInteraction)null));
 		}
 
 		[Fact]
