@@ -7,7 +7,7 @@
 #endif
 		static class Consts {
 
-		/// <summary>The maximum value for an index. After this point, bytes are </summary>
+		/// <summary>The maximum value for an index. After this point, bytes are now being used to represent special values</summary>
 		public const int MaxLength = 0xFE;
 
 		/// <summary>Used to tell that this value is deleted.</summary>
