@@ -79,7 +79,7 @@ namespace StringDB {
 			new Database(stream, dbm, dbv, keepStreamOpen);
 
 		private Stream _stream { get; set; }
-		private IReader _reader { get; set; }
+		public IReader _reader { get; set; }
 		private IWriter _writer { get; set; }
 
 		/// <summary>Will tell the reader to see how much of an overhead StringDB is using.</summary>
@@ -224,7 +224,7 @@ namespace StringDB {
 	/// <summary>The version of the database. This can't be inferred</summary>
 	public enum DatabaseVersion {
 		/// <summary>The most current database version.</summary>
-		Latest = (int)DatabaseVersion.Version300,
+		Latest = (int)DatabaseVersion.Version310,
 
 		/// <summary>The original database structure as of version 1.0.0</summary>
 		Version100 = 1,
@@ -239,6 +239,12 @@ namespace StringDB {
 		Verson210 = 3,
 
 		/// <summary>The database structure as of version 3.0.0</summary>
-		Version300 = 4
+		Version300 = 4,
+
+		/// <summary>The database structure as of version 3.0.1</summary>
+		Version301 = 5,
+
+		/// <summary>The database structure as of version 3.1.0</summary>
+		Version310 = 6,
 	}
 }

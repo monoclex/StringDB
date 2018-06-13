@@ -12,8 +12,11 @@ namespace StringDB.Reader {
 		/// <summary>The next position to quick seek to to retrieve the next value</summary>
 		ulong QuickSeekToNext { get; }
 
+		/// <summary>The amount of overhead this specific type of item would have</summary>
+		ulong BytesOfOverhead(INewReader reader);
+
 		/// <summary>The type of read result.</summary>
-		ResultType Type { get;}
+		ResultType Type { get; }
 	}
 
 	/// <summary>A enum to simplify the two types of reading results</summary>
@@ -25,7 +28,10 @@ namespace StringDB.Reader {
 		DataPair,
 
 		/// <summary>An index chain - correlates the current set of indexes with the next set of indexes</summary>
-		IndexChain
+		IndexChain,
+
+		/// <summary>Actual data has been found. </summary>
+		Data
 	}
 
 	/// <summary>The specific type for an EndOfStream result</summary>
@@ -45,9 +51,13 @@ namespace StringDB.Reader {
 
 		/// <summary>The position of the value stored</summary>
 		ulong DataPosition { get; }
+	}
 
-		/// <summary>Retrieve the name of the index</summary>
-		byte[] IndexName { get; }
+	/// <summary>The specific type for a data result</summary>
+	public interface IReadData : IReadResult {
+
+		/// <summary>The data that is stored. Might be a string, a byte array, null, or an error response</summary>
+		object DataStored { get; }
 	}
 
 
@@ -62,6 +72,9 @@ namespace StringDB.Reader {
 
 		/// <inheritdoc/>
 		public ulong QuickSeekToNext => throw new NotImplementedException();
+
+		/// <inheritdoc/>
+		public ulong BytesOfOverhead(INewReader reader) => 0;
 
 		/// <inheritdoc/>
 		public ResultType Type => ResultType.EndOfStream;
@@ -84,6 +97,9 @@ namespace StringDB.Reader {
 		public ulong QuickSeekToNext { get; }
 
 		/// <inheritdoc/>
+		public ulong BytesOfOverhead(INewReader reader) => sizeof(byte) + sizeof(ulong);
+
+		/// <inheritdoc/>
 		public ResultType Type => ResultType.IndexChain;
 	}
 
@@ -95,13 +111,12 @@ namespace StringDB.Reader {
 		/// <param name="indexerLength"></param>
 		/// <param name="indexerPosition"></param>
 		/// <param name="dataPosition"></param>
-		public ReadDataPair(ulong quickSeekToThis, ulong quickSeekToNext, byte indexerLength, ulong indexerPosition, ulong dataPosition, byte[] indexName) {
+		public ReadDataPair(ulong quickSeekToThis, ulong quickSeekToNext, byte indexerLength, ulong indexerPosition, ulong dataPosition) {
 			this.QuickSeekToThis = quickSeekToThis;
 			this.QuickSeekToNext = quickSeekToNext;
 			this.IndexerLength = indexerLength;
 			this.IndexerPosition = indexerPosition;
 			this.DataPosition = dataPosition;
-			this.IndexName = indexName;
 		}
 
 		/// <inheritdoc/>
@@ -120,9 +135,25 @@ namespace StringDB.Reader {
 		public ulong QuickSeekToNext { get; }
 
 		/// <inheritdoc/>
-		public ResultType Type => ResultType.DataPair;
+		public ulong BytesOfOverhead(INewReader reader) => sizeof(byte) + sizeof(ulong) + reader.OverheadOf(this);
 
 		/// <inheritdoc/>
-		public byte[] IndexName { get; }
+		public ResultType Type => ResultType.DataPair;
+	}
+
+	/// <inheritdoc/>
+	public struct ReadData : IReadData {
+
+		/// <summary>Constructor</summary>
+		/// <param name="dataStored">ReadType or null</param>
+		public ReadData(object dataStored) =>
+			this.DataStored = dataStored;
+
+		/// <inheritdoc/>
+		public object DataStored { get; } /// <inheritdoc/>
+		public ulong QuickSeekToThis => throw new NotImplementedException(); /// <inheritdoc/>
+		public ulong QuickSeekToNext => throw new NotImplementedException(); /// <inheritdoc/>
+		public ulong BytesOfOverhead(INewReader reader) => throw new NotImplementedException();
+		public ResultType Type => ResultType.Data;
 	}
 }

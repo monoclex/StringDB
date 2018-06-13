@@ -1,11 +1,96 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace StringDB.Reader {
+	public interface INewReader : IEnumerable<ReaderPair>, IDisposable, IRawReader {
+		ulong GetBytesOfOverhead();
+
+		byte[] GetValueAsByteArray(string index);
+		string GetValueAsString(string index);
+		void GetValueIntoStream(string index, Stream feedData);
+
+		bool IsIndexAfter(string index);
+
+		byte[][] GetIndexes();
+
+		IReaderChain GetIndexChain();
+	}
+
+	public class NewStreamReader : INewReader {
+		/// <summary>Create a new StreamReader.</summary>
+		/// <param name="stream">The stream to read.</param>
+		/// <param name="dbv">The database version to read from.</param>
+		/// <param name="leaveOpen">Whether or not the stream is to be disposed after using it.</param>
+		public NewStreamReader(Stream stream, DatabaseVersion dbv, bool leaveOpen) {
+			this._stream = stream;
+			this._rawReader = new RawReader(stream, dbv, leaveOpen);
+		}
+
+		private Stream _stream;
+		private IRawReader _rawReader;
+
+		public ulong GetBytesOfOverhead() => throw new NotImplementedException();
+		public byte[] GetValueAsByteArray(string index) => throw new NotImplementedException();
+		public string GetValueAsString(string index) => throw new NotImplementedException();
+		public void GetValueIntoStream(string index, Stream feedData) => throw new NotImplementedException();
+		public bool IsIndexAfter(string index) => throw new NotImplementedException();
+		public byte[][] GetIndexes() => throw new NotImplementedException();
+		public IReaderChain GetIndexChain() => throw new NotImplementedException();
+
+		public IEnumerator<ReaderPair> GetEnumerator() => throw new NotImplementedException();
+		IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
+
+		public IReadResult ReadAt(ulong position) => _rawReader.ReadAt(position);
+		public IReadResult ReadNext(IReadResult previous) => _rawReader.ReadNext(previous);
+		public ulong OverheadOf(IReadDataPair dataPair) => _rawReader.OverheadOf(dataPair);
+
+		public void Dispose() => _rawReader.Dispose();
+	}
+
 	/// <inheritdoc/>
 	public class StreamReader : IReader {
+
+		/// <summary>Create a new StreamReader.</summary>
+		/// <param name="stream">The stream to read.</param>
+		/// <param name="dbv">The database version to read from.</param>
+		/// <param name="leaveOpen">Whether or not the stream is to be disposed after using it.</param>
+		public StreamReader(Stream stream, DatabaseVersion dbv, bool leaveOpen) {
+			this._stream = stream;
+			this._rawReader = new RawReader(stream, dbv, leaveOpen);
+		}
+
+		private Stream _stream;
+		private IRawReader _rawReader;
+
+		/// <inheritdoc/>
+		public bool Empty() => throw new NotImplementedException(); /// <inheritdoc/>
+		public ulong GetOverhead() => throw new NotImplementedException();  /// <inheritdoc/>
+		public byte[] GetValueOf(IReaderInteraction r, bool doSeek = false) => throw new NotImplementedException(); /// <inheritdoc/>
+		public byte[] GetValueOf(string index, bool doSeek = false, ulong quickSeek = 0) => throw new NotImplementedException();    /// <inheritdoc/>
+		public byte[] GetDirectValueOf(ulong dataPos) => throw new NotImplementedException();   /// <inheritdoc/>
+		public byte[][] GetValuesOf(IReaderInteraction r, bool doSeek = false) => throw new NotImplementedException();  /// <inheritdoc/>
+		public byte[][] GetValuesOf(string index, bool doSeek = false, ulong quickSeek = 0) => throw new NotImplementedException(); /// <inheritdoc/>
+		public bool IsIndexAfter(IReaderInteraction r, bool doSeek = false) => throw new NotImplementedException(); /// <inheritdoc/>
+		public bool IsIndexAfter(string index, bool doSeek = false, ulong quickSeek = 0) => throw new NotImplementedException();    /// <inheritdoc/>
+		public IReaderInteraction IndexAfter(IReaderInteraction r, bool doSeek = false) => throw new NotImplementedException(); /// <inheritdoc/>
+		public IReaderInteraction IndexAfter(string index, bool doSeek = false, ulong quickSeek = 0) => throw new NotImplementedException();    /// <inheritdoc/>
+		public IReaderInteraction FirstIndex() => throw new NotImplementedException();  /// <inheritdoc/>
+		public IReaderInteraction LastIndex() => throw new NotImplementedException();   /// <inheritdoc/>
+		public byte[][] GetIndexes() => throw new NotImplementedException();    /// <inheritdoc/>
+		public IReaderChain GetReaderChain() => throw new NotImplementedException();    /// <inheritdoc/>
+		public IEnumerator<ReaderPair> GetEnumerator() => throw new NotImplementedException();  /// <inheritdoc/>
+		IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException(); /// <inheritdoc/>
+		public void Dispose() => this._rawReader.Dispose(); 
+
+
+	}
+
+	/*
+	/// <inheritdoc/>
+		public class StreamReader : IReader {
 
 		/// <summary>Create a new StreamReader.</summary>
 		/// <param name="stream">The stream to read.</param>
@@ -456,5 +541,5 @@ namespace StringDB.Reader {
 		public ulong QuickSeek { get; } /// <inheritdoc/>
 		public ulong DataPosition { get; } /// <inheritdoc/>
 		public ulong Advances { get; }
-	}
+	}*/
 }
