@@ -1,4 +1,4 @@
-version: '2.1.{build}'
+version: '4.0.{build}'
 image: Visual Studio 2017
 clone_depth: 1
 deploy: off
@@ -10,9 +10,6 @@ init:
 build_script:
   - cmd: dotnet --version
   - cmd: dotnet restore -v q
-  #don't do net 2.0 because it's hitler in a box
-  - cmd: dotnet build -c Debug -f net35 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -c Debug -f net40 "StringDB\StringDB.csproj"
   - cmd: dotnet build -c Debug -f net45 "StringDB\StringDB.csproj"
   - cmd: dotnet build -c Debug -f net451 "StringDB\StringDB.csproj"
   - cmd: dotnet build -c Debug -f net452 "StringDB\StringDB.csproj"
@@ -56,10 +53,6 @@ artifacts:
    name: StringDB_netcoreapp1.1
  - path: 'bin\Debug\netcoreapp1.0\'
    name: StringDB_netcoreapp1.0
- - path: 'bin\Debug\net35\'
-   name: StringDB_net35
- - path: 'bin\Debug\net40\'
-   name: StringDB_net40
  - path: 'bin\Debug\net45\'
    name: StringDB_net45
  - path: 'bin\Debug\net46\'
