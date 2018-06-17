@@ -20,7 +20,7 @@ namespace StringDB.Reader {
 	}
 
 	public class Reader : IReader {
-		public Reader(Stream stream, object @lock = null) {
+		internal Reader(Stream stream, object @lock = null) {
 			this._stream = stream ?? throw new ArgumentNullException(nameof(stream));
 			this._rawReader = new RawReader(this._stream, @lock);
 

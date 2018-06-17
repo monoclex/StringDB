@@ -15,7 +15,7 @@ namespace StringDB.Reader {
 	}
 
 	public class RawReader : IRawReader {
-		public RawReader(Stream s, object @lock = null) {
+		internal RawReader(Stream s, object @lock = null) {
 			this._stream = s;
 			this._br = new BinaryReader(s);
 			this._lock = @lock;

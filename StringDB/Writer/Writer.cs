@@ -15,7 +15,7 @@ namespace StringDB.Writer {
 	}
 
 	public class Writer : IWriter {
-		public Writer(Stream s, object @lock = null) {
+		internal Writer(Stream s, object @lock = null) {
 			this._stream = s;
 			this._bw = new BinaryWriter(this._stream);
 			this._lock = @lock;

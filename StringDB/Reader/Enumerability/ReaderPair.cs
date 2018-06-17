@@ -10,7 +10,7 @@ namespace StringDB.Reader {
 	}
 
 	public class ReaderPair : IReaderPair {
-		public ReaderPair(IPartDataPair dp, IRawReader rawReader) {
+		internal ReaderPair(IPartDataPair dp, IRawReader rawReader) {
 			this._dp = dp;
 			this._rawReader = rawReader;
 		}

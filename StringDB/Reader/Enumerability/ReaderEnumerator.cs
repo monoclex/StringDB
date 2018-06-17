@@ -5,7 +5,7 @@ using System.Text;
 
 namespace StringDB.Reader {
 	public class ReaderEnumerator : IEnumerator<IReaderPair> {
-		public ReaderEnumerator(IRawReader rawReader) {
+		internal ReaderEnumerator(IRawReader rawReader) {
 			this._rawReader = rawReader;
 			this._partOn = Part.Start;
 		}

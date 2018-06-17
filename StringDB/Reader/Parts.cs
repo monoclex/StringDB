@@ -14,7 +14,7 @@ namespace StringDB.Reader {
 	}
 
 	public struct Part : IPart {
-		public Part(byte initByte, long pos, long nextPart) {
+		internal Part(byte initByte, long pos, long nextPart) {
 			this.InitialByte = initByte;
 			this.Position = pos;
 			this.NextPart = nextPart;
@@ -32,7 +32,7 @@ namespace StringDB.Reader {
 	}
 
 	public struct PartIndexChain : IPartIndexChain {
-		public PartIndexChain(byte initByte, long pos, long nextPart) {
+		internal PartIndexChain(byte initByte, long pos, long nextPart) {
 			this.InitialByte = initByte;
 			this.Position = pos;
 			this.NextPart = nextPart;
@@ -50,7 +50,7 @@ namespace StringDB.Reader {
 	}
 
 	public struct PartDataPair : IPartDataPair {
-		public PartDataPair(byte initByte, long pos, long dataPos, byte[] indexName) {
+		internal PartDataPair(byte initByte, long pos, long dataPos, byte[] indexName) {
 			this.InitialByte = initByte;
 			this.Position = pos;
 			this.NextPart = pos + sizeof(byte) + sizeof(long) + (long)initByte;
