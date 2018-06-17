@@ -7,23 +7,48 @@ Install from [nuget,](https://www.nuget.org/packages/StringDB) or from the [gith
 [```Install-Package StringDB```](https://www.nuget.org/packages/StringDB)
 
 ## Why make another DB engine?
-I wanted a DB engine that I could just write to once, and read from later. I was storing a lot of data, and modern day DB programs are very fancy, and add lots of overhead as a result.
-I didn't need that overhead. So I made my own.
+I wanted a DB engine that was light on RAM, storage space and relatively fast. I was archiving multiple things, and I needed a way to access those archives really quickly. so I made this.
 
 ## How do I use it?
 It's very straight forward - and the library is documented so you shouldn't need to refer to anything online, it's hilariously easy to use.
 
 First, make a new database.
 
-```var db = Database.FromStream(File.Open("mydb.db", FileMode.OpenOrCreate));```
+```using(var db = Database.FromFile("my.db")) { }```
 
-Next, look at the [available methods](https://github.com/SirJosh3917/StringDB/blob/master/StringDB/Database.cs)!
+Next, look at the [available methods!](https://github.com/SirJosh3917/StringDB/blob/master/StringDB/Database.cs)
 
 ## What's the byte overhead?
-There's exactly 9 bytes of overhead for each index, 4 bytes of overhead for each value, and an additional 9 bytes of overhead per each IndexChain.
+Not much. There's 8 bytes at the beginning of the file representing the index chan, and 9 bytes per index and 2-9 bytes per value ( depending on the length of the value. ). For every index chain, it's just 9 bytes.
 
-An IndexChain is a place in the DB where it links the previous IndexChain to the newest IndexChain. IndexChains are created anytime you do a single Insert(), or if you do an InsertRange().
-To minimize the size of your DB and speed up read times, it's recommended to use InsertRange as frequently as possible to prevent overhead.
+## Performance?
 
-## Can I calculate the byte overhead using math?
-Yeah sure! Here's the forumla: `(13 * a) + 9`, with `a` representing how many indexes/values there are in the specified IndexChain. You have to repeat this formula for each and every IndexChain you write to.
+```
+Final Results
+=============
+
+> StringDBTest
+--------------
+Insert............ 192ms
+FetchLast......... 3101ms
+
+DB Size: 5MiB
+
+> MongoDBTest
+-------------
+Insert............ 335ms
+FetchLast......... 539ms
+
+DB Size: 12MiB
+
+> LiteDBNoJournalTest
+---------------------
+Insert............ 531ms
+FetchLast......... 135ms
+
+DB Size: 15MiB
+
+=============
+Insert inserts 5000 objects at once
+FetchLast gets the very last item in the database 5000 times
+```
