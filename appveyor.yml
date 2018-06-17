@@ -22,10 +22,6 @@ build_script:
   - cmd: dotnet build -c Debug -f netcoreapp1.0 "StringDB\StringDB.csproj"
   - cmd: dotnet build -c Debug -f netcoreapp1.1 "StringDB\StringDB.csproj"
   - cmd: dotnet build -c Debug -f netcoreapp2.0 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -c Debug -f netstandard1.0 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -c Debug -f netstandard1.1 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -c Debug -f netstandard1.2 "StringDB\StringDB.csproj"
-  - cmd: dotnet build -c Debug -f netstandard1.3 "StringDB\StringDB.csproj"
   - cmd: dotnet build -c Debug -f netstandard1.4 "StringDB\StringDB.csproj"
   - cmd: dotnet build -c Debug -f netstandard1.5 "StringDB\StringDB.csproj"
   - cmd: dotnet build -c Debug -f netstandard1.6 "StringDB\StringDB.csproj"
@@ -39,14 +35,6 @@ artifacts:
    name: StringDB_netstandard1.5
  - path: 'bin\Debug\netstandard1.4\'
    name: StringDB_netstandard1.4
- - path: 'bin\Debug\netstandard1.3\'
-   name: StringDB_netstandard1.3
- - path: 'bin\Debug\netstandard1.2\'
-   name: StringDB_netstandard1.2
- - path: 'bin\Debug\netstandard1.1\'
-   name: StringDB_netstandard1.1
- - path: 'bin\Debug\netstandard1.0\'
-   name: StringDB_netstandard1.0
  - path: 'bin\Debug\netcoreapp2.0\'
    name: StringDB_netcoreapp2.0
  - path: 'bin\Debug\netcoreapp1.1\'
