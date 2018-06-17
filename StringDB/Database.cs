@@ -32,7 +32,7 @@ namespace StringDB {
 		public IReaderPair First() => this._reader.First(); /// <inheritdoc/>
 		public IEnumerator<IReaderPair> GetEnumerator() => this._reader.GetEnumerator(); /// <inheritdoc/>
 		public IReaderPair GetByIndex(string index) => this._reader.GetByIndex(index ?? throw new ArgumentNullException(nameof(index))); /// <inheritdoc/>
-		public IReaderPair[] GetMultipleByIndex(string index) => this._reader.GetMultipleByIndex(index ?? throw new ArgumentNullException(nameof(index))); /// <inheritdoc/>
+		public IEnumerable<IReaderPair> GetMultipleByIndex(string index) => this._reader.GetMultipleByIndex(index ?? throw new ArgumentNullException(nameof(index))); /// <inheritdoc/>
 		internal void NotifyInsert(ICollection<KeyValuePair<string, string>> inserts) => (this._reader as Reader.Reader).NotifyInsert(inserts ?? throw new ArgumentNullException(nameof(inserts))); /// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => this._reader.GetEnumerator(); /// <inheritdoc/>
 

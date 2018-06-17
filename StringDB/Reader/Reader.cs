@@ -16,7 +16,7 @@ namespace StringDB.Reader {
 		IReaderPair GetByIndex(string index);
 
 		/// <summary>Gets the multiple IReaderPairs responsible for a given index</summary>
-		IReaderPair[] GetMultipleByIndex(string index);
+		IEnumerable<IReaderPair> GetMultipleByIndex(string index);
 	}
 
 	public class Reader : IReader {
@@ -99,18 +99,15 @@ namespace StringDB.Reader {
 			return null;
 		} /// <inheritdoc/>
 
-		public IReaderPair[] GetMultipleByIndex(string index) {
+		public IEnumerable<IReaderPair> GetMultipleByIndex(string index) {
 			if (this._stream.Length <= 8)
-				return null;
-
-			var vals = new List<IReaderPair>();
+				yield break;
+			
 			byte[] comparing = Encoding.UTF8.GetBytes(index);
 
 			foreach (var i in this)
 				if (EqualBytesLongUnrolled(comparing, i.IndexAsByteArray))
-					vals.Add(i);
-
-			return vals.ToArray();
+					yield return i;
 		} /// <inheritdoc/>
 
 		public IEnumerator<IReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader); /// <inheritdoc/>
