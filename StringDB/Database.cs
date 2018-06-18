@@ -33,7 +33,7 @@ namespace StringDB {
 		public IEnumerator<IReaderPair> GetEnumerator() => this._reader.GetEnumerator(); /// <inheritdoc/>
 		public IReaderPair GetByIndex(string index) => this._reader.GetByIndex(index ?? throw new ArgumentNullException(nameof(index))); /// <inheritdoc/>
 		public IEnumerable<IReaderPair> GetMultipleByIndex(string index) => this._reader.GetMultipleByIndex(index ?? throw new ArgumentNullException(nameof(index))); /// <inheritdoc/>
-		internal void NotifyInsert(ICollection<KeyValuePair<string, string>> inserts) => (this._reader as Reader.Reader).NotifyInsert(inserts ?? throw new ArgumentNullException(nameof(inserts))); /// <inheritdoc/>
+		internal void NotifyInsert(IEnumerable<KeyValuePair<string, string>> inserts) => (this._reader as Reader.Reader).NotifyInsert(inserts ?? throw new ArgumentNullException(nameof(inserts))); /// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => this._reader.GetEnumerator(); /// <inheritdoc/>
 
 		public void Insert(string index, string value) {
@@ -41,10 +41,18 @@ namespace StringDB {
 			this.NotifyInsert(new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>(index, value) });
 		} /// <inheritdoc/>
 
-		public void InsertRange(ICollection<KeyValuePair<string, string>> items) {
+		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) {
 			this._writer.InsertRange(items ?? throw new ArgumentNullException(nameof(items)));
 			this.NotifyInsert(items);
 		} /// <inheritdoc/>
+
+		public void OverwriteValue(IReaderPair replacePair, string newValue) {
+			this._writer.OverwriteValue(replacePair ?? throw new ArgumentNullException(nameof(replacePair)), newValue ?? throw new ArgumentNullException(newValue));
+			this._reader.DrainBuffer();
+		} /// <inheritdoc/>
+
+		public void DrainBuffer() =>
+			this._reader.DrainBuffer(); /// <inheritdoc/>
 
 		public void Dispose() {
 			this._writer.Dispose();

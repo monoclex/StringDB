@@ -7,26 +7,48 @@ namespace StringDB.Tester
     class Program
     {
 		static void Main(string[] args) {
-			Console.ReadKey(true);
-			using(var db = Database.FromFile("re.db")) {
+			Insertations();
+			
+			using (var db = Database.FromFile("game on your phone.db")) {
+				db.InsertRange(GetValues(100_000, "example test value"));
 
-				Benchmark(() => { var E = db.First(); }, 1000);
-
-				Console.WriteLine("started");
-				Benchmark(() => { var E = db.First().Value; }, 1_000_000_000);
-
-				Console.WriteLine("done");
+				foreach (var i in db)
+					Console.WriteLine(i.ToString());
 			}
 
 			Console.ReadLine();
 		}
 
-		static void New(Stopwatch z) {
-			z.Stop();
+		static void Insertations() {
+			foreach (var i in GetValues(100, "ree"))
+				Console.WriteLine(i.ToString());
+		}
+		
+		static IEnumerable<KeyValuePair<string, string>> GetValues(int amount, string dataValue) {
+			for(int iteration = 0; iteration < amount; iteration++)
+				yield return new KeyValuePair<string, string>(iteration.ToString(), dataValue);
+		}
 
-			Console.WriteLine($"{z.ElapsedMilliseconds}ms, {z.ElapsedTicks}t");
+		static void OverwriteExample() {
+			using (var db = Database.FromFile("Overwrite.db")) {
 
-			z.Restart();
+				var itm = db.GetByIndex("Hello"); //try to find "Hello"
+
+				if (itm == null) { //if it doesn't exist, create it
+					db.Insert("Hello", "World");
+					itm = db.GetByIndex("Hello"); //now get "Hello"
+				}
+
+				Console.WriteLine(itm.ToString()); //write the current value of it
+
+				db.OverwriteValue(itm, "Continent"); //change it to Continent
+
+				itm = db.GetByIndex("Hello"); //re-get it by the index ( though itm.Value also changes so you can reuse the ReaderPair )
+
+				Console.WriteLine(itm.ToString()); //prove that it's changed
+
+				Console.WriteLine("done");
+			}
 		}
 
 		private static void Benchmark(Action act, int iterations) {

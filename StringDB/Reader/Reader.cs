@@ -17,6 +17,9 @@ namespace StringDB.Reader {
 
 		/// <summary>Gets the multiple IReaderPairs responsible for a given index</summary>
 		IEnumerable<IReaderPair> GetMultipleByIndex(string index);
+
+		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
+		void DrainBuffer();
 	}
 
 	public class Reader : IReader {
@@ -113,7 +116,8 @@ namespace StringDB.Reader {
 		public IEnumerator<IReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader); /// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator(); /// <inheritdoc/>
 
-		public void NotifyInsert(ICollection<KeyValuePair<string, string>> inserts) {
+		public void NotifyInsert(IEnumerable<KeyValuePair<string, string>> inserts) {
+			/*
 			foreach(var i in inserts) {
 				var l = (ulong)i.Value.Length;
 
@@ -130,7 +134,11 @@ namespace StringDB.Reader {
 			}
 
 			_overheadCache += sizeof(byte) + sizeof(long);
+			*/
 		}
+
+		public void DrainBuffer() =>
+			this._rawReader.DrainBuffer();
 
 		//  ___
 		// /. .\

@@ -12,6 +12,9 @@ namespace StringDB.Reader {
 		IPart ReadOn(IPart previous);
 
 		byte[] ReadDataValueAt(long p);
+
+		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
+		void DrainBuffer();
 	}
 
 	public class RawReader : IRawReader {
@@ -44,23 +47,23 @@ namespace StringDB.Reader {
 #endif
 			_BufferSeek(pos);
 
-			var p = this.ReadBytes(9);
+			var p = this.ReadBytes(9); //set the important values right NOW, since later the buffer can chnage and screw things up.
+			var importantByte = this._bufferRead[p];
+			var intVal = BitConverter.ToInt64(this._bufferRead, p + 1);
 
-			if (this._bufferRead[p] == Consts.IndexSeperator) {
-				var ic = BitConverter.ToInt64(this._bufferRead, p + 1);
-				//TODO: remove if statement
-				if (ic == 0)
+			if (importantByte == Consts.IndexSeperator) {
+				if (intVal == 0)
 					return null;
 				else
-					return new PartIndexChain(this._bufferRead[p], pos, ic);
+					return new PartIndexChain(importantByte, pos, intVal);
 			} else {
-				var val_pos = this.ReadBytes(this._bufferRead[p]);
+				var val_pos = this.ReadBytes(importantByte);
 
-				byte[] val = new byte[this._bufferRead[p]];
+				byte[] val = new byte[importantByte];
 				for (var i = 0; i < val.Length; i++)
 					val[i] = this._bufferRead[val_pos + i];
 
-				return new PartDataPair(this._bufferRead[p], pos, BitConverter.ToInt64(this._bufferRead, p + 1), val);
+				return new PartDataPair(importantByte, pos, intVal, val);
 			}
 #if THREAD_SAFE
 			}
@@ -106,6 +109,12 @@ namespace StringDB.Reader {
 #endif
 		}
 
+		public void DrainBuffer() {
+			this._bufferPos = MinusBufferSize;
+			this._bufferReadPos = MinusBufferSize;
+			//we don't clear the actual byte[] buffer because that'll be done when we try to read it
+		}
+
 		//heavily optimized method of reading bytes with an internal byte[] cache
 		private int ReadBytes(int amt) {
 			//we don't need this because we know we'll only be reading 9-253 bytes at a time ( or however many the index name is )
@@ -148,7 +157,7 @@ namespace StringDB.Reader {
 		}
 
 		private void _BufferSeek(long pos) {
-			if (Math.Abs(this._bufferReadPos - pos) > BufferSize || pos < this._bufferReadPos) {
+			if (Math.Abs(this._bufferReadPos - pos) >= BufferSize || pos < this._bufferReadPos) {
 				this._bufferReadPos = pos; //move the buffer reading pos
 				this._bufferPos = 0; //move the buffer pos
 

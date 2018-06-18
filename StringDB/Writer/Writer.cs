@@ -11,7 +11,10 @@ namespace StringDB.Writer {
 		void Insert(string index, string value);
 
 		/// <summary>Insert multiple items into the database</summary>
-		void InsertRange(ICollection<KeyValuePair<string, string>> items);
+		void InsertRange(IEnumerable<KeyValuePair<string, string>> items);
+
+		/// <summary>Overwrite a value. Note: The old value is still left in the file, and a database cleanup function is needed to be implemented soon.</summary>
+		void OverwriteValue(Reader.IReaderPair replacePair, string newValue);
 	}
 
 	public class Writer : IWriter {
@@ -40,8 +43,26 @@ namespace StringDB.Writer {
 
 		private object _lock = null; /// <inheritdoc/>
 
+		public void OverwriteValue(Reader.IReaderPair replacePair, string newValue) {
+#if THREAD_SAFE
+			lock (this._lock) {
+#endif
+			this._stream.Seek(0, SeekOrigin.End);
+
+			var savePos = this._stream.Position;
+			WriteValue(newValue);
+			var raw = (replacePair as Reader.ReaderPair)._dp;
+			this._stream.Seek(raw.Position + 1, SeekOrigin.Begin);
+			this._bw.Write(savePos);
+
+			(replacePair as Reader.ReaderPair)._valueCache = newValue;
+#if THREAD_SAFE
+			}
+#endif
+		} /// <inheritdoc/>
+
 		public void Insert(string index, string value) => InsertRange(new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>(index, value) }); /// <inheritdoc/>
-		public void InsertRange(ICollection<KeyValuePair<string, string>> items) {
+		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) {
 #if THREAD_SAFE
 			lock (this._lock) {
 #endif
@@ -86,6 +107,9 @@ namespace StringDB.Writer {
 
 				_Seek(0);
 				this._bw.Write((long)this._indexChainReplace);
+
+				this._bw.Flush();
+				this._stream.Flush();
 #if THREAD_SAFE
 			}
 #endif
