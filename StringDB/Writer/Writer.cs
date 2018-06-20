@@ -70,10 +70,7 @@ namespace StringDB.Writer {
 			lock (this._lock) {
 #endif
 			var l = this._stream.Length;
-
-			/*if (l >= 8)
-				this._stream.Seek(0, SeekOrigin.End);
-			else*/
+			
 			if(l < 8) {
 				_Seek(0);
 				this._bw.Write((long)0);
@@ -88,8 +85,7 @@ namespace StringDB.Writer {
 			_Seek(p);
 
 			var judge = p + sizeof(byte) + sizeof(long);
-
-			//judge the amount of space it'd require to write each item
+			
 			foreach (var i in items)
 				judge += Judge_WriteIndex(i.Key);
 

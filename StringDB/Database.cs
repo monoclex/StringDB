@@ -36,11 +36,17 @@ namespace StringDB {
 		internal void NotifyInsert(IEnumerable<KeyValuePair<string, string>> inserts) => (this._reader as Reader.Reader).NotifyInsert(inserts ?? throw new ArgumentNullException(nameof(inserts))); /// <inheritdoc/>
 		internal void NotifyInsert(IEnumerable<IReaderPair> inserts) => (this._reader as Reader.Reader).NotifyInsert(inserts ?? throw new ArgumentNullException(nameof(inserts))); /// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => this._reader.GetEnumerator();
-		
-		/// <summary>Cleans out the DB. You should only use this if you've overwritten a value, or if you've done a lot of single inserts, or if you need to clean up a database</summary>
-		/// <param name="dbCleanTo"></param>
+
+		/// <summary>Cleans out the database specified, and copies all of the contents of the other database into this one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</summary>
+		/// <param name="dbCleanTo">The database to clean up</param>
 		public void CleanFrom(Database dbCleanTo) {
 			this.InsertRange(FromDatabase(dbCleanTo));
+		}
+
+		/// <summary>Cleans out the current database, and copies all of the contents of this database into the other one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</summary>
+		/// <param name="dbCleanTo">The database that will be used to insert the other database's values into</param>
+		public void CleanTo(Database dbCleanTo) {
+			dbCleanTo.InsertRange(FromDatabase(this));
 		} /// <inheritdoc/>
 
 		public void Insert(string index, string value) {
@@ -79,9 +85,8 @@ namespace StringDB {
 		}
 
 		private IEnumerable<IReaderPair> FromDatabase(Database other) {
-			foreach (var i in other) {
+			foreach (var i in other)
 				yield return i;
-			}
 		}
 	}
 }
