@@ -7,7 +7,16 @@ namespace StringDB.Tester
     class Program
     {
 		static void Main(string[] args) {
+			using (var db = Database.FromFile("pobj.db"))
+			using (var other = Database.FromFile("other_2.db")) {
+				int c = 0;
+				foreach (var i in other) {
+					c++;
+				}
+				Console.WriteLine($"{c}");
+			}
 
+			Console.ReadLine();
 		}
 
 		static void Insertations() {

@@ -51,6 +51,7 @@ namespace StringDB.Reader {
 			var importantByte = this._bufferRead[p]; //set these variables incase the buffer changes later when reading more bytes
 			var intVal = BitConverter.ToInt64(this._bufferRead, p + 1);
 
+
 			if (importantByte == Consts.IndexSeperator) {
 				if (intVal == 0)
 					return null;
@@ -102,6 +103,9 @@ namespace StringDB.Reader {
 				return this._br.ReadBytes((int)BitConverter.ToUInt64(b, 1));
 
 				default:
+				Console.WriteLine("what");
+				Console.WriteLine(p);
+				throw new Exception("e");
 				return null;
 			}
 #if THREAD_SAFE
@@ -132,7 +136,7 @@ namespace StringDB.Reader {
 		}
 
 		private void _BufferSeek(long pos) {
-			if (Math.Abs(this._bufferReadPos - pos) >= BufferSize || pos < this._bufferReadPos) {
+			if (Math.Abs(this._bufferReadPos - pos) >= BufferSize || pos <= this._bufferReadPos) {
 				this._bufferReadPos = pos; //move the buffer reading pos
 				this._bufferPos = 0; //move the buffer pos
 

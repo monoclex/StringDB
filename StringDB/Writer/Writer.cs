@@ -13,9 +13,6 @@ namespace StringDB.Writer {
 		/// <summary>Insert multiple items into the database</summary>
 		void InsertRange(IEnumerable<KeyValuePair<string, string>> items);
 
-		/// <summary>Insert multiple ReaderPairs</summary>
-		void InsertRange(IEnumerable<Reader.IReaderPair> items);
-
 		/// <summary>Overwrite a value. Note: The old value is still left in the file, and a database cleanup function is needed to be implemented soon.</summary>
 		void OverwriteValue(Reader.IReaderPair replacePair, string newValue);
 	}
@@ -107,27 +104,10 @@ namespace StringDB.Writer {
 
 			_Seek(0);
 			this._bw.Write((long)this._indexChainReplace);
-
-			this._bw.Flush();
-			this._stream.Flush();
 #if THREAD_SAFE
 			}
 #endif
 		} /// <inheritdoc/>
-		public void InsertRange(IEnumerable<Reader.IReaderPair> items) {
-#if THREAD_SAFE
-			lock (this._lock) {
-#endif
-			InsertRange(FromReaderPair(items));
-#if THREAD_SAFE
-			}
-#endif
-		}
-
-		private IEnumerable<KeyValuePair<string, string>> FromReaderPair(IEnumerable<Reader.IReaderPair> items) {
-			foreach (var i in items)
-				yield return new KeyValuePair<string, string>(i.Index, i.Value);
-		}
 
 		public void Dispose() {
 			this._bw.Flush();
@@ -138,27 +118,34 @@ namespace StringDB.Writer {
 		}
 
 		private void WriteIndex(string index, long nextPos) {
-			this._bw.Write((byte)index.Length);
+			var bytes = Encoding.UTF8.GetBytes(index);
+
+			if (bytes.Length >= Consts.MaxLength)
+				throw new ArgumentException($"index.Length is longer {Consts.MaxLength}", nameof(index));
+
+			this._bw.Write((byte)bytes.Length);
 			this._bw.Write(nextPos);
-			this._bw.Write(Encoding.UTF8.GetBytes(index));
+			this._bw.Write(bytes);
 		}
 
 		private void WriteValue(string value) {
-			if (value.Length <= byte.MaxValue) {
+			var bytes = Encoding.UTF8.GetBytes(value);
+
+			if ((ulong)bytes.Length <= byte.MaxValue) {
 				this._bw.Write(Consts.IsByteValue);
-				this._bw.Write((byte)value.Length);
-			} else if (value.Length <= ushort.MaxValue) {
+				this._bw.Write((byte)bytes.Length);
+			} else if ((ulong)bytes.Length <= ushort.MaxValue) {
 				this._bw.Write(Consts.IsUShortValue);
-				this._bw.Write((ushort)value.Length);
-			} else if ((ulong)value.Length <= uint.MaxValue) {
+				this._bw.Write((ushort)bytes.Length);
+			} else if ((ulong)bytes.Length <= uint.MaxValue) {
 				this._bw.Write(Consts.IsUIntValue);
-				this._bw.Write((uint)value.Length);
-			} else if ((ulong)value.Length <= ulong.MaxValue) {
+				this._bw.Write((uint)bytes.Length);
+			} else if ((ulong)bytes.Length <= ulong.MaxValue) {
 				this._bw.Write(Consts.IsULongValue);
-				this._bw.Write((ulong)value.Length);
+				this._bw.Write((ulong)bytes.Length);
 			} else throw new Exception("lolwut");
 
-			this._bw.Write(Encoding.UTF8.GetBytes(value));
+			this._bw.Write(bytes);
 		}
 
 
@@ -166,6 +153,9 @@ namespace StringDB.Writer {
 			sizeof(byte) + sizeof(long) + (long)index.Length;
 
 		private long Judge_WriteValue(string value) =>
+			Judge_WriteValue(Encoding.UTF8.GetBytes(value));
+
+		private long Judge_WriteValue(byte[] value) =>
 			sizeof(byte) +
 			(long)value.Length +
 			(value.Length <= byte.MaxValue ?

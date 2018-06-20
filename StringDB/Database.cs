@@ -38,9 +38,9 @@ namespace StringDB {
 		IEnumerator IEnumerable.GetEnumerator() => this._reader.GetEnumerator();
 
 		/// <summary>Cleans out the database specified, and copies all of the contents of the other database into this one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</summary>
-		/// <param name="dbCleanTo">The database to clean up</param>
-		public void CleanFrom(Database dbCleanTo) {
-			this.InsertRange(FromDatabase(dbCleanTo));
+		/// <param name="dbCleanFrom">The database to clean up</param>
+		public void CleanFrom(Database dbCleanFrom) {
+			this.InsertRange(FromDatabase(dbCleanFrom));
 		}
 
 		/// <summary>Cleans out the current database, and copies all of the contents of this database into the other one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</summary>
@@ -55,11 +55,6 @@ namespace StringDB {
 		} /// <inheritdoc/>
 
 		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) {
-			this._writer.InsertRange(items ?? throw new ArgumentNullException(nameof(items)));
-			this.NotifyInsert(items);
-		} /// <inheritdoc/>
-
-		public void InsertRange(IEnumerable<IReaderPair> items) {
 			this._writer.InsertRange(items ?? throw new ArgumentNullException(nameof(items)));
 			this.NotifyInsert(items);
 		} /// <inheritdoc/>
@@ -84,9 +79,9 @@ namespace StringDB {
 				this._stream.Dispose();
 		}
 
-		private IEnumerable<IReaderPair> FromDatabase(Database other) {
+		private IEnumerable<KeyValuePair<string, string>> FromDatabase(Database other) {
 			foreach (var i in other)
-				yield return i;
+				yield return new KeyValuePair<string, string>(i.Index, i.Value);
 		}
 	}
 }
