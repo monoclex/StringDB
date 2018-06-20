@@ -117,25 +117,12 @@ namespace StringDB.Reader {
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator(); /// <inheritdoc/>
 
 		public void NotifyInsert(IEnumerable<KeyValuePair<string, string>> inserts) {
-			/*
-			foreach(var i in inserts) {
-				var l = (ulong)i.Value.Length;
 
-				_overheadCache += sizeof(byte) + sizeof(long) +
-					(l < byte.MaxValue ?
-						sizeof(byte)
-						: l < ushort.MaxValue ?
-							sizeof(ushort)
-							: l < uint.MaxValue ?
-								sizeof(uint)
-								: l < ulong.MaxValue ?
-									sizeof(ulong)
-									: throw new Exception("lolwut"));
-			}
+		} /// <inheritdoc/>
 
-			_overheadCache += sizeof(byte) + sizeof(long);
-			*/
-		}
+		public void NotifyInsert(IEnumerable<IReaderPair> inserts) {
+
+		} /// <inheritdoc/>
 
 		public void DrainBuffer() =>
 			this._rawReader.DrainBuffer();

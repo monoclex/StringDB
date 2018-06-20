@@ -34,7 +34,14 @@ namespace StringDB {
 		public IReaderPair GetByIndex(string index) => this._reader.GetByIndex(index ?? throw new ArgumentNullException(nameof(index))); /// <inheritdoc/>
 		public IEnumerable<IReaderPair> GetMultipleByIndex(string index) => this._reader.GetMultipleByIndex(index ?? throw new ArgumentNullException(nameof(index))); /// <inheritdoc/>
 		internal void NotifyInsert(IEnumerable<KeyValuePair<string, string>> inserts) => (this._reader as Reader.Reader).NotifyInsert(inserts ?? throw new ArgumentNullException(nameof(inserts))); /// <inheritdoc/>
-		IEnumerator IEnumerable.GetEnumerator() => this._reader.GetEnumerator(); /// <inheritdoc/>
+		internal void NotifyInsert(IEnumerable<IReaderPair> inserts) => (this._reader as Reader.Reader).NotifyInsert(inserts ?? throw new ArgumentNullException(nameof(inserts))); /// <inheritdoc/>
+		IEnumerator IEnumerable.GetEnumerator() => this._reader.GetEnumerator();
+		
+		/// <summary>Cleans out the DB. You should only use this if you've overwritten a value, or if you've done a lot of single inserts, or if you need to clean up a database</summary>
+		/// <param name="dbCleanTo"></param>
+		public void CleanFrom(Database dbCleanTo) {
+			this.InsertRange(FromDatabase(dbCleanTo));
+		} /// <inheritdoc/>
 
 		public void Insert(string index, string value) {
 			this._writer.Insert(index ?? throw new ArgumentNullException(nameof(index)), value ?? throw new ArgumentNullException(nameof(value)));
@@ -42,6 +49,11 @@ namespace StringDB {
 		} /// <inheritdoc/>
 
 		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) {
+			this._writer.InsertRange(items ?? throw new ArgumentNullException(nameof(items)));
+			this.NotifyInsert(items);
+		} /// <inheritdoc/>
+
+		public void InsertRange(IEnumerable<IReaderPair> items) {
 			this._writer.InsertRange(items ?? throw new ArgumentNullException(nameof(items)));
 			this.NotifyInsert(items);
 		} /// <inheritdoc/>
@@ -64,6 +76,12 @@ namespace StringDB {
 
 			if (this._disposeStream)
 				this._stream.Dispose();
+		}
+
+		private IEnumerable<IReaderPair> FromDatabase(Database other) {
+			foreach (var i in other) {
+				yield return i;
+			}
 		}
 	}
 }

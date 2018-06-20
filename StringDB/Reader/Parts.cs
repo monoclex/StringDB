@@ -56,10 +56,6 @@ namespace StringDB.Reader {
 			this.NextPart = pos + sizeof(byte) + sizeof(long) + (long)initByte;
 			this._dataPos = dataPos;
 			this._indexName = indexName;
-
-			if(Encoding.UTF8.GetString(this._indexName) == "1019") {
-				Console.WriteLine("ee");
-			}
 		}
 
 		private long _dataPos { get; }

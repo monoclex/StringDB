@@ -7,21 +7,28 @@ namespace StringDB.Tester
     class Program
     {
 		static void Main(string[] args) {
-			Insertations();
-			
-			using (var db = Database.FromFile("game on your phone.db")) {
-				db.InsertRange(GetValues(100_000, "example test value"));
 
-				foreach (var i in db)
-					Console.WriteLine(i.ToString());
-			}
-
-			Console.ReadLine();
 		}
 
 		static void Insertations() {
-			foreach (var i in GetValues(100, "ree"))
-				Console.WriteLine(i.ToString());
+
+		}
+
+		static void CopyFrom() {
+			var otherdb = Database.FromFile("eee.db");
+
+			using (var db = Database.FromFile("game on your phone.db")) {
+				foreach (var i in GetValues(100_000, "example test value"))
+					db.Insert(i.Key, i.Value);
+			}
+
+			Console.WriteLine("inserted");
+
+			using (var db = Database.FromFile("game on your phone.db")) {
+				otherdb.CleanFrom(db);
+			}
+
+			Console.ReadLine();
 		}
 		
 		static IEnumerable<KeyValuePair<string, string>> GetValues(int amount, string dataValue) {

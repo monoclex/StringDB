@@ -48,7 +48,7 @@ namespace StringDB.Reader {
 			_BufferSeek(pos);
 
 			var p = this.ReadBytes(9); //set the important values right NOW, since later the buffer can chnage and screw things up.
-			var importantByte = this._bufferRead[p];
+			var importantByte = this._bufferRead[p]; //set these variables incase the buffer changes later when reading more bytes
 			var intVal = BitConverter.ToInt64(this._bufferRead, p + 1);
 
 			if (importantByte == Consts.IndexSeperator) {
@@ -117,43 +117,18 @@ namespace StringDB.Reader {
 
 		//heavily optimized method of reading bytes with an internal byte[] cache
 		private int ReadBytes(int amt) {
-			//we don't need this because we know we'll only be reading 9-253 bytes at a time ( or however many the index name is )
-			/*
-			bool situation = amt > BufferSize; //if we're reading more then the buffer size allows
-
-			if (situation) throw new Exception("The amount of bytes we're reading is more then the buffer size."); //just read those
-
-			//ok, now let's make sure that the buffer we have is updated
-			*/
-
-			//we don't need this because the +amt will do it for us
-			if (/*this._bufferPos >= BufferSize ||*/ this._bufferPos + amt >= BufferSize) { //if we've went out of scope of the buffer
-				this._bufferReadPos += this._bufferPos; //move the buffer reading pos
-				this._bufferPos = 0; //move the buffer pos
+			if (this._bufferPos + amt >= BufferSize) { //if we've went out of scope of the buffer
+				this._bufferReadPos += this._bufferPos; //re-read the buffer
+				this._bufferPos = 0;
 
 				this._stream.Seek(this._bufferReadPos, SeekOrigin.Begin);
 				this._stream.Read(this._bufferRead, 0, BufferSize);
 			}
-
-			//guarenteed to be false after the above code
-			//situation = amt + _bufferPos > BufferSize;
-
-			//if (!situation) { //if the amount of bytes and the position the buffer size is at is less then the buffer size
-			//return the bytes from the buffer
+			
+			//return the position of bytes from the buffer
 
 			this._bufferPos += amt;
 			return this._bufferPos - amt;
-			/*} else {
-				//the amount of bytes and the position within the buffer size is more then the buffer size, but the amount of bytes is less then the buffer size
-
-				this._bufferReadPos += this._bufferPos; //set the new read position to the current pos in the buffer
-				this._bufferPos = 0;
-				this._stream.Seek(this._bufferReadPos, SeekOrigin.Begin);
-				this._stream.Read(this._bufferRead, 0, BufferSize); //read at the new position into the buffer
-				
-				this._bufferPos += amt;
-				return this._bufferPos - amt;
-			}*/
 		}
 
 		private void _BufferSeek(long pos) {

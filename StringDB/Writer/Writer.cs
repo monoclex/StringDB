@@ -13,6 +13,9 @@ namespace StringDB.Writer {
 		/// <summary>Insert multiple items into the database</summary>
 		void InsertRange(IEnumerable<KeyValuePair<string, string>> items);
 
+		/// <summary>Insert multiple ReaderPairs</summary>
+		void InsertRange(IEnumerable<Reader.IReaderPair> items);
+
 		/// <summary>Overwrite a value. Note: The old value is still left in the file, and a database cleanup function is needed to be implemented soon.</summary>
 		void OverwriteValue(Reader.IReaderPair replacePair, string newValue);
 	}
@@ -68,51 +71,66 @@ namespace StringDB.Writer {
 #endif
 			var l = this._stream.Length;
 
-				if (l >= 8)
-					this._stream.Seek(0, SeekOrigin.End);
-				else {
-					_Seek(0);
-					this._bw.Write((long)0);
-					_Seek(8);
-				}
-
-				//replace index chain
-				var p = l < 8 ? 8 : l;
-
-				_Seek(_indexChainReplace);
-				this._bw.Write(p);
-				_Seek(p);
-
-				var judge = p + sizeof(byte) + sizeof(long);
-
-				//judge the amount of space it'd require to write each item
-				foreach (var i in items)
-					judge += Judge_WriteIndex(i.Key);
-
-				//foreach item
-				foreach (var i in items) {
-					WriteIndex(i.Key, judge);
-
-					//judge -= Judge_WriteIndex(i.Key);
-					judge += Judge_WriteValue(i.Value);
-				}
-
-				this._bw.Write((byte)0xFF);
-				this._indexChainReplace = this._stream.Position;
-				this._bw.Write((long)0);
-
-				foreach (var i in items) {
-					WriteValue(i.Value);
-				}
-
+			/*if (l >= 8)
+				this._stream.Seek(0, SeekOrigin.End);
+			else*/
+			if(l < 8) {
 				_Seek(0);
-				this._bw.Write((long)this._indexChainReplace);
+				this._bw.Write((long)0);
+				_Seek(8);
+			}
 
-				this._bw.Flush();
-				this._stream.Flush();
+			//replace index chain
+			var p = l < 8 ? 8 : l;
+
+			_Seek(_indexChainReplace);
+			this._bw.Write(p);
+			_Seek(p);
+
+			var judge = p + sizeof(byte) + sizeof(long);
+
+			//judge the amount of space it'd require to write each item
+			foreach (var i in items)
+				judge += Judge_WriteIndex(i.Key);
+
+			//foreach item
+			foreach (var i in items) {
+				WriteIndex(i.Key, judge);
+
+				//judge -= Judge_WriteIndex(i.Key);
+				judge += Judge_WriteValue(i.Value);
+			}
+
+			this._bw.Write((byte)0xFF);
+			this._indexChainReplace = this._stream.Position;
+			this._bw.Write((long)0);
+
+			foreach (var i in items) {
+				WriteValue(i.Value);
+			}
+
+			_Seek(0);
+			this._bw.Write((long)this._indexChainReplace);
+
+			this._bw.Flush();
+			this._stream.Flush();
 #if THREAD_SAFE
 			}
 #endif
+		} /// <inheritdoc/>
+		public void InsertRange(IEnumerable<Reader.IReaderPair> items) {
+#if THREAD_SAFE
+			lock (this._lock) {
+#endif
+			InsertRange(FromReaderPair(items));
+#if THREAD_SAFE
+			}
+#endif
+		}
+
+		private IEnumerable<KeyValuePair<string, string>> FromReaderPair(IEnumerable<Reader.IReaderPair> items) {
+			foreach (var i in items)
+				yield return new KeyValuePair<string, string>(i.Index, i.Value);
 		}
 
 		public void Dispose() {
