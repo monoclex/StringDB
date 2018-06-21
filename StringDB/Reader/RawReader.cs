@@ -50,8 +50,7 @@ namespace StringDB.Reader {
 			var p = this.ReadBytes(9); //set the important values right NOW, since later the buffer can chnage and screw things up.
 			var importantByte = this._bufferRead[p]; //set these variables incase the buffer changes later when reading more bytes
 			var intVal = BitConverter.ToInt64(this._bufferRead, p + 1);
-
-
+			
 			if (importantByte == Consts.IndexSeperator) {
 				if (intVal == 0)
 					return null;
@@ -103,9 +102,6 @@ namespace StringDB.Reader {
 				return this._br.ReadBytes((int)BitConverter.ToUInt64(b, 1));
 
 				default:
-				Console.WriteLine("what");
-				Console.WriteLine(p);
-				throw new Exception("e");
 				return null;
 			}
 #if THREAD_SAFE

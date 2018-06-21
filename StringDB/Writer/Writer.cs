@@ -150,7 +150,7 @@ namespace StringDB.Writer {
 
 
 		private long Judge_WriteIndex(string index) =>
-			sizeof(byte) + sizeof(long) + (long)index.Length;
+			sizeof(byte) + sizeof(long) + (long)(Encoding.UTF8.GetBytes(index)).Length;
 
 		private long Judge_WriteValue(string value) =>
 			Judge_WriteValue(Encoding.UTF8.GetBytes(value));
