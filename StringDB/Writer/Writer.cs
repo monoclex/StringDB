@@ -10,7 +10,11 @@ namespace StringDB.Writer {
 		/// <summary>Insert an item into the database</summary>
 		void Insert(string index, string value);
 
-		/// <summary>Insert multiple items into the database</summary>
+		/// <summary>Insert an item into the database</summary>
+		void Insert(KeyValuePair<string, string> kvp);
+
+		/// <summary>Insert multiple items into the database.</summary>
+		/// <remarks>DO NOT FEED A yield return; ON THIS - if you feed in an IEnumerable that is generated via yield return, please make sure that the yield returns are constant. Make sure NO RNG AT ALL is used, or StringDB will fail at writing your stuff. This is because it iterates over the IEnumerable 3 times. If you'd like to use RNG, call a .ToList() ( System.Linq ) on it so it stays constant and everybody has a happy day.</remarks>
 		void InsertRange(IEnumerable<KeyValuePair<string, string>> items);
 
 		/// <summary>Overwrite a value. Note: The old value is still left in the file, and a database cleanup function is needed to be implemented soon.</summary>
@@ -47,21 +51,31 @@ namespace StringDB.Writer {
 #if THREAD_SAFE
 			lock (this._lock) {
 #endif
-			this._stream.Seek(0, SeekOrigin.End);
+			//if the value we are replacing is longer then the older value
+			if (Encoding.UTF8.GetBytes(replacePair.Value).Length > Encoding.UTF8.GetBytes(newValue).Length) {
 
-			var savePos = this._stream.Position;
-			WriteValue(newValue);
-			var raw = (replacePair as Reader.ReaderPair)._dp;
-			this._stream.Seek(raw.Position + 1, SeekOrigin.Begin);
-			this._bw.Write(savePos);
+				this._stream.Seek(0, SeekOrigin.End);
 
-			(replacePair as Reader.ReaderPair)._valueCache = newValue;
+				var savePos = this._stream.Position;
+				WriteValue(newValue);
+				var raw = (replacePair as Reader.ReaderPair)._dp;
+				this._stream.Seek(raw.Position + 1, SeekOrigin.Begin);
+				this._bw.Write(savePos);
+
+				(replacePair as Reader.ReaderPair)._valueCache = newValue;
+
+			} else { //or else, we'll just overwrite the old one
+				this._stream.Seek(((Reader.ReaderPair)replacePair)._dp.DataPosition, SeekOrigin.Begin);
+
+				this.WriteValue(newValue); //the value of the new one is less then the old one
+			}
 #if THREAD_SAFE
 			}
 #endif
 		} /// <inheritdoc/>
 
-		public void Insert(string index, string value) => InsertRange(new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>(index, value) }); /// <inheritdoc/>
+		public void Insert(string index, string value) => InsertRange(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>(index, value) }); /// <inheritdoc/>
+		public void Insert(KeyValuePair<string, string> kvp) => InsertRange(new KeyValuePair<string, string>[] { kvp });
 		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) {
 #if THREAD_SAFE
 			lock (this._lock) {
@@ -81,6 +95,7 @@ namespace StringDB.Writer {
 			this._bw.Write(p);
 			_Seek(p);
 
+			//current pos + index chain
 			var judge = p + sizeof(byte) + sizeof(long);
 			
 			foreach (var i in items)
@@ -131,7 +146,7 @@ namespace StringDB.Writer {
 		private void WriteValue(string value) {
 			var bytes = Encoding.UTF8.GetBytes(value);
 
-			if ((ulong)bytes.Length <= byte.MaxValue) {
+			if ((long)bytes.Length <= byte.MaxValue) {
 				this._bw.Write(Consts.IsByteValue);
 				this._bw.Write((byte)bytes.Length);
 			} else if ((ulong)bytes.Length <= ushort.MaxValue) {
@@ -150,14 +165,13 @@ namespace StringDB.Writer {
 
 
 		private long Judge_WriteIndex(string index) =>
-			sizeof(byte) + sizeof(long) + (long)(Encoding.UTF8.GetBytes(index)).Length;
+			sizeof(byte) + sizeof(long) + (long)((Encoding.UTF8.GetBytes(index)).Length);
 
 		private long Judge_WriteValue(string value) =>
 			Judge_WriteValue(Encoding.UTF8.GetBytes(value));
 
 		private long Judge_WriteValue(byte[] value) =>
 			sizeof(byte) +
-			(long)value.Length +
 			(value.Length <= byte.MaxValue ?
 				sizeof(byte)
 				: value.Length <= ushort.MaxValue ?
@@ -166,7 +180,8 @@ namespace StringDB.Writer {
 						sizeof(uint)
 						: (ulong)value.Length <= ulong.MaxValue ?
 							sizeof(ulong)
-							: throw new Exception("lolwut"));
+							: throw new Exception("lolwut")) +
+			(long)value.Length;
 
 		private void _Seek(long pos) {
 			this._stream.Seek(pos, SeekOrigin.Begin);

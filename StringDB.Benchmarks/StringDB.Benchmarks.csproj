@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="benchmarkdotnet" Version="0.10.14" />
     <PackageReference Include="newtonsoft.json" Version="11.0.2" />
   </ItemGroup>
 

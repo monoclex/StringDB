@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 
 namespace StringDB.Reader {
+	//TODO: google is there a way to generate a stream from a specific portion of a filestream?
+
 	public interface IReader : IEnumerable<IReaderPair> {
 		/// <summary>Gets the very first element in the database</summary>
 		IReaderPair First();
@@ -116,13 +118,13 @@ namespace StringDB.Reader {
 		public IEnumerator<IReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader); /// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator(); /// <inheritdoc/>
 
-		public void NotifyInsert(IEnumerable<KeyValuePair<string, string>> inserts) {
+		/*public void NotifyInsert(IEnumerable<KeyValuePair<string, string>> inserts) {
 
 		} /// <inheritdoc/>
 
 		public void NotifyInsert(IEnumerable<IReaderPair> inserts) {
 
-		} /// <inheritdoc/>
+		} /// <inheritdoc/>*/
 
 		public void DrainBuffer() =>
 			this._rawReader.DrainBuffer();
