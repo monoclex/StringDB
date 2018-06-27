@@ -9,13 +9,13 @@ namespace StringDB.Tester
     class Program
     {
 		static void Main(string[] args) {
-			var db = Database.FromFile("blank.db");
+			var db = Database.FromFile("blanyou yhacv e the big gayk.db");
 
 			foreach(var i in db) {
 				Console.WriteLine(i.ToString());
 			}
 
-			for (int i = 0; i < 1000; i++)
+			for (int i = 0; i < 100000; i++)
 				db.Insert(i.ToString(), "ure agaty");
 
 			foreach (var i in db) {

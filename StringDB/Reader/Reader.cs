@@ -8,6 +8,7 @@ using System.Text;
 namespace StringDB.Reader {
 	//TODO: google is there a way to generate a stream from a specific portion of a filestream?
 
+	/// <summary>Defines a reader. Use it to read out data</summary>
 	public interface IReader : IEnumerable<ReaderPair> {
 		/// <summary>Gets the very first element in the database</summary>
 		ReaderPair First();
@@ -22,6 +23,7 @@ namespace StringDB.Reader {
 		void DrainBuffer();
 	}
 
+	/// <summary>A Reader that reads out a StringDB database file.</summary>
 	public class Reader : IReader {
 		internal Reader(Stream stream, object @lock = null) {
 			this._stream = stream ?? throw new ArgumentNullException(nameof(stream));
