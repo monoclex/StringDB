@@ -57,8 +57,10 @@ namespace StringDB.Writer {
 #if THREAD_SAFE
 			lock (this._lock) {
 #endif
+			Console.WriteLine("overwrite");
 			//if the value we are replacing is longer then the older value
-			if (replacePair.Value.GetBytes().Length > newValue.GetBytes().Length) {
+			if (replacePair.Value.GetBytes().Length < newValue.GetBytes().Length) {
+				Console.WriteLine("longer");
 
 				this._stream.Seek(0, SeekOrigin.End);
 
@@ -68,13 +70,18 @@ namespace StringDB.Writer {
 				this._stream.Seek(raw.Position + 1, SeekOrigin.Begin);
 				this._bw.Write(savePos);
 
-				replacePair._valueCache = newValue;
+				//when we write new data we have to update our length cache
+				this._lastLength += Judge_WriteValue(newValue);
+
 
 			} else { //or else, we'll just overwrite the old one
+				Console.WriteLine("shorter");
 				this._stream.Seek(replacePair._dp.DataPosition, SeekOrigin.Begin);
 
 				this.WriteValue(newValue); //the value of the new one is less then the old one
 			}
+
+			replacePair._valueCache = newValue;
 #if THREAD_SAFE
 			}
 #endif

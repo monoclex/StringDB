@@ -9,18 +9,60 @@ namespace StringDB.Tester
     class Program
     {
 		static void Main(string[] args) {
-			var db = Database.FromFile("blanyou yhacv e the big gayk.db");
+			using (var db = Database.FromFile("string.db")) {
+				foreach (var i in db) // loop over every item and say the index
+					Console.WriteLine(i.Index);
 
-			foreach(var i in db) {
-				Console.WriteLine(i.ToString());
+				db.Insert("test_key", "test_value"); // insert a single item named "test_key"
+
+				db.InsertRange(new KeyValuePair<string, string>[] { // insert multiple items
+
+					new KeyValuePair<string, string>("test1", "value1"),
+					new KeyValuePair<string, string>("test2", "value2"),
+					new KeyValuePair<string, string>("test3", "value3"),
+					new KeyValuePair<string, string>("test4", "value4"),
+					new KeyValuePair<string, string>("test5", "value5"),
+
+				});
+
+				foreach (var i in db) // loop over every item in the DB again and say the index
+					Console.WriteLine(i.Index);
+
+				var testKey = db.GetByIndex("test_key"); // get test_key
+
+				Console.WriteLine(testKey.Value); // say the value of test_key
+
+				db.OverwriteValue(testKey, "new_value"); // change the value
+
+				Console.WriteLine(testKey.Value); // say the new value
+
+				db.OverwriteValue(testKey, "newest_value"); // change the value again
+
+				// insert another test_key
+
+				db.Insert("test_key", "i'm hidden behind the other test_key!");
+
+				// foreach loop
+
+				foreach (var i in db)
+					Console.WriteLine(i.Index);
+
+				// will print out the first test_key and the other test key
+
+				foreach (var i in db.GetMultipleByIndex("test_key")) //let's get every single test_key
+					Console.WriteLine(i.Value); //write out the value
+
+				// now by doing so many tiny inserts we can save a little space if we clean it
+
+				using (var cleaneddb = Database.FromFile("cleaned-string.db")) {
+					cleaneddb.CleanFrom(db);
+				}
 			}
 
-			for (int i = 0; i < 100000; i++)
-				db.Insert(i.ToString(), "ure agaty");
+			// let's see hwo big the normal database is compared to the cleaned one
 
-			foreach (var i in db) {
-				Console.WriteLine(i.ToString());
-			}
+			Console.WriteLine("unclean: " + new System.IO.FileInfo("string.db").Length + " bytes");
+			Console.WriteLine("clean: " + new System.IO.FileInfo("cleaned-string.db").Length + " bytes");
 
 			Console.ReadLine();
 		}
