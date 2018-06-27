@@ -7,6 +7,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 namespace StringDB.Reader {
+	//the end user should never be using raw readers
+
 	public interface IRawReader {
 		IPart ReadAt(long pos);
 		IPart ReadOn(IPart previous);
@@ -50,7 +52,9 @@ namespace StringDB.Reader {
 			var p = this.ReadBytes(9); //set the important values right NOW, since later the buffer can chnage and screw things up.
 			var importantByte = this._bufferRead[p]; //set these variables incase the buffer changes later when reading more bytes
 			var intVal = BitConverter.ToInt64(this._bufferRead, p + 1);
-			
+
+			if (importantByte == Consts.NoIndex) return null;
+
 			if (importantByte == Consts.IndexSeperator) {
 				if (intVal == 0)
 					return null;

@@ -1,6 +1,7 @@
-﻿#define WRITER_TESTS
+﻿#define SETUP
+#define WRITER_TESTS
 #define READER_TESTS
-//#define CLEAN_TESTS
+#define CLEAN_TESTS
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Exporters;
@@ -52,7 +53,7 @@ namespace StringDB.Benchmarks {
 			"Hailee",
 			"Kevin",
 			"Alex",
-			"Amber",
+			"Elizabeth",
 			"Skyler"
 		};
 
@@ -97,6 +98,7 @@ namespace StringDB.Benchmarks {
 
 	[HtmlExporter]
 	public class StringDBBenchmark {
+#if SETUP
 		public Database stringdb;
 		private IEnumerable<KeyValuePair<string, string>> itemsToInsert;
 		private IEnumerable<KeyValuePair<string, string>> newInserts;
@@ -227,6 +229,7 @@ namespace StringDB.Benchmarks {
 
 			File.Delete(GenerateItems.GenerateDatabaseName(clean));
 		}
+#endif
 #endif
 	}
 }

@@ -36,7 +36,7 @@
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="..\PostBuild\InheritDoc.exe -b $(OutDir) -o" />
+    <Exec Command="..\PostBuild\InheritDoc.exe -o -b $(OutDir)" />
   </Target>
 
 </Project>

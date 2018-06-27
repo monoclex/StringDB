@@ -9,10 +9,11 @@ namespace StringDB.Tester
     class Program
     {
 		static void Main(string[] args) {
-			var db = Database.FromFile("HEYYE.txt");
+			var db = Database.FromFile("blank.db");
 
-			for (int i = 0; i < 10_000; i++)
-				foreach (var j in db) { }
+			foreach(var i in db) {
+
+			}
 
 			Console.ReadLine();
 		}
@@ -46,7 +47,7 @@ namespace StringDB.Tester
 			"Hailee",
 			"Kevin",
 			"Alex",
-			"Amber",
+			"Elizabeth",
 			"Skyler"
 		};
 

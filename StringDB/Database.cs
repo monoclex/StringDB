@@ -8,18 +8,18 @@ using System.Text;
 
 namespace StringDB {
 	/// <summary>A StringDB database, used to encapsulate an IReader and an IWriter together for easy usage.</summary>
-	public interface IDatabase {
+	public interface IDatabase : IReader, IWriter, IDisposable {
 		/// <summary>Cleans out the current database, and copies all of the contents of this database into the other one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</summary>
 		/// <param name="dbCleanTo">The database that will be used to insert the other database's values into</param>
-		void CleanTo(Database dbCleanTo);
+		void CleanTo(IDatabase dbCleanTo);
 
 		/// <summary>Cleans out the database specified, and copies all of the contents of the other database into this one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</summary>
 		/// <param name="dbCleanFrom">The database to clean up</param>
-		void CleanFrom(Database dbCleanFrom);
+		void CleanFrom(IDatabase dbCleanFrom);
 	}
 
 	/// <inheritdoc/>
-	public class Database : IReader, IWriter, IDisposable, IDatabase {
+	public class Database : IDatabase {
 		internal Database(Stream s, bool disposeStream) {
 			this._lock = new object();
 
@@ -43,10 +43,10 @@ namespace StringDB {
 		private IReader _reader;
 		private IWriter _writer; /// <inheritdoc/>
 
-		public void CleanTo(Database dbCleanTo) =>
+		public void CleanTo(IDatabase dbCleanTo) =>
 			dbCleanTo.InsertRange(FromDatabase(this)); /// <inheritdoc/>
 
-		public void CleanFrom(Database dbCleanFrom) =>
+		public void CleanFrom(IDatabase dbCleanFrom) =>
 			this.InsertRange(FromDatabase(dbCleanFrom)); /// <inheritdoc/>
 
 		public void DrainBuffer() =>
@@ -97,7 +97,7 @@ namespace StringDB {
 				this._stream.Dispose();
 		}
 
-		private IEnumerable<KeyValuePair<string, string>> FromDatabase(Database other) {
+		private IEnumerable<KeyValuePair<string, string>> FromDatabase(IDatabase other) {
 			foreach (var i in other)
 				yield return new KeyValuePair<string, string>(i.Index, i.Value);
 		}

@@ -51,7 +51,7 @@ namespace StringDB.Writer {
 		private long _lastLength = 0;
 		private long _lastPos = -1;
 
-		private object _lock = null; /// <inheritdoc/>
+		private object _lock; /// <inheritdoc/>
 
 		public void OverwriteValue(Reader.ReaderPair replacePair, string newValue) {
 #if THREAD_SAFE
@@ -154,6 +154,9 @@ namespace StringDB.Writer {
 			if (bytes.Length >= Consts.MaxLength)
 				throw new ArgumentException($"index.Length is longer {Consts.MaxLength}", nameof(index));
 
+			if (bytes.Length == 0)
+				throw new ArgumentException($"index.Length is of 0 lenth", nameof(index));
+
 			this._bw.Write((byte)bytes.Length);
 			this._bw.Write(nextPos);
 			this._bw.Write(bytes);
@@ -162,7 +165,7 @@ namespace StringDB.Writer {
 		private void WriteValue(string value) {
 			var bytes = value.GetBytes();
 
-			if ((long)bytes.Length <= byte.MaxValue) {
+			if ((ulong)bytes.Length <= byte.MaxValue) {
 				this._bw.Write(Consts.IsByteValue);
 				this._bw.Write((byte)bytes.Length);
 			} else if ((ulong)bytes.Length <= ushort.MaxValue) {
@@ -174,7 +177,7 @@ namespace StringDB.Writer {
 			} else if ((ulong)bytes.Length <= ulong.MaxValue) {
 				this._bw.Write(Consts.IsULongValue);
 				this._bw.Write((ulong)bytes.Length);
-			} else throw new Exception("lolwut");
+			}
 
 			this._bw.Write(bytes);
 		}
