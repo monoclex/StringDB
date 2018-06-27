@@ -8,17 +8,17 @@ using System.Text;
 namespace StringDB.Reader {
 	//TODO: google is there a way to generate a stream from a specific portion of a filestream?
 
-	public interface IReader : IEnumerable<IReaderPair> {
+	public interface IReader : IEnumerable<ReaderPair> {
 		/// <summary>Gets the very first element in the database</summary>
-		IReaderPair First();
+		ReaderPair First();
 
 		//long BytesOfStringDBOverhead();
 
-		/// <summary>Gets the IReaderPair responsible for a given index</summary>
-		IReaderPair GetByIndex(string index);
+		/// <summary>Gets the ReaderPair responsible for a given index</summary>
+		ReaderPair GetByIndex(string index);
 
-		/// <summary>Gets the multiple IReaderPairs responsible for a given index</summary>
-		IEnumerable<IReaderPair> GetMultipleByIndex(string index);
+		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
+		IEnumerable<ReaderPair> GetMultipleByIndex(string index);
 
 		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
 		void DrainBuffer();
@@ -39,24 +39,19 @@ namespace StringDB.Reader {
 
 		private Stream _stream;
 		private IRawReader _rawReader;
-
-		private IReaderPair _cacheFirstIndex = null;
+		
 		private long _overheadCache = -1; /// <inheritdoc/>
 
-		public IReaderPair First() {
+		public ReaderPair First() {
 			if (this._stream.Length <= 8)
 				return null;
-
-			if (_cacheFirstIndex != null)
-				return _cacheFirstIndex;
 
 			var p = this._rawReader.ReadOn(Part.Start);
 
 			while (!(p is IPartDataPair))
 				p = this._rawReader.ReadOn(p);
 				
-			_cacheFirstIndex = new ReaderPair(p as IPartDataPair, this._rawReader);
-			return _cacheFirstIndex;
+			return new ReaderPair(p as IPartDataPair, this._rawReader);
 		} /// <inheritdoc/>
 
 		/*public long BytesOfStringDBOverhead() {
@@ -91,11 +86,11 @@ namespace StringDB.Reader {
 			return this._overheadCache + sizeof(long);
 		}*/
 
-		public IReaderPair GetByIndex(string index) {
+		public ReaderPair GetByIndex(string index) {
 			if (this._stream.Length <= 8)
 				return null;
 
-			byte[] comparing = Encoding.UTF8.GetBytes(index);
+			byte[] comparing = index.GetBytes();
 
 			foreach (var i in this)
 				if (EqualBytesLongUnrolled(comparing, i.IndexAsByteArray))
@@ -104,25 +99,25 @@ namespace StringDB.Reader {
 			return null;
 		} /// <inheritdoc/>
 
-		public IEnumerable<IReaderPair> GetMultipleByIndex(string index) {
+		public IEnumerable<ReaderPair> GetMultipleByIndex(string index) {
 			if (this._stream.Length <= 8)
 				yield break;
 			
-			byte[] comparing = Encoding.UTF8.GetBytes(index);
+			byte[] comparing = index.GetBytes();
 
 			foreach (var i in this)
 				if (EqualBytesLongUnrolled(comparing, i.IndexAsByteArray))
 					yield return i;
 		} /// <inheritdoc/>
 
-		public IEnumerator<IReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader); /// <inheritdoc/>
+		public IEnumerator<ReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader); /// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator(); /// <inheritdoc/>
 
 		/*public void NotifyInsert(IEnumerable<KeyValuePair<string, string>> inserts) {
 
 		} /// <inheritdoc/>
 
-		public void NotifyInsert(IEnumerable<IReaderPair> inserts) {
+		public void NotifyInsert(IEnumerable<ReaderPair> inserts) {
 
 		} /// <inheritdoc/>*/
 

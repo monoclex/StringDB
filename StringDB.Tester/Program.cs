@@ -1,79 +1,91 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace StringDB.Tester
 {
     class Program
     {
 		static void Main(string[] args) {
-			using (var db = Database.FromFile("pobj.db"))
-			using (var other = Database.FromFile("other_2.db")) {
-				foreach (var i in db)
-					Console.WriteLine(i.ToString());
-				Console.WriteLine($"done");
-			}
+			var db = Database.FromFile("HEYYE.txt");
+
+			for (int i = 0; i < 10_000; i++)
+				foreach (var j in db) { }
 
 			Console.ReadLine();
 		}
+	}
 
-		static void Insertations() {
 
-		}
+	public static class GenerateItems {
+		public const int ItemsToInsert = 10_000;
 
-		static void CopyFrom() {
-			var otherdb = Database.FromFile("eee.db");
+		public const int MinIncome = 100;
+		public const int MaxIncome = 10_000;
 
-			using (var db = Database.FromFile("game on your phone.db")) {
-				foreach (var i in GetValues(100_000, "example test value"))
-					db.Insert(i.Key, i.Value);
+		public const int FriendsToGenerate = 20;
+
+		private static Random _random;
+		public static Random Rng => _random ?? (_random = new Random());
+
+		internal static int LastDatabaseIDGenerated = Rng.Next(0, int.MaxValue / 2);
+		public static Database NewStringDB() => Database.FromFile(GenerateDatabaseName(LastDatabaseIDGenerated++));
+
+		public static string GenerateDatabaseName(int id) => $"{id}-stringdb.db";
+
+		public static readonly string[] RandomNames = {
+			"Jimbo",
+			"Josh",
+			"Shelby",
+			"Kelly",
+			"Jimmy",
+			"John",
+			"Sarah",
+			"Hailee",
+			"Kevin",
+			"Alex",
+			"Amber",
+			"Skyler"
+		};
+
+		public static string RandomName => RandomNames[Rng.Next(0, RandomNames.Length)];
+
+		//we are NOT using yield return because we will get random things *every time* we iterate over it
+
+		public static IEnumerable<Item> GetItems(int items) {
+			var res = new List<Item>();
+
+			for (var i = 0; i < items; i++) {
+				string usersName = RandomName;
+				res.Add(new Item() {
+					Identifier = $"{i}.{usersName}",
+					Name = $"{usersName} {RandomName}",
+					Dollars = Rng.Next(GenerateItems.MinIncome, GenerateItems.MaxIncome),
+					Friends = GenerateFriends(GenerateItems.FriendsToGenerate).ToArray()
+				});
 			}
 
-			Console.WriteLine("inserted");
-
-			using (var db = Database.FromFile("game on your phone.db")) {
-				otherdb.CleanFrom(db);
-			}
-
-			Console.ReadLine();
-		}
-		
-		static IEnumerable<KeyValuePair<string, string>> GetValues(int amount, string dataValue) {
-			for(int iteration = 0; iteration < amount; iteration++)
-				yield return new KeyValuePair<string, string>(iteration.ToString(), dataValue);
+			return res;
 		}
 
-		static void OverwriteExample() {
-			using (var db = Database.FromFile("Overwrite.db")) {
-
-				var itm = db.GetByIndex("Hello"); //try to find "Hello"
-
-				if (itm == null) { //if it doesn't exist, create it
-					db.Insert("Hello", "World");
-					itm = db.GetByIndex("Hello"); //now get "Hello"
-				}
-
-				Console.WriteLine(itm.ToString()); //write the current value of it
-
-				db.OverwriteValue(itm, "Continent"); //change it to Continent
-
-				itm = db.GetByIndex("Hello"); //re-get it by the index ( though itm.Value also changes so you can reuse the ReaderPair )
-
-				Console.WriteLine(itm.ToString()); //prove that it's changed
-
-				Console.WriteLine("done");
-			}
+		public static IEnumerable<KeyValuePair<string, string>> GetItemsAsKVP(IEnumerable<Item> items) {
+			foreach (var i in items)
+				yield return new KeyValuePair<string, string>(i.Identifier, JsonConvert.SerializeObject(i));
 		}
 
-		private static void Benchmark(Action act, int iterations) {
-			GC.Collect();
-			act.Invoke(); // run once outside of loop to avoid initialization costs
-			Stopwatch sw = Stopwatch.StartNew();
-			for (int i = 1; i <= iterations; i++) {
-				act.Invoke();
-			}
-			sw.Stop();
-			Console.WriteLine($"{((decimal)sw.ElapsedMilliseconds / (decimal)iterations)}ms {((decimal)sw.ElapsedTicks / (decimal)iterations)}t");
+		public static IEnumerable<string> GenerateFriends(int amount) {
+			for (var i = 0; i < amount; i++)
+				yield return RandomName;
+		}
+
+		public class Item {
+			public string Identifier { get; set; }
+
+			public string Name { get; set; }
+			public int Dollars { get; set; }
+			public string[] Friends { get; set; }
 		}
 	}
 }

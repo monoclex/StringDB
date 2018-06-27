@@ -1,4 +1,8 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿#define WRITER_TESTS
+#define READER_TESTS
+//#define CLEAN_TESTS
+
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Exporters;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Horology;
@@ -113,6 +117,8 @@ namespace StringDB.Benchmarks {
 				this._end = i.Key;
 				if (count == 0)
 					this._begin = i.Key;
+
+				count++;
 			}
 
 			int c = 0;
@@ -121,6 +127,8 @@ namespace StringDB.Benchmarks {
 					this._middle = i.Key;
 				c++;
 			}
+
+			Console.WriteLine($"Beginning, middle, end: {this._begin}, {this._middle}, {this._end}");
 		}
 
 		[IterationSetup]
@@ -144,7 +152,8 @@ namespace StringDB.Benchmarks {
 				Console.WriteLine(ex.Message);
 			}
 		}
-		
+
+#if WRITER_TESTS
 		[Benchmark]
 		public void InsertRangeItems() {
 			this.stringdb.InsertRange(this.itemsToInsert);
@@ -164,7 +173,9 @@ namespace StringDB.Benchmarks {
 			while (enum_1.MoveNext() && enum_2.MoveNext())
 				this.stringdb.OverwriteValue(enum_1.Current, enum_2.Current.Value);
 		}
-		
+#endif
+
+#if READER_TESTS
 		[Benchmark]
 		public void IterateThroughEveryEntry() {
 			foreach (var i in this.stringdb) { }
@@ -191,7 +202,9 @@ namespace StringDB.Benchmarks {
 				var t = i.Value;
 			}
 		}
+#endif
 
+#if CLEAN_TESTS
 		[Benchmark]
 		public void CleanFromDatabase() {
 			//TODO: remove new StringDb and generate database name from the benchmark
@@ -214,5 +227,6 @@ namespace StringDB.Benchmarks {
 
 			File.Delete(GenerateItems.GenerateDatabaseName(clean));
 		}
+#endif
 	}
 }

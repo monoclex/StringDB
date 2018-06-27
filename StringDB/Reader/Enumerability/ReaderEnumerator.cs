@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace StringDB.Reader {
-	public class ReaderEnumerator : IEnumerator<IReaderPair> {
+	public class ReaderEnumerator : IEnumerator<ReaderPair> {
 		internal ReaderEnumerator(IRawReader rawReader) {
 			this._rawReader = rawReader;
 			this._partOn = Part.Start;
@@ -13,7 +13,7 @@ namespace StringDB.Reader {
 		private IRawReader _rawReader;
 		private IPart _partOn = null;
 
-		public IReaderPair Current => new ReaderPair(_partOn as IPartDataPair, this._rawReader);
+		public ReaderPair Current => new ReaderPair(_partOn as IPartDataPair, this._rawReader);
 		object IEnumerator.Current => this.Current;
 		
 		public bool MoveNext() {

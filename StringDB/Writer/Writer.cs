@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 
 namespace StringDB.Writer {
+	/// <summary>Some kind of wwriter that writes stuff.</summary>
 	public interface IWriter : IDisposable {
 		/// <summary>Insert an item into the database</summary>
 		void Insert(string index, string value);
@@ -18,9 +19,10 @@ namespace StringDB.Writer {
 		void InsertRange(IEnumerable<KeyValuePair<string, string>> items);
 
 		/// <summary>Overwrite a value. Note: The old value is still left in the file, and a database cleanup function is needed to be implemented soon.</summary>
-		void OverwriteValue(Reader.IReaderPair replacePair, string newValue);
+		void OverwriteValue(Reader.ReaderPair replacePair, string newValue);
 	}
 
+	/// <inheritdoc/>
 	public class Writer : IWriter {
 		internal Writer(Stream s, object @lock = null) {
 			this._stream = s;
@@ -36,6 +38,9 @@ namespace StringDB.Writer {
 				_Seek(0);
 				this._indexChainReplace = br.ReadInt64();
 			}
+
+			this._lastLength = s.Length;
+			_Seek(0); //seek to the beginning
 		}
 
 		private Stream _stream;
@@ -43,29 +48,30 @@ namespace StringDB.Writer {
 
 		internal long _indexChainReplace = 0;
 
+		private long _lastLength = 0;
 		private long _lastPos = -1;
 
 		private object _lock = null; /// <inheritdoc/>
 
-		public void OverwriteValue(Reader.IReaderPair replacePair, string newValue) {
+		public void OverwriteValue(Reader.ReaderPair replacePair, string newValue) {
 #if THREAD_SAFE
 			lock (this._lock) {
 #endif
 			//if the value we are replacing is longer then the older value
-			if (Encoding.UTF8.GetBytes(replacePair.Value).Length > Encoding.UTF8.GetBytes(newValue).Length) {
+			if (replacePair.Value.GetBytes().Length > newValue.GetBytes().Length) {
 
 				this._stream.Seek(0, SeekOrigin.End);
 
 				var savePos = this._stream.Position;
 				WriteValue(newValue);
-				var raw = (replacePair as Reader.ReaderPair)._dp;
+				var raw = replacePair._dp;
 				this._stream.Seek(raw.Position + 1, SeekOrigin.Begin);
 				this._bw.Write(savePos);
 
-				(replacePair as Reader.ReaderPair)._valueCache = newValue;
+				replacePair._valueCache = newValue;
 
 			} else { //or else, we'll just overwrite the old one
-				this._stream.Seek(((Reader.ReaderPair)replacePair)._dp.DataPosition, SeekOrigin.Begin);
+				this._stream.Seek(replacePair._dp.DataPosition, SeekOrigin.Begin);
 
 				this.WriteValue(newValue); //the value of the new one is less then the old one
 			}
@@ -75,29 +81,28 @@ namespace StringDB.Writer {
 		} /// <inheritdoc/>
 
 		public void Insert(string index, string value) => InsertRange(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>(index, value) }); /// <inheritdoc/>
-		public void Insert(KeyValuePair<string, string> kvp) => InsertRange(new KeyValuePair<string, string>[] { kvp });
+		public void Insert(KeyValuePair<string, string> kvp) => InsertRange(new KeyValuePair<string, string>[] { kvp }); /// <inheritdoc/>
 		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) {
 #if THREAD_SAFE
 			lock (this._lock) {
 #endif
-			var l = this._stream.Length;
-			
-			if(l < 8) {
-				_Seek(0);
-				this._bw.Write((long)0);
-				_Seek(8);
-			}
-
-			//replace index chain
+			var l = this._lastLength;
 			var p = l < 8 ? 8 : l;
 
-			_Seek(_indexChainReplace);
-			this._bw.Write(p);
+			if (l < 8) {
+				if(l != 0) //no reason to seek to 0 if we're already there
+					_Seek(0);
+
+				this._bw.Write((long)0);
+
+				p = 8;
+			}
+			
 			_Seek(p);
 
 			//current pos + index chain
 			var judge = p + sizeof(byte) + sizeof(long);
-			
+
 			foreach (var i in items)
 				judge += Judge_WriteIndex(i.Key);
 
@@ -109,6 +114,8 @@ namespace StringDB.Writer {
 				judge += Judge_WriteValue(i.Value);
 			}
 
+			var oldRepl = this._indexChainReplace; //where we need to go to replace the old
+
 			this._bw.Write((byte)0xFF);
 			this._indexChainReplace = this._stream.Position;
 			this._bw.Write((long)0);
@@ -117,8 +124,17 @@ namespace StringDB.Writer {
 				WriteValue(i.Value);
 			}
 
-			_Seek(0);
+			if (oldRepl != 0) {
+				_Seek(oldRepl); //seek here to oldRepl
+				this._bw.Write(p);
+			}
+			
+			_Seek(0); //and then seek to 0 and replace that
 			this._bw.Write((long)this._indexChainReplace);
+
+			//set the last length to what we judged would be the future
+			//because what we judged is exactly the amount we re-wrote over
+			this._lastLength = judge;
 #if THREAD_SAFE
 			}
 #endif
@@ -133,7 +149,7 @@ namespace StringDB.Writer {
 		}
 
 		private void WriteIndex(string index, long nextPos) {
-			var bytes = Encoding.UTF8.GetBytes(index);
+			var bytes = index.GetBytes();
 
 			if (bytes.Length >= Consts.MaxLength)
 				throw new ArgumentException($"index.Length is longer {Consts.MaxLength}", nameof(index));
@@ -144,7 +160,7 @@ namespace StringDB.Writer {
 		}
 
 		private void WriteValue(string value) {
-			var bytes = Encoding.UTF8.GetBytes(value);
+			var bytes = value.GetBytes();
 
 			if ((long)bytes.Length <= byte.MaxValue) {
 				this._bw.Write(Consts.IsByteValue);
@@ -165,10 +181,10 @@ namespace StringDB.Writer {
 
 
 		private long Judge_WriteIndex(string index) =>
-			sizeof(byte) + sizeof(long) + (long)((Encoding.UTF8.GetBytes(index)).Length);
+			sizeof(byte) + sizeof(long) + (long)index.GetBytes().Length;
 
 		private long Judge_WriteValue(string value) =>
-			Judge_WriteValue(Encoding.UTF8.GetBytes(value));
+			Judge_WriteValue(value.GetBytes());
 
 		private long Judge_WriteValue(byte[] value) =>
 			sizeof(byte) +

@@ -4,12 +4,13 @@ using System.Text;
 
 namespace StringDB.Reader {
 	public interface IPart {
-
+		/// <summary>The initial byte detected</summary>
 		byte InitialByte { get; }
 
 		/// <summary>position of this part</summary>
 		long Position { get; }
 
+		/// <summary>Where the next position will be</summary>
 		long NextPart { get; }
 	}
 
@@ -20,10 +21,10 @@ namespace StringDB.Reader {
 			this.NextPart = nextPart;
 		}
 
-		public static Part Start => new Part(0x00, 8, 8);
+		public static Part Start => new Part(0x00, 8, 8); /// <inheritdoc/>
 
-		public byte InitialByte { get; }
-		public long Position { get; }
+		public byte InitialByte { get; } /// <inheritdoc/>
+		public long Position { get; } /// <inheritdoc/>
 		public long NextPart { get; }
 	}
 
@@ -36,16 +37,16 @@ namespace StringDB.Reader {
 			this.InitialByte = initByte;
 			this.Position = pos;
 			this.NextPart = nextPart;
-		}
+		} /// <inheritdoc/>
 
-		public byte InitialByte { get; }
-		public long Position { get; }
+		public byte InitialByte { get; } /// <inheritdoc/>
+		public long Position { get; } /// <inheritdoc/>
 		public long NextPart { get; }
 	}
 
-	public interface IPartDataPair : IPart {
-		byte[] Index { get; }
-		long DataPosition { get; }
+	public interface IPartDataPair : IPart { /// <inheritdoc/>
+		byte[] Index { get; } /// <inheritdoc/>
+		long DataPosition { get; } /// <inheritdoc/>
 		byte[] ReadData(IRawReader rawReader);
 	}
 
@@ -59,10 +60,10 @@ namespace StringDB.Reader {
 		}
 
 		private long _dataPos { get; }
-		private byte[] _indexName { get; }
+		private byte[] _indexName { get; } /// <inheritdoc/>
 
-		public byte InitialByte { get; }
-		public long Position { get; }
+		public byte InitialByte { get; } /// <inheritdoc/>
+		public long Position { get; } /// <inheritdoc/>
 		public long NextPart { get; }
 
 		public byte[] Index =>

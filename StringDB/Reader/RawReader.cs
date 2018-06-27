@@ -83,12 +83,12 @@ namespace StringDB.Reader {
 #endif
 			_Seek(p);
 
-			byte[] b = this._br.ReadBytes(9);
+			byte[] b = this._br.ReadBytes(9); //read the first 9 header bytes
 
-			switch (b[0]) {
-				case Consts.IsByteValue:
-				this._stream.Seek(p + 1 + sizeof(byte), SeekOrigin.Begin);
-				return this._br.ReadBytes(b[1]);
+			switch (b[0]) { //depends on the header byte
+				case Consts.IsByteValue: //if it's that value
+				this._stream.Seek(p + 1 + sizeof(byte), SeekOrigin.Begin); //seek backwards a little in the stream to where the data stars
+				return this._br.ReadBytes(b[1]); //read out that data to a byte array
 
 				case Consts.IsUShortValue:
 				this._stream.Seek(p + 1 + sizeof(ushort), SeekOrigin.Begin);
