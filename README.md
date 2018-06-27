@@ -6,49 +6,10 @@ Install from [nuget,](https://www.nuget.org/packages/StringDB) or from the [gith
 
 [```Install-Package StringDB```](https://www.nuget.org/packages/StringDB)
 
-## Why make another DB engine?
-I wanted a DB engine that was light on RAM, storage space and relatively fast. I was archiving multiple things, and I needed a way to access those archives really quickly. so I made this.
+# See the wiki for any questions.
 
-## How do I use it?
-It's very straight forward - and the library is documented so you shouldn't need to refer to anything online, it's hilariously easy to use.
+## [Why make another DB engine?](https://github.com/SirJosh3917/StringDB/wiki)
 
-First, make a new database.
+## [How fast does it perform?](https://github.com/SirJosh3917/StringDB/wiki/Benchmarks)
 
-```using(var db = Database.FromFile("my.db")) { }```
-
-Next, look at the [available methods!](https://github.com/SirJosh3917/StringDB/blob/master/StringDB/Database.cs)
-
-## What's the byte overhead?
-Not much. There's 8 bytes at the beginning of the file representing the index chan, and 9 bytes per index and 2-9 bytes per value ( depending on the length of the value. ). For every index chain, it's just 9 bytes.
-
-## Performance?
-
-```
-Final Results
-=============
-
-> StringDBTest
---------------
-Insert............ 192ms
-FetchLast......... 3101ms
-
-DB Size: 5MiB
-
-> MongoDBTest
--------------
-Insert............ 335ms
-FetchLast......... 539ms
-
-DB Size: 12MiB
-
-> LiteDBNoJournalTest
----------------------
-Insert............ 531ms
-FetchLast......... 135ms
-
-DB Size: 15MiB
-
-=============
-Insert inserts 5000 objects at once
-FetchLast gets the very last item in the database 5000 times
-```
+## [How can I get started using it?](https://github.com/SirJosh3917/StringDB/wiki/Getting-Started)
