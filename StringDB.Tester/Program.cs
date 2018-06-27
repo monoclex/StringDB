@@ -12,7 +12,14 @@ namespace StringDB.Tester
 			var db = Database.FromFile("blank.db");
 
 			foreach(var i in db) {
+				Console.WriteLine(i.ToString());
+			}
 
+			for (int i = 0; i < 1000; i++)
+				db.Insert(i.ToString(), "ure agaty");
+
+			foreach (var i in db) {
+				Console.WriteLine(i.ToString());
 			}
 
 			Console.ReadLine();

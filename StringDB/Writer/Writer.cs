@@ -86,22 +86,22 @@ namespace StringDB.Writer {
 #if THREAD_SAFE
 			lock (this._lock) {
 #endif
-			var l = this._lastLength;
-			var p = l < 8 ? 8 : l;
+			var streamLength = this._lastLength;
+			var seekToPosition = streamLength < 8 ? 8 : streamLength;
 
-			if (l < 8) {
-				if(l != 0) //no reason to seek to 0 if we're already there
+			if (streamLength < 8) {
+				if(streamLength != 0) //no reason to seek to 0 if we're already there
 					_Seek(0);
 
-				this._bw.Write((long)0);
+				this._bw.Write(0L);
 
-				p = 8;
+				seekToPosition = 8;
 			}
 			
-			_Seek(p);
+			_Seek(seekToPosition);
 
 			//current pos + index chain
-			var judge = p + sizeof(byte) + sizeof(long);
+			var judge = seekToPosition + sizeof(byte) + sizeof(long);
 
 			foreach (var i in items)
 				judge += Judge_WriteIndex(i.Key);
@@ -116,21 +116,21 @@ namespace StringDB.Writer {
 
 			var oldRepl = this._indexChainReplace; //where we need to go to replace the old
 
-			this._bw.Write((byte)0xFF);
+			this._bw.Write(Consts.IndexSeperator);
 			this._indexChainReplace = this._stream.Position;
-			this._bw.Write((long)0);
+			this._bw.Write(0L);
 
 			foreach (var i in items) {
 				WriteValue(i.Value);
 			}
 
-			if (oldRepl != 0) {
+			if (oldRepl != 0) { //we'll be seeking and rewriting, so we want to make sure we don't do that
 				_Seek(oldRepl); //seek here to oldRepl
-				this._bw.Write(p);
+				this._bw.Write(seekToPosition);
 			}
 			
 			_Seek(0); //and then seek to 0 and replace that
-			this._bw.Write((long)this._indexChainReplace);
+			this._bw.Write(this._indexChainReplace);
 
 			//set the last length to what we judged would be the future
 			//because what we judged is exactly the amount we re-wrote over
@@ -151,13 +151,7 @@ namespace StringDB.Writer {
 		private void WriteIndex(string index, long nextPos) {
 			var bytes = index.GetBytes();
 
-			if (bytes.Length >= Consts.MaxLength)
-				throw new ArgumentException($"index.Length is longer {Consts.MaxLength}", nameof(index));
-
-			if (bytes.Length == 0)
-				throw new ArgumentException($"index.Length is of 0 lenth", nameof(index));
-
-			this._bw.Write((byte)bytes.Length);
+			this._bw.Write((byte)bytes.Length); //we know it's less then 255 so we're safe
 			this._bw.Write(nextPos);
 			this._bw.Write(bytes);
 		}
@@ -165,26 +159,39 @@ namespace StringDB.Writer {
 		private void WriteValue(string value) {
 			var bytes = value.GetBytes();
 
-			if ((ulong)bytes.Length <= byte.MaxValue) {
+			if (bytes.Length <= byte.MaxValue) {
 				this._bw.Write(Consts.IsByteValue);
 				this._bw.Write((byte)bytes.Length);
-			} else if ((ulong)bytes.Length <= ushort.MaxValue) {
+			} else if (bytes.Length <= ushort.MaxValue) {
 				this._bw.Write(Consts.IsUShortValue);
 				this._bw.Write((ushort)bytes.Length);
-			} else if ((ulong)bytes.Length <= uint.MaxValue) {
+			} else {
+				this._bw.Write(Consts.IsUIntValue);
+				this._bw.Write(bytes.Length);
+			}
+			
+			/*else if ((ulong)bytes.Length <= uint.MaxValue) {
 				this._bw.Write(Consts.IsUIntValue);
 				this._bw.Write((uint)bytes.Length);
 			} else if ((ulong)bytes.Length <= ulong.MaxValue) {
 				this._bw.Write(Consts.IsULongValue);
 				this._bw.Write((ulong)bytes.Length);
-			}
+			}*/
 
 			this._bw.Write(bytes);
 		}
+		
+		private long Judge_WriteIndex(string index) {
+			var bytes = index.GetBytes();
 
+			if (bytes.Length >= Consts.MaxLength)
+				throw new ArgumentException($"index.Length is longer {Consts.MaxLength}", nameof(index));
 
-		private long Judge_WriteIndex(string index) =>
-			sizeof(byte) + sizeof(long) + (long)index.GetBytes().Length;
+			if (bytes.Length == 0)
+				throw new ArgumentException($"index.Length is of 0 lenth", nameof(index));
+
+			return sizeof(byte) + sizeof(long) + bytes.Length;
+		}
 
 		private long Judge_WriteValue(string value) =>
 			Judge_WriteValue(value.GetBytes());
@@ -195,15 +202,9 @@ namespace StringDB.Writer {
 				sizeof(byte)
 				: value.Length <= ushort.MaxValue ?
 					sizeof(ushort)
-					: (ulong)value.Length <= uint.MaxValue ?
-						sizeof(uint)
-						: (ulong)value.Length <= ulong.MaxValue ?
-							sizeof(ulong)
-							: throw new Exception("lolwut")) +
-			(long)value.Length;
+					: sizeof(int)) +
+			value.Length;
 
-		private void _Seek(long pos) {
-			this._stream.Seek(pos, SeekOrigin.Begin);
-		}
+		private void _Seek(long pos) => this._stream.Seek(pos, SeekOrigin.Begin);
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace StringDB.Reader {
-	public interface IPart {
+	internal interface IPart {
 		/// <summary>The initial byte detected</summary>
 		byte InitialByte { get; }
 
@@ -14,7 +14,7 @@ namespace StringDB.Reader {
 		long NextPart { get; }
 	}
 
-	public struct Part : IPart {
+	internal struct Part : IPart {
 		internal Part(byte initByte, long pos, long nextPart) {
 			this.InitialByte = initByte;
 			this.Position = pos;
@@ -28,11 +28,11 @@ namespace StringDB.Reader {
 		public long NextPart { get; }
 	}
 
-	public interface IPartIndexChain : IPart {
+	internal interface IPartIndexChain : IPart {
 
 	}
 
-	public struct PartIndexChain : IPartIndexChain {
+	internal struct PartIndexChain : IPartIndexChain {
 		internal PartIndexChain(byte initByte, long pos, long nextPart) {
 			this.InitialByte = initByte;
 			this.Position = pos;
@@ -44,13 +44,13 @@ namespace StringDB.Reader {
 		public long NextPart { get; }
 	}
 
-	public interface IPartDataPair : IPart { /// <inheritdoc/>
+	internal interface IPartDataPair : IPart { /// <inheritdoc/>
 		byte[] Index { get; } /// <inheritdoc/>
 		long DataPosition { get; } /// <inheritdoc/>
 		byte[] ReadData(IRawReader rawReader);
 	}
 
-	public struct PartDataPair : IPartDataPair {
+	internal struct PartDataPair : IPartDataPair {
 		internal PartDataPair(byte initByte, long pos, long dataPos, byte[] indexName) {
 			this.InitialByte = initByte;
 			this.Position = pos;

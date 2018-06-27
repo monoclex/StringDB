@@ -7,9 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 namespace StringDB.Reader {
-	//the end user should never be using raw readers
-
-	public interface IRawReader {
+	internal interface IRawReader {
 		IPart ReadAt(long pos);
 		IPart ReadOn(IPart previous);
 
@@ -19,7 +17,7 @@ namespace StringDB.Reader {
 		void DrainBuffer();
 	}
 
-	public class RawReader : IRawReader {
+	internal class RawReader : IRawReader {
 		internal RawReader(Stream s, object @lock = null) {
 			this._stream = s;
 			this._br = new BinaryReader(s);

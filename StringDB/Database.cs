@@ -102,37 +102,4 @@ namespace StringDB {
 				yield return new KeyValuePair<string, string>(i.Index, i.Value);
 		}
 	}
-	
-	/*
-	/// <inheritdoc/>
-	public class ThreadSafeDatabase : IReader, IWriter, IDisposable, IDatabase {
-		internal ThreadSafeDatabase(Stream s, bool disposeStream) =>
-			this._db = new ThreadSafeWrapper<Database>(new Database(s, disposeStream));
-
-		private ThreadSafeWrapper<Database> _db { get; }
-
-		/// <summary>Create a new ThreadSafeDatabase from a stream</summary><param name="s">The stream to be using</param><param name="disposeStream">If the stream should be disposed after we're done using it</param>
-		public static ThreadSafeDatabase FromStream(Stream s, bool disposeStream = false) => new ThreadSafeDatabase(s, disposeStream);
-
-		/// <summary>Create a new ThreadSafeDatabase from a string name to open a file</summary><param name="name">The name of the file</param>
-		public static ThreadSafeDatabase FromFile(string name) => new ThreadSafeDatabase(File.Open(name, FileMode.OpenOrCreate), true); /// <inheritdoc/>
-
-		public void CleanTo(Database dbCleanTo) => this._db.WrappedObject.CleanTo(dbCleanTo); /// <inheritdoc/>
-		public void CleanFrom(Database dbCleanFrom) => this._db.WrappedObject.CleanFrom(dbCleanFrom); /// <inheritdoc/>
-
-		public ReaderPair First() => this._db.WrappedObject.First(); /// <inheritdoc/>
-		public ReaderPair GetByIndex(string index) => this._db.WrappedObject.GetByIndex(index); /// <inheritdoc/>
-		public IEnumerable<ReaderPair> GetMultipleByIndex(string index) => this._db.WrappedObject.GetMultipleByIndex(index); /// <inheritdoc/>
-		public void DrainBuffer() => this._db.WrappedObject.DrainBuffer(); /// <inheritdoc/>
-		public IEnumerator<ReaderPair> GetEnumerator() => this._db.WrappedObject.GetEnumerator(); /// <inheritdoc/>
-		IEnumerator IEnumerable.GetEnumerator() => this._db.WrappedObject.GetEnumerator(); /// <inheritdoc/>
-
-		public void Insert(string index, string value) => this._db.WrappedObject.Insert(index, value); /// <inheritdoc/>
-		public void Insert(KeyValuePair<string, string> kvp) => this._db.WrappedObject.Insert(kvp); /// <inheritdoc/>
-		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) => this._db.WrappedObject.InsertRange(items); /// <inheritdoc/>
-		public void OverwriteValue(ReaderPair replacePair, string newValue) => this._db.WrappedObject.OverwriteValue(replacePair, newValue); /// <inheritdoc/>
-
-		public void Dispose() => this._db.WrappedObject.Dispose();
-	}
-	*/
 }

@@ -1,11 +1,5 @@
 ﻿namespace StringDB {
-#if DEBUG
-	/// <summary>Constants</summary>
-	public
-#else
-	internal
-#endif
-		static class Consts {
+	internal static class Consts {
 
 		/// <summary>The maximum value for an index. After this point, bytes are </summary>
 		public const int MaxLength = 0xFE;
