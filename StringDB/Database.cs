@@ -1,14 +1,16 @@
 ﻿using StringDB.Reader;
 using StringDB.Writer;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace StringDB {
+
 	/// <summary>A StringDB database, used to encapsulate an IReader and an IWriter together for easy usage.</summary>
 	public interface IDatabase : IReader, IWriter, IDisposable {
+
 		/// <summary>Cleans out the current database, and copies all of the contents of this database into the other one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</summary>
 		/// <param name="dbCleanTo">The database that will be used to insert the other database's values into</param>
 		void CleanTo(IDatabase dbCleanTo);
@@ -20,6 +22,7 @@ namespace StringDB {
 
 	/// <inheritdoc/>
 	public class Database : IDatabase {
+
 		internal Database(Stream s, bool disposeStream) {
 			this._lock = new object();
 
@@ -69,7 +72,7 @@ namespace StringDB {
 
 		public void Insert(string index, string value) =>
 			this._writer.Insert(index ?? throw new ArgumentNullException(nameof(index)), value ?? throw new ArgumentNullException(nameof(value))); /// <inheritdoc/>
-		
+
 		public void Insert(KeyValuePair<string, string> kvp) {
 			if (kvp.Key == null) throw new ArgumentNullException(nameof(kvp), "The key was null.");
 			if (kvp.Value == null) throw new ArgumentNullException(nameof(kvp), "The value was null.");

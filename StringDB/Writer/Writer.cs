@@ -3,17 +3,18 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace StringDB.Writer {
+
 	/// <summary>Some kind of wwriter that writes stuff.</summary>
 	public interface IWriter : IDisposable {
+
 		/// <summary>Insert an item into the database</summary>
 		void Insert(string index, string value);
 
 		/// <summary>Insert an item into the database</summary>
 		void Insert(KeyValuePair<string, string> kvp);
-		
+
 		/// <summary>Insert multiple items into the database.</summary>
 		/// <remarks>DO NOT FEED A yield return; ON THIS - if you feed in an IEnumerable that is generated via yield return, please make sure that the yield returns are constant. Make sure NO RNG AT ALL is used, or StringDB will fail at writing your stuff. This is because it iterates over the IEnumerable 3 times. If you'd like to use RNG, call a .ToList() ( System.Linq ) on it so it stays constant and everybody has a happy day.</remarks>
 		void InsertRange(IEnumerable<KeyValuePair<string, string>> items);
@@ -24,6 +25,7 @@ namespace StringDB.Writer {
 
 	/// <inheritdoc/>
 	public class Writer : IWriter {
+
 		internal Writer(Stream s, object @lock = null) {
 			this._stream = s;
 			this._bw = new BinaryWriter(this._stream);
@@ -68,8 +70,6 @@ namespace StringDB.Writer {
 
 				//when we write new data we have to update our length cache
 				this._lastLength += Judge_WriteValue(newValue);
-
-
 			} else { //or else, we'll just overwrite the old one
 				this._stream.Seek(replacePair._dp.DataPosition, SeekOrigin.Begin);
 
@@ -83,7 +83,9 @@ namespace StringDB.Writer {
 		} /// <inheritdoc/>
 
 		public void Insert(string index, string value) => InsertRange(new KeyValuePair<string, string>(index, value).AsEnumerable()); /// <inheritdoc/>
+
 		public void Insert(KeyValuePair<string, string> kvp) => InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+
 		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) {
 #if THREAD_SAFE
 			lock (this._lock) {
@@ -92,14 +94,14 @@ namespace StringDB.Writer {
 			var seekToPosition = streamLength < 8 ? 8 : streamLength;
 
 			if (streamLength < 8) {
-				if(streamLength != 0) //no reason to seek to 0 if we're already there
+				if (streamLength != 0) //no reason to seek to 0 if we're already there
 					_Seek(0);
 
 				this._bw.Write(0L);
 
 				seekToPosition = 8;
 			}
-			
+
 			_Seek(seekToPosition);
 
 			//current pos + index chain
@@ -130,7 +132,7 @@ namespace StringDB.Writer {
 				_Seek(oldRepl); //seek here to oldRepl
 				this._bw.Write(seekToPosition);
 			}
-			
+
 			_Seek(0); //and then seek to 0 and replace that
 			this._bw.Write(this._indexChainReplace);
 
@@ -171,7 +173,7 @@ namespace StringDB.Writer {
 				this._bw.Write(Consts.IsUIntValue);
 				this._bw.Write(bytes.Length);
 			}
-			
+
 			/*else if ((ulong)bytes.Length <= uint.MaxValue) {
 				this._bw.Write(Consts.IsUIntValue);
 				this._bw.Write((uint)bytes.Length);
@@ -182,7 +184,7 @@ namespace StringDB.Writer {
 
 			this._bw.Write(bytes);
 		}
-		
+
 		private long Judge_WriteIndex(string index) {
 			var bytes = index.GetBytes();
 

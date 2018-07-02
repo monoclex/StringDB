@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace StringDB.Reader {
+
 	/// <summary>Used to enumerate over a StringDB.</summary>
 	public class ReaderEnumerator : IEnumerator<ReaderPair> {
+
 		internal ReaderEnumerator(IRawReader rawReader) {
 			this._rawReader = rawReader;
 			this._partOn = Part.Start;
@@ -16,8 +16,9 @@ namespace StringDB.Reader {
 
 		/// <summary>What the current element is on.</summary>
 		public ReaderPair Current => new ReaderPair((PartDataPair)this._partOn, this._rawReader);
+
 		object IEnumerator.Current => this.Current;
-		
+
 		/// <summary>Retireves the next element in the sequence</summary>
 		/// <returns>True if there is an element, false if there isn't.</returns>
 		public bool MoveNext() {

@@ -1,4 +1,5 @@
 ﻿namespace StringDB {
+
 	internal static class Consts {
 
 		/// <summary>The maximum value for an index. After this point, bytes are </summary>

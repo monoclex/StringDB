@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace StringDB {
+
 	internal static class Helpers {
+
 		public static byte[] GetBytes(this string s) =>
 			Encoding.UTF8.GetBytes(s ?? throw new ArgumentNullException(nameof(s), "A key or value was probably null, can you check?"));
 
 		public static string GetString(this byte[] b) =>
 			Encoding.UTF8.GetString(b ?? throw new ArgumentNullException(nameof(b), "A key or value was probably null, can you check?"));
-		
+
 		public static IEnumerable<T> AsEnumerable<T>(this T item) { // make a single item enumberable ;D
 			yield return item;
 		}
