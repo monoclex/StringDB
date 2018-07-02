@@ -13,6 +13,8 @@ namespace StringDB.Reader {
 
 		byte[] ReadDataValueAt(long p);
 
+		long ReadDataValueLengthAt(long p);
+
 		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
 		void DrainBuffer();
 	}
@@ -78,16 +80,44 @@ namespace StringDB.Reader {
 					this.ReadAt(previous.NextPart)
 					: null;
 
-		public byte[] ReadDataValueAt(long p) {
+		public long ReadDataValueLengthAt(long p) {
 #if THREAD_SAFE
 			lock(_lock) {
 #endif
 			_Seek(p);
 
-			var b = this._br.ReadBytes(9); //read the first 9 header bytes
+			var b = this._br.ReadBytes(9);
 
-			switch (b[0]) { //depends on the header byte
-				case Consts.IsByteValue: //if it's that value
+			switch (b[0]) {
+				case Consts.IsByteValue:
+				return b[1];
+
+				case Consts.IsUShortValue:
+				return BitConverter.ToUInt16(b, 1);
+
+				case Consts.IsUIntValue:
+				return BitConverter.ToUInt32(b, 1);
+
+				case Consts.IsULongValue:
+				return (long)BitConverter.ToUInt64(b, 1);
+			}
+
+			return 0;
+#if THREAD_SAFE
+			}
+#endif
+		}
+
+		public byte[] ReadDataValueAt(long p) {
+#if THREAD_SAFE
+			lock(_lock) {
+#endif
+			_Seek(p); //don't use the readlength because it slows down performance
+
+			var b = this._br.ReadBytes(9);
+
+			switch (b[0]) {
+				case Consts.IsByteValue:
 				this._stream.Seek(p + 1 + sizeof(byte), SeekOrigin.Begin); //seek backwards a little in the stream to where the data stars
 				return this._br.ReadBytes(b[1]); //read out that data to a byte array
 
@@ -101,10 +131,9 @@ namespace StringDB.Reader {
 
 				case Consts.IsULongValue:
 				return this._br.ReadBytes((int)BitConverter.ToUInt64(b, 1));
-
-				default:
-				return null;
 			}
+
+			return null;
 #if THREAD_SAFE
 			}
 #endif

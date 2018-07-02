@@ -20,7 +20,8 @@
 			this.NextPart = nextPart;
 		}
 
-		public static Part Start => new Part(0x00, 8, 8); /// <inheritdoc/>
+		private static Part _cacheStart = new Part(0x00, 8, 8); //cache the start for possibly better performance?
+		public static Part Start => _cacheStart; /// <inheritdoc/>
 
 		public byte InitialByte { get; } /// <inheritdoc/>
 		public long Position { get; } /// <inheritdoc/>
@@ -57,13 +58,16 @@
 		public long Position { get; } /// <inheritdoc/>
 		public long NextPart { get; }
 
-		public byte[] Index =>
-			this._indexName;
+		public byte[] Index
+			=> this._indexName;
 
-		public long DataPosition =>
-			this._dataPos;
+		public long DataPosition
+			=> this._dataPos;
 
-		public byte[] ReadData(IRawReader rawReader) =>
-			rawReader.ReadDataValueAt(this.DataPosition);
+		public byte[] ReadData(IRawReader rawReader)
+			=> rawReader.ReadDataValueAt(this.DataPosition);
+
+		public long DataLength(IRawReader rawReader)
+			=> rawReader.ReadDataValueLengthAt(this.DataPosition);
 	}
 }

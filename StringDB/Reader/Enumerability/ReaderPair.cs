@@ -31,6 +31,9 @@
 		/// <summary>Retrieves the value of the index. This value isn't actually fetched until you call on it, for performance reasons.</summary>
 		public string Value => this._strValueCache ?? (this._strValueCache = this.ByteArrayValue.GetString());
 
+		/// <summary>Get how long the value is without reading it into memory.</summary>
+		public long ValueLength => this._dp.DataLength(this._rawReader);
+
 		/// <summary>A simple string form of the item.</summary>
 		/// <returns>[index, value]</returns>
 		public override string ToString() =>

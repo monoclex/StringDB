@@ -59,7 +59,7 @@ namespace StringDB.Writer {
 			lock (this._lock) {
 #endif
 			//if the value we are replacing is longer then the older value
-			if (replacePair.Value.GetBytes().Length < newValue.GetBytes().Length) {
+			if (replacePair.ValueLength <= newValue.GetBytes().Length) {
 				this._stream.Seek(0, SeekOrigin.End);
 
 				var savePos = this._stream.Position;

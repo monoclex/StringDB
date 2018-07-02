@@ -5,19 +5,20 @@
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Exporters;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+
 using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace StringDB.Benchmarks {
-	class Program {
-		static void Main(string[] args) {
+
+	internal class Program {
+
+		private static void Main(string[] args) {
 			var summary = BenchmarkRunner.Run<StringDBBenchmark>();
 			try {
 				System.IO.File.WriteAllText("results.txt", JsonConvert.SerializeObject(summary));
@@ -38,6 +39,7 @@ namespace StringDB.Benchmarks {
 		public static Random Rng => _random ?? (_random = new Random());
 
 		internal static int LastDatabaseIDGenerated = Rng.Next(0, int.MaxValue / 2);
+
 		public static Database NewStringDB() => Database.FromFile(GenerateDatabaseName(LastDatabaseIDGenerated++));
 
 		public static string GenerateDatabaseName(int id) => $"{id}-stringdb.db";
@@ -115,7 +117,7 @@ namespace StringDB.Benchmarks {
 			this.newInserts = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.ItemsToInsert));
 
 			int count = 0;
-			foreach(var i in this.itemsToInsert) {
+			foreach (var i in this.itemsToInsert) {
 				this._end = i.Key;
 				if (count == 0)
 					this._begin = i.Key;
@@ -144,18 +146,17 @@ namespace StringDB.Benchmarks {
 			this.lastdb = GenerateItems.LastDatabaseIDGenerated;
 
 			try {
-
 				if (this.stringdb != null)
 					this.stringdb.Dispose();
 
 				File.Delete(GenerateItems.GenerateDatabaseName(this.lastdb));
-
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 			}
 		}
 
 #if WRITER_TESTS
+
 		[Benchmark]
 		public void InsertRangeItems() {
 			this.stringdb.InsertRange(this.itemsToInsert);
@@ -163,10 +164,10 @@ namespace StringDB.Benchmarks {
 
 		[Benchmark]
 		public void SingleInsertItems() {
-			foreach(var i in this.itemsToInsert)
+			foreach (var i in this.itemsToInsert)
 				this.stringdb.Insert(i.Key, i.Value);
 		}
-		
+
 		[Benchmark]
 		public void OverwriteValues() {
 			var enum_1 = this.stringdb.GetEnumerator();
@@ -175,9 +176,11 @@ namespace StringDB.Benchmarks {
 			while (enum_1.MoveNext() && enum_2.MoveNext())
 				this.stringdb.OverwriteValue(enum_1.Current, enum_2.Current.Value);
 		}
+
 #endif
 
 #if READER_TESTS
+
 		[Benchmark]
 		public void IterateThroughEveryEntry() {
 			foreach (var i in this.stringdb) { }
@@ -204,9 +207,11 @@ namespace StringDB.Benchmarks {
 				var t = i.Value;
 			}
 		}
+
 #endif
 
 #if CLEAN_TESTS
+
 		[Benchmark]
 		public void CleanFromDatabase() {
 			//TODO: remove new StringDb and generate database name from the benchmark
@@ -229,6 +234,7 @@ namespace StringDB.Benchmarks {
 
 			File.Delete(GenerateItems.GenerateDatabaseName(clean));
 		}
+
 #endif
 #endif
 	}

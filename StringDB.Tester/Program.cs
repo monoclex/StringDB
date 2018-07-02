@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
-namespace StringDB.Tester
-{
-    class Program
-    {
-		static void Main(string[] args) {
+namespace StringDB.Tester {
+
+	internal class Program {
+
+		private static void Main(string[] args) {
 			using (var db = Database.FromFile("string.db")) {
 				foreach (var i in db) // loop over every item and say the index
 					Console.WriteLine(i.Index);
@@ -16,13 +16,11 @@ namespace StringDB.Tester
 				db.Insert("test_key", "test_value"); // insert a single item named "test_key"
 
 				db.InsertRange(new KeyValuePair<string, string>[] { // insert multiple items
-
 					new KeyValuePair<string, string>("test1", "value1"),
 					new KeyValuePair<string, string>("test2", "value2"),
 					new KeyValuePair<string, string>("test3", "value3"),
 					new KeyValuePair<string, string>("test4", "value4"),
 					new KeyValuePair<string, string>("test5", "value5"),
-
 				});
 
 				foreach (var i in db) // loop over every item in the DB again and say the index
@@ -63,10 +61,8 @@ namespace StringDB.Tester
 
 			Console.WriteLine("unclean: " + new System.IO.FileInfo("string.db").Length + " bytes");
 			Console.WriteLine("clean: " + new System.IO.FileInfo("cleaned-string.db").Length + " bytes");
-			
 		}
 	}
-
 
 	public static class GenerateItems {
 		public const int ItemsToInsert = 10_000;
@@ -80,6 +76,7 @@ namespace StringDB.Tester
 		public static Random Rng => _random ?? (_random = new Random());
 
 		internal static int LastDatabaseIDGenerated = Rng.Next(0, int.MaxValue / 2);
+
 		public static Database NewStringDB() => Database.FromFile(GenerateDatabaseName(LastDatabaseIDGenerated++));
 
 		public static string GenerateDatabaseName(int id) => $"{id}-stringdb.db";
