@@ -1,14 +1,14 @@
 ﻿//#define THREAD_SAFE
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace StringDB.Reader {
+
 	internal interface IRawReader {
+
 		IPart ReadAt(long pos);
+
 		IPart ReadOn(IPart previous);
 
 		byte[] ReadDataValueAt(long p);
@@ -18,6 +18,7 @@ namespace StringDB.Reader {
 	}
 
 	internal class RawReader : IRawReader {
+
 		internal RawReader(Stream s, object @lock = null) {
 			this._stream = s;
 			this._br = new BinaryReader(s);
@@ -49,14 +50,14 @@ namespace StringDB.Reader {
 			var importantByte = this._bufferRead[p]; //set these variables incase the buffer changes later when reading more bytes
 			var intVal = BitConverter.ToInt64(this._bufferRead, p + 1);
 
-			if (importantByte == Consts.NoIndex) return null;
-
 			if (importantByte == Consts.IndexSeperator) {
 				if (intVal == 0)
 					return null;
 				else
 					return new PartIndexChain(importantByte, pos, intVal);
 			} else {
+				if (importantByte == Consts.NoIndex) return null;
+
 				var val_pos = this.ReadBytes(importantByte);
 
 				var val = new byte[importantByte];
@@ -124,7 +125,7 @@ namespace StringDB.Reader {
 				this._stream.Seek(this._bufferReadPos, SeekOrigin.Begin);
 				this._stream.Read(this._bufferRead, 0, BufferSize);
 			}
-			
+
 			//return the position of bytes from the buffer
 
 			this._bufferPos += amt;

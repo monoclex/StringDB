@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace StringDB.Reader {
-	//TODO: google is there a way to generate a stream from a specific portion of a filestream?
 
 	/// <summary>Defines a reader. Use it to read out data</summary>
 	public interface IReader : IEnumerable<ReaderPair> {
@@ -64,7 +63,7 @@ namespace StringDB.Reader {
 			var comparing = index.GetBytes();
 
 			foreach (var i in this)
-				if (comparing.EqualTo(i.IndexAsByteArray))
+				if (comparing.EqualTo(i.ByteArrayIndex))
 					yield return i;
 		} /// <inheritdoc/>
 

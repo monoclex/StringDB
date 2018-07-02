@@ -27,7 +27,7 @@
 		public long NextPart { get; }
 	}
 
-	internal struct PartIndexChain : IPart {//IndexChain {
+	internal struct PartIndexChain : IPart {
 
 		internal PartIndexChain(byte initByte, long pos, long nextPart) {
 			this.InitialByte = initByte;

@@ -76,7 +76,7 @@ namespace StringDB.Writer {
 				this.WriteValue(newValue); //the value of the new one is less then the old one
 			}
 
-			replacePair._valueCache = newValue;
+			replacePair._strValueCache = newValue;
 #if THREAD_SAFE
 			}
 #endif

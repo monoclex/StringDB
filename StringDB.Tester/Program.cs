@@ -63,8 +63,7 @@ namespace StringDB.Tester
 
 			Console.WriteLine("unclean: " + new System.IO.FileInfo("string.db").Length + " bytes");
 			Console.WriteLine("clean: " + new System.IO.FileInfo("cleaned-string.db").Length + " bytes");
-
-			Console.ReadLine();
+			
 		}
 	}
 
