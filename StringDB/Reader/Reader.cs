@@ -40,10 +40,10 @@ namespace StringDB.Reader {
 
 			var p = this._rawReader.ReadOn(Part.Start);
 
-			while (!(p is IPartDataPair))
+			while (!(p is PartDataPair))
 				p = this._rawReader.ReadOn(p);
 				
-			return new ReaderPair(p as IPartDataPair, this._rawReader);
+			return new ReaderPair((PartDataPair)p, this._rawReader);
 		} /// <inheritdoc/>
 
 		public ReaderPair GetByIndex(string index) {

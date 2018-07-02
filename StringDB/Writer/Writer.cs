@@ -13,7 +13,7 @@ namespace StringDB.Writer {
 
 		/// <summary>Insert an item into the database</summary>
 		void Insert(KeyValuePair<string, string> kvp);
-
+		
 		/// <summary>Insert multiple items into the database.</summary>
 		/// <remarks>DO NOT FEED A yield return; ON THIS - if you feed in an IEnumerable that is generated via yield return, please make sure that the yield returns are constant. Make sure NO RNG AT ALL is used, or StringDB will fail at writing your stuff. This is because it iterates over the IEnumerable 3 times. If you'd like to use RNG, call a .ToList() ( System.Linq ) on it so it stays constant and everybody has a happy day.</remarks>
 		void InsertRange(IEnumerable<KeyValuePair<string, string>> items);
@@ -56,11 +56,8 @@ namespace StringDB.Writer {
 #if THREAD_SAFE
 			lock (this._lock) {
 #endif
-			Console.WriteLine("overwrite");
 			//if the value we are replacing is longer then the older value
 			if (replacePair.Value.GetBytes().Length < newValue.GetBytes().Length) {
-				Console.WriteLine("longer");
-
 				this._stream.Seek(0, SeekOrigin.End);
 
 				var savePos = this._stream.Position;
@@ -74,7 +71,6 @@ namespace StringDB.Writer {
 
 
 			} else { //or else, we'll just overwrite the old one
-				Console.WriteLine("shorter");
 				this._stream.Seek(replacePair._dp.DataPosition, SeekOrigin.Begin);
 
 				this.WriteValue(newValue); //the value of the new one is less then the old one
@@ -86,8 +82,8 @@ namespace StringDB.Writer {
 #endif
 		} /// <inheritdoc/>
 
-		public void Insert(string index, string value) => InsertRange(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>(index, value) }); /// <inheritdoc/>
-		public void Insert(KeyValuePair<string, string> kvp) => InsertRange(new KeyValuePair<string, string>[] { kvp }); /// <inheritdoc/>
+		public void Insert(string index, string value) => InsertRange(new KeyValuePair<string, string>(index, value).AsEnumerable()); /// <inheritdoc/>
+		public void Insert(KeyValuePair<string, string> kvp) => InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
 		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) {
 #if THREAD_SAFE
 			lock (this._lock) {
@@ -193,8 +189,8 @@ namespace StringDB.Writer {
 			if (bytes.Length >= Consts.MaxLength)
 				throw new ArgumentException($"index.Length is longer {Consts.MaxLength}", nameof(index));
 
-			if (bytes.Length == 0)
-				throw new ArgumentException($"index.Length is of 0 lenth", nameof(index));
+			if (bytes.Length <= 0)
+				throw new ArgumentException($"index.Length is of 0 length", nameof(index));
 
 			return sizeof(byte) + sizeof(long) + bytes.Length;
 		}

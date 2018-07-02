@@ -71,7 +71,7 @@ namespace StringDB.Reader {
 		}
 
 		public IPart ReadOn(IPart previous) =>
-			!(previous is IPartIndexChain) ?
+			!(previous is PartIndexChain) ?
 				this.ReadAt(previous.NextPart)
 				: !(previous.NextPart == 0) ?
 					this.ReadAt(previous.NextPart)

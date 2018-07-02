@@ -15,7 +15,7 @@ namespace StringDB.Reader {
 		private IPart _partOn = null;
 
 		/// <summary>What the current element is on.</summary>
-		public ReaderPair Current => new ReaderPair(this._partOn as IPartDataPair, this._rawReader);
+		public ReaderPair Current => new ReaderPair((PartDataPair)this._partOn, this._rawReader);
 		object IEnumerator.Current => this.Current;
 		
 		/// <summary>Retireves the next element in the sequence</summary>
@@ -23,7 +23,7 @@ namespace StringDB.Reader {
 		public bool MoveNext() {
 			this._partOn = this._rawReader.ReadOn(this._partOn);
 
-			while (this._partOn != null && (this._partOn is IPartIndexChain)) //we don't want index chains lol
+			while (this._partOn != null && (this._partOn is PartIndexChain)) //we don't want index chains lol
 				this._partOn = this._rawReader.ReadOn(this._partOn);
 
 			return this._partOn != null;

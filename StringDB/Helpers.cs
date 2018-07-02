@@ -10,6 +10,10 @@ namespace StringDB {
 		public static string GetString(this byte[] b) =>
 			Encoding.UTF8.GetString(b ?? throw new ArgumentNullException(nameof(b), "A key or value was probably null, can you check?"));
 		
+		public static IEnumerable<T> AsEnumerable<T>(this T item) { // make a single item enumberable ;D
+			yield return item;
+		}
+
 		//  ___
 		// /. .\
 

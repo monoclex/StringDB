@@ -28,11 +28,7 @@ namespace StringDB.Reader {
 		public long NextPart { get; }
 	}
 
-	internal interface IPartIndexChain : IPart {
-
-	}
-
-	internal struct PartIndexChain : IPartIndexChain {
+	internal struct PartIndexChain : IPart {//IndexChain {
 		internal PartIndexChain(byte initByte, long pos, long nextPart) {
 			this.InitialByte = initByte;
 			this.Position = pos;
@@ -44,13 +40,7 @@ namespace StringDB.Reader {
 		public long NextPart { get; }
 	}
 
-	internal interface IPartDataPair : IPart { /// <inheritdoc/>
-		byte[] Index { get; } /// <inheritdoc/>
-		long DataPosition { get; } /// <inheritdoc/>
-		byte[] ReadData(IRawReader rawReader);
-	}
-
-	internal struct PartDataPair : IPartDataPair {
+	internal struct PartDataPair : IPart {
 		internal PartDataPair(byte initByte, long pos, long dataPos, byte[] indexName) {
 			this.InitialByte = initByte;
 			this.Position = pos;
@@ -74,6 +64,5 @@ namespace StringDB.Reader {
 
 		public byte[] ReadData(IRawReader rawReader) =>
 			rawReader.ReadDataValueAt(this.DataPosition);
-
 	}
 }

@@ -5,12 +5,12 @@ using System.Text;
 namespace StringDB.Reader {
 	/// <summary>A pair of data - this correlates an index to it's corresponding value.</summary>
 	public class ReaderPair {
-		internal ReaderPair(IPartDataPair dp, IRawReader rawReader) {
+		internal ReaderPair(PartDataPair dp, IRawReader rawReader) {
 			this._dp = dp;
 			this._rawReader = rawReader;
 		}
 		
-		internal IPartDataPair _dp { get; }
+		internal PartDataPair _dp { get; }
 		private IRawReader _rawReader { get; }
 
 		internal string _indexCache { get; set; } = null;
