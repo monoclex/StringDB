@@ -25,6 +25,8 @@ namespace StringDB.Reader {
 		/// <summary>Retrieves the value of the index. This value isn't actually fetched until you call on it, for performance reasons.</summary>
 		public string Value => this._valueCache ?? (this._valueCache = (this._dp.ReadData(this._rawReader) ?? new byte[0] { }).GetString());
 		
+		/// <summary>A simple string form of the item.</summary>
+		/// <returns>[index, value]</returns>
 		public override string ToString() =>
 			$"[{this.Index}, {this.Value}]";
 	}

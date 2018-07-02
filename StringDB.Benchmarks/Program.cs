@@ -65,7 +65,7 @@ namespace StringDB.Benchmarks {
 			var res = new List<Item>(items);
 
 			for (var i = 0; i < items; i++) {
-				string usersName = RandomName;
+				var usersName = RandomName;
 				res.Add(new Item() {
 					Identifier = $"{i}.{usersName}",
 					Name = $"{usersName} {RandomName}",
@@ -123,7 +123,7 @@ namespace StringDB.Benchmarks {
 				count++;
 			}
 
-			int c = 0;
+			var c = 0;
 			foreach (var i in this.itemsToInsert) {
 				if (count / 2 == c)
 					this._middle = i.Key;

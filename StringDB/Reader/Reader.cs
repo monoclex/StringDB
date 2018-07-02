@@ -47,14 +47,12 @@ namespace StringDB.Reader {
 		} /// <inheritdoc/>
 
 		public ReaderPair GetByIndex(string index) {
-			if (this._stream.Length <= 8)
-				return null;
+			// prevent the re-use of code
 
-			byte[] comparing = index.GetBytes();
-
-			foreach (var i in this)
-				if (comparing.EqualTo(i.IndexAsByteArray))
-					return i;
+			using(var enumer = this.GetMultipleByIndex(index).GetEnumerator()) {
+				if (enumer.MoveNext())
+					return enumer.Current;
+			}
 
 			return null;
 		} /// <inheritdoc/>
@@ -63,7 +61,7 @@ namespace StringDB.Reader {
 			if (this._stream.Length <= 8)
 				yield break;
 			
-			byte[] comparing = index.GetBytes();
+			var comparing = index.GetBytes();
 
 			foreach (var i in this)
 				if (comparing.EqualTo(i.IndexAsByteArray))

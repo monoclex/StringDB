@@ -49,7 +49,6 @@ namespace StringDB.Writer {
 		internal long _indexChainReplace = 0;
 
 		private long _lastLength = 0;
-		private long _lastPos = -1;
 
 		private object _lock; /// <inheritdoc/>
 

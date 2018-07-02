@@ -32,8 +32,6 @@ namespace StringDB.Reader {
 
 		private object _lock = null;
 
-		private long _lastPos = -1;
-
 		private static readonly int BufferSize = 0x1000; //1MiB
 		private static readonly int MinusBufferSize = -1 - BufferSize;
 
@@ -61,7 +59,7 @@ namespace StringDB.Reader {
 			} else {
 				var val_pos = this.ReadBytes(importantByte);
 
-				byte[] val = new byte[importantByte];
+				var val = new byte[importantByte];
 				for (var i = 0; i < val.Length; i++)
 					val[i] = this._bufferRead[val_pos + i];
 
@@ -85,7 +83,7 @@ namespace StringDB.Reader {
 #endif
 			_Seek(p);
 
-			byte[] b = this._br.ReadBytes(9); //read the first 9 header bytes
+			var b = this._br.ReadBytes(9); //read the first 9 header bytes
 
 			switch (b[0]) { //depends on the header byte
 				case Consts.IsByteValue: //if it's that value
@@ -143,8 +141,6 @@ namespace StringDB.Reader {
 			} else this._bufferPos = (int)(pos - this._bufferReadPos);
 		}
 
-		private void _Seek(long pos) {
-			this._stream.Seek(pos, SeekOrigin.Begin);
-		}
+		private void _Seek(long pos) => this._stream.Seek(pos, SeekOrigin.Begin);
 	}
 }
