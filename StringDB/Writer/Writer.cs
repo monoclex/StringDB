@@ -1,5 +1,7 @@
 ﻿//#define THREAD_SAFE
 
+using StringDB.Reader;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,22 +12,164 @@ namespace StringDB.Writer {
 	public interface IWriter : IDisposable {
 
 		/// <summary>Insert an item into the database</summary>
+		void Insert(byte[] index, byte[] value);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(byte[] index, string value);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(byte[] index, Stream value);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(string index, byte[] value);
+
+		/// <summary>Insert an item into the database</summary>
 		void Insert(string index, string value);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(string index, Stream value);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(Stream index, byte[] value);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(Stream index, string value);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(Stream index, Stream value);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(KeyValuePair<byte[], byte[]> kvp);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(KeyValuePair<byte[], string> kvp);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(KeyValuePair<byte[], Stream> kvp);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(KeyValuePair<string, byte[]> kvp);
 
 		/// <summary>Insert an item into the database</summary>
 		void Insert(KeyValuePair<string, string> kvp);
 
+		/// <summary>Insert an item into the database</summary>
+		void Insert(KeyValuePair<string, Stream> kvp);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(KeyValuePair<Stream, byte[]> kvp);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(KeyValuePair<Stream, string> kvp);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert(KeyValuePair<Stream, Stream> kvp);
+
 		/// <summary>Insert multiple items into the database.</summary>
-		/// <remarks>DO NOT FEED A yield return; ON THIS - if you feed in an IEnumerable that is generated via yield return, please make sure that the yield returns are constant. Make sure NO RNG AT ALL is used, or StringDB will fail at writing your stuff. This is because it iterates over the IEnumerable 3 times. If you'd like to use RNG, call a .ToList() ( System.Linq ) on it so it stays constant and everybody has a happy day.</remarks>
+		void InsertRange(IEnumerable<KeyValuePair<byte[], byte[]>> items);
+
+		/// <summary>Insert multiple items into the database.</summary>
+		void InsertRange(IEnumerable<KeyValuePair<byte[], string>> items);
+
+		/// <summary>Insert multiple items into the database.</summary>
+		void InsertRange(IEnumerable<KeyValuePair<byte[], Stream>> items);
+
+		/// <summary>Insert multiple items into the database.</summary>
+		void InsertRange(IEnumerable<KeyValuePair<string, byte[]>> items);
+
+		/// <summary>Insert multiple items into the database.</summary>
 		void InsertRange(IEnumerable<KeyValuePair<string, string>> items);
 
-		/// <summary>Overwrite a value. Note: The old value is still left in the file, and a database cleanup function is needed to be implemented soon.</summary>
+		/// <summary>Insert multiple items into the database.</summary>
+		void InsertRange(IEnumerable<KeyValuePair<string, Stream>> items);
+
+		/// <summary>Insert multiple items into the database.</summary>
+		void InsertRange(IEnumerable<KeyValuePair<Stream, byte[]>> items);
+
+		/// <summary>Insert multiple items into the database.</summary>
+		void InsertRange(IEnumerable<KeyValuePair<Stream, string>> items);
+
+		/// <summary>Insert multiple items into the database.</summary>
+		void InsertRange(IEnumerable<KeyValuePair<Stream, Stream>> items);
+
+		/// <summary>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</summary>
+		void OverwriteValue(Reader.ReaderPair replacePair, byte[] newValue);
+
+		/// <summary>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</summary>
 		void OverwriteValue(Reader.ReaderPair replacePair, string newValue);
+
+		/// <summary>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</summary>
+		void OverwriteValue(Reader.ReaderPair replacePair, Stream newValue);
 	}
+
+	public class Writer : IWriter {
+
+		public Writer(Stream s, object @lock) {
+			this._rawWriter = new RawWriter(s);
+		}
+
+		private IRawWriter _rawWriter;
+
+		/// <inheritdoc/>
+		public void Dispose() {
+		}
+
+		// lmao if this isn't a wall of text i don't know what is
+
+		/// <inheritdoc/>
+		public void Insert(byte[] index, byte[] value) => this.Insert(new KeyValuePair<byte[], byte[]>(index, value)); /// <inheritdoc/>
+		public void Insert(byte[] index, string value) => this.Insert(new KeyValuePair<byte[], string>(index, value)); /// <inheritdoc/>
+		public void Insert(byte[] index, Stream value) => this.Insert(new KeyValuePair<byte[], Stream>(index, value)); /// <inheritdoc/>
+		public void Insert(string index, byte[] value) => this.Insert(new KeyValuePair<string, byte[]>(index, value)); /// <inheritdoc/>
+		public void Insert(string index, string value) => this.Insert(new KeyValuePair<string, string>(index, value)); /// <inheritdoc/>
+		public void Insert(string index, Stream value) => this.Insert(new KeyValuePair<string, Stream>(index, value)); /// <inheritdoc/>
+		public void Insert(Stream index, byte[] value) => this.Insert(new KeyValuePair<Stream, byte[]>(index, value)); /// <inheritdoc/>
+		public void Insert(Stream index, string value) => this.Insert(new KeyValuePair<Stream, string>(index, value)); /// <inheritdoc/>
+		public void Insert(Stream index, Stream value) => this.Insert(new KeyValuePair<Stream, Stream>(index, value)); /// <inheritdoc/>
+		public void Insert(KeyValuePair<byte[], byte[]> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+		public void Insert(KeyValuePair<byte[], string> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+		public void Insert(KeyValuePair<byte[], Stream> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+		public void Insert(KeyValuePair<string, byte[]> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+		public void Insert(KeyValuePair<string, string> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+		public void Insert(KeyValuePair<string, Stream> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+		public void Insert(KeyValuePair<Stream, byte[]> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+		public void Insert(KeyValuePair<Stream, string> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+		public void Insert(KeyValuePair<Stream, Stream> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<byte[], byte[]>> items) => this._rawWriter.InsertRange(WriterTypeManager.ByteArray, WriterTypeManager.ByteArray, items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<byte[], string>> items) => this._rawWriter.InsertRange(WriterTypeManager.ByteArray, WriterTypeManager.String, items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<byte[], Stream>> items) => this._rawWriter.InsertRange(WriterTypeManager.ByteArray, WriterTypeManager.Stream, items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<string, byte[]>> items) => this._rawWriter.InsertRange(WriterTypeManager.String, WriterTypeManager.ByteArray, items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) => this._rawWriter.InsertRange(WriterTypeManager.String, WriterTypeManager.String, items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<string, Stream>> items) => this._rawWriter.InsertRange(WriterTypeManager.String, WriterTypeManager.Stream, items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<Stream, byte[]>> items) => this._rawWriter.InsertRange(WriterTypeManager.Stream, WriterTypeManager.ByteArray, items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<Stream, string>> items) => this._rawWriter.InsertRange(WriterTypeManager.Stream, WriterTypeManager.String, items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<Stream, Stream>> items) => this._rawWriter.InsertRange(WriterTypeManager.Stream, WriterTypeManager.Stream, items); /// <inheritdoc/>
+		public void OverwriteValue(ReaderPair replacePair, byte[] newValue) => OverwriteValue(replacePair, WriterTypeManager.ByteArray, newValue); /// <inheritdoc/>
+		public void OverwriteValue(ReaderPair replacePair, string newValue) => OverwriteValue(replacePair, WriterTypeManager.String, newValue); /// <inheritdoc/>
+		public void OverwriteValue(ReaderPair replacePair, Stream newValue) => OverwriteValue(replacePair, WriterTypeManager.Stream, newValue); /// <inheritdoc/>
+
+		private void OverwriteValue<T>(ReaderPair replacePair, WriterType<T> wt, T newValue) {
+			this._rawWriter.OverwriteValue(wt, newValue, replacePair.ValueLength, replacePair._dp.DataPosition, replacePair._dp.Position + sizeof(byte));
+
+			//TODO: set the replace pair values
+		}
+
+		/*
+			public void Insert(string index, string value) => this._rawWriter.InsertRange(WriterType<string>.StringWriterType, WriterType<string>.StringWriterType, new KeyValuePair<string, string>(index, value).AsEnumerable()); /// <inheritdoc/>
+			public void Insert(KeyValuePair<string, string> kvp) => this._rawWriter.InsertRange(WriterType<string>.StringWriterType, WriterType<string>.StringWriterType, kvp.AsEnumerable()); /// <inheritdoc/>
+			public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) => this._rawWriter.InsertRange(WriterType<string>.StringWriterType, WriterType<string>.StringWriterType, items); /// <inheritdoc/>
+			public void OverwriteValue(ReaderPair replacePair, string newValue) {
+				this._rawWriter.OverwriteValue(WriterType<string>.StringWriterType, newValue, replacePair.ValueLength, replacePair._dp.DataPosition, replacePair._dp.Position + sizeof(byte));
+
+				replacePair._byteValueCache = newValue.GetBytes();
+				replacePair._strValueCache = newValue;
+			}*/
+	}
+
+	/*
 
 	/// <inheritdoc/>
 	public class Writer : IWriter {
-
 		internal Writer(Stream s, object @lock = null) {
 			this._stream = s;
 			this._bw = new BinaryWriter(this._stream);
@@ -180,7 +324,7 @@ namespace StringDB.Writer {
 			} else if ((ulong)bytes.Length <= ulong.MaxValue) {
 				this._bw.Write(Consts.IsULongValue);
 				this._bw.Write((ulong)bytes.Length);
-			}*/
+			}
 
 			this._bw.Write(bytes);
 		}
@@ -210,5 +354,5 @@ namespace StringDB.Writer {
 			value.Length;
 
 		private void _Seek(long pos) => this._stream.Seek(pos, SeekOrigin.Begin);
-	}
+	}*/
 }

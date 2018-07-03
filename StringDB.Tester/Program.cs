@@ -13,6 +13,10 @@ namespace StringDB.Tester {
 				foreach (var i in db) // loop over every item and say the index
 					Console.WriteLine(i.Index);
 
+				var fs = System.IO.File.OpenRead("file-to-insert.txt");
+
+				db.Insert("very-cool", fs);
+
 				db.Insert("test_key", "test_value"); // insert a single item named "test_key"
 
 				db.InsertRange(new KeyValuePair<string, string>[] { // insert multiple items
@@ -24,7 +28,7 @@ namespace StringDB.Tester {
 				});
 
 				foreach (var i in db) // loop over every item in the DB again and say the index
-					Console.WriteLine(i.Index);
+					Console.WriteLine(i.ToString());
 
 				var testKey = db.GetByIndex("test_key"); // get test_key
 
@@ -61,6 +65,8 @@ namespace StringDB.Tester {
 
 			Console.WriteLine("unclean: " + new System.IO.FileInfo("string.db").Length + " bytes");
 			Console.WriteLine("clean: " + new System.IO.FileInfo("cleaned-string.db").Length + " bytes");
+
+			Console.ReadLine();
 		}
 	}
 

@@ -70,24 +70,6 @@ namespace StringDB {
 		public IEnumerable<ReaderPair> GetMultipleByIndex(string index) =>
 			this._reader.GetMultipleByIndex(index ?? throw new ArgumentNullException(nameof(index))); /// <inheritdoc/>
 
-		public void Insert(string index, string value) =>
-			this._writer.Insert(index ?? throw new ArgumentNullException(nameof(index)), value ?? throw new ArgumentNullException(nameof(value))); /// <inheritdoc/>
-
-		public void Insert(KeyValuePair<string, string> kvp) {
-			if (kvp.Key == null) throw new ArgumentNullException(nameof(kvp), "The key was null.");
-			if (kvp.Value == null) throw new ArgumentNullException(nameof(kvp), "The value was null.");
-
-			this._writer.Insert(kvp);
-		} /// <inheritdoc/>
-
-		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) =>
-			this._writer.InsertRange(items ?? throw new ArgumentNullException(nameof(items))); /// <inheritdoc/>
-
-		public void OverwriteValue(ReaderPair replacePair, string newValue) {
-			this._writer.OverwriteValue(replacePair ?? throw new ArgumentNullException(nameof(replacePair)), newValue ?? throw new ArgumentNullException(newValue));
-			this._reader.DrainBuffer();
-		} /// <inheritdoc/>
-
 		public void Dispose() {
 			this._writer.Dispose();
 			this._writer = null;
@@ -103,6 +85,50 @@ namespace StringDB {
 		private IEnumerable<KeyValuePair<string, string>> FromDatabase(IDatabase other) {
 			foreach (var i in other)
 				yield return new KeyValuePair<string, string>(i.Index, i.Value);
+		}
+
+		/// <inheritdoc/>
+		public void Insert(byte[] index, byte[] value) => this._writer.Insert(index, value); /// <inheritdoc/>
+		public void Insert(byte[] index, string value) => this._writer.Insert(index, value); /// <inheritdoc/>
+		public void Insert(byte[] index, Stream value) => this._writer.Insert(index, value); /// <inheritdoc/>
+		public void Insert(string index, byte[] value) => this._writer.Insert(index, value); /// <inheritdoc/>
+		public void Insert(string index, string value) => this._writer.Insert(index, value); /// <inheritdoc/>
+		public void Insert(string index, Stream value) => this._writer.Insert(index, value); /// <inheritdoc/>
+		public void Insert(Stream index, byte[] value) => this._writer.Insert(index, value); /// <inheritdoc/>
+		public void Insert(Stream index, string value) => this._writer.Insert(index, value); /// <inheritdoc/>
+		public void Insert(Stream index, Stream value) => this._writer.Insert(index, value); /// <inheritdoc/>
+		public void Insert(KeyValuePair<byte[], byte[]> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
+		public void Insert(KeyValuePair<byte[], string> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
+		public void Insert(KeyValuePair<byte[], Stream> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
+		public void Insert(KeyValuePair<string, byte[]> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
+		public void Insert(KeyValuePair<string, string> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
+		public void Insert(KeyValuePair<string, Stream> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
+		public void Insert(KeyValuePair<Stream, byte[]> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
+		public void Insert(KeyValuePair<Stream, string> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
+		public void Insert(KeyValuePair<Stream, Stream> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<byte[], byte[]>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<byte[], string>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<byte[], Stream>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<string, byte[]>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<string, string>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<string, Stream>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<Stream, byte[]>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<Stream, string>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
+		public void InsertRange(IEnumerable<KeyValuePair<Stream, Stream>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
+
+		public void OverwriteValue(ReaderPair replacePair, byte[] newValue) {
+			this._writer.OverwriteValue(replacePair, newValue);
+			this._reader.DrainBuffer();
+		} /// <inheritdoc/>
+
+		public void OverwriteValue(ReaderPair replacePair, string newValue) {
+			this._writer.OverwriteValue(replacePair, newValue);
+			this._reader.DrainBuffer();
+		} /// <inheritdoc/>
+
+		public void OverwriteValue(ReaderPair replacePair, Stream newValue) {
+			this._writer.OverwriteValue(replacePair, newValue);
+			this._reader.DrainBuffer();
 		}
 	}
 }
