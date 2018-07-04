@@ -114,7 +114,7 @@ namespace StringDB.Writer {
 		public void Dispose() {
 		}
 
-		// lmao if this isn't a wall of text i don't know what is
+		// lol if this isn't a wall of text i don't know what is
 
 		/// <inheritdoc/>
 		public void Insert(byte[] index, byte[] value) => this.Insert(new KeyValuePair<byte[], byte[]>(index, value)); /// <inheritdoc/>

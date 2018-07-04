@@ -7,11 +7,12 @@ using System.Linq;
 namespace StringDB.Tester {
 
 	internal class Program {
-
 		private static void Main(string[] args) {
 			using (var db = Database.FromFile("string.db")) {
 				foreach (var i in db) // loop over every item and say the index
 					Console.WriteLine(i.Index);
+
+				Console.WriteLine(GetSizeOfObject(db));
 
 				var fs = System.IO.File.OpenRead("file-to-insert.txt");
 

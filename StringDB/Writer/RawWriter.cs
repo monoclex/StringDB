@@ -95,7 +95,7 @@ namespace StringDB.Writer {
 				WriteValueLength(len);
 				wt.Write(this._bw, newValue);
 
-				//go to posOfDataPos and overwrite that with the lew position
+				//go to posOfDataPos and overwrite that with the new position
 
 				Seek(posOfDataPos);
 				this._bw.Write(this._lastStreamLength);

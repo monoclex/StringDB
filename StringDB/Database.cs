@@ -82,9 +82,9 @@ namespace StringDB {
 				this._stream.Dispose();
 		}
 
-		private IEnumerable<KeyValuePair<string, string>> FromDatabase(IDatabase other) {
+		private IEnumerable<KeyValuePair<byte[], byte[]>> FromDatabase(IDatabase other) {
 			foreach (var i in other)
-				yield return new KeyValuePair<string, string>(i.Index, i.Value);
+				yield return new KeyValuePair<byte[], byte[]>(i.ByteArrayIndex, i.ByteArrayValue);
 		}
 
 		/// <inheritdoc/>
