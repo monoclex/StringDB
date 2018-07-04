@@ -25,6 +25,9 @@
 		/// <summary>Get the value as a byte array instead.</summary>
 		public byte[] ByteArrayValue => this._byteValueCache ?? (this._byteValueCache = (this._dp.ReadData(this._rawReader) ?? new byte[0] { }));
 
+		/// <summary>Get a stream of the value</summary>
+		public System.IO.Stream StreamValue => this._rawReader.GetStreamOfDataAt(this._dp.DataPosition);
+
 		/// <summary>Whatever the index is.</summary>
 		public string Index => this._strIndexCache ?? (this._strIndexCache = this._dp.Index.GetString());
 

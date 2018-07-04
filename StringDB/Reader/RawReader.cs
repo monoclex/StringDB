@@ -11,6 +11,8 @@ namespace StringDB.Reader {
 
 		IPart ReadOn(IPart previous);
 
+		Stream GetStreamOfDataAt(long p);
+
 		byte[] ReadDataValueAt(long p);
 
 		long ReadDataValueLengthAt(long p);
@@ -103,6 +105,30 @@ namespace StringDB.Reader {
 			}
 
 			return 0;
+#if THREAD_SAFE
+			}
+#endif
+		}
+
+		public Stream GetStreamOfDataAt(long p) {
+#if THREAD_SAFE
+			lock(_lock) {
+#endif
+			var len = ReadDataValueLengthAt(p);
+
+			var newp = p + 1;
+
+			if (len < byte.MaxValue)
+				newp += sizeof(byte);
+			else if (len < ushort.MaxValue)
+				newp += sizeof(ushort);
+			else if (len < uint.MaxValue)
+				newp += sizeof(uint);
+			else if ((ulong)len < ulong.MaxValue)
+				newp += sizeof(ulong);
+
+
+			return new StreamFragment(this._stream, newp, len);
 #if THREAD_SAFE
 			}
 #endif
