@@ -9,6 +9,9 @@ namespace StringDB.Tester {
 
 	internal class Program {
 		private static void Main(string[] args) {
+			using(var db = Database.FromFile("Test.db")) {
+
+			}
 		}
 	}
 

@@ -30,8 +30,8 @@ namespace StringDB.Reader
 			set {
 				var lP = this._pos;
 				this._pos = this._originalPos + value;
-				//TODO:                                                                >=
-				if (this._pos - this._originalPos < 0 || this._pos - this._originalPos	> this.Length)
+				//TODO:                                >=
+				if (this.Position < 0 || this.Position	> this.Length)
 					this._pos = lP;
 			}
 		}
@@ -39,12 +39,12 @@ namespace StringDB.Reader
 		public override void Flush() { }
 
 		public override int Read(byte[] buffer, int offset, int count) {
-			if (this._pos - this._originalPos < 0)
+			if (this.Position < 0)
 				return -1;
 
 			var c = count;
-			if (this._pos - this._originalPos + c > this.Length)
-				c += (int)( this.Length - ((this._pos - this._originalPos) + c) );
+			if (this.Position + c > this.Length)
+				c += (int)( this.Length - ((this.Position) + c) );
 
 			this._s.Seek(this._pos, SeekOrigin.Begin);
 			this._pos += c;
