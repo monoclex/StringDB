@@ -1,5 +1,6 @@
 ﻿//#define THREAD_SAFE
 
+using StringDB.DBTypes;
 using System;
 using System.IO;
 
@@ -100,7 +101,7 @@ namespace StringDB.Reader {
 				case Consts.IsUIntValue:
 				return BitConverter.ToUInt32(b, 1);
 
-				case Consts.IsULongValue:
+				case Consts.IsLongValue:
 				return (long)BitConverter.ToUInt64(b, 1);
 			}
 
@@ -155,7 +156,7 @@ namespace StringDB.Reader {
 				this._stream.Seek(p + 1 + sizeof(uint), SeekOrigin.Begin);
 				return this._br.ReadBytes((int)BitConverter.ToUInt32(b, 1));
 
-				case Consts.IsULongValue:
+				case Consts.IsLongValue:
 				return this._br.ReadBytes((int)BitConverter.ToUInt64(b, 1));
 			}
 

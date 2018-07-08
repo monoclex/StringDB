@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace StringDB.Reader
+namespace StringDB.DBTypes
 {
 	public class StreamFragment : Stream {
 		public StreamFragment(Stream main, long pos, long lenAfterPos) {

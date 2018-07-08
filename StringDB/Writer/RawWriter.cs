@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StringDB.DBTypes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -6,9 +7,9 @@ namespace StringDB.Writer {
 
 	internal interface IRawWriter {
 
-		void InsertRange<T1, T2>(WriterType<T1> wt1, WriterType<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps);
+		void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps);
 
-		void OverwriteValue<T>(WriterType<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos);
+		void OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos);
 	}
 
 	internal class RawWriter : IRawWriter {
@@ -31,7 +32,7 @@ namespace StringDB.Writer {
 		private long _lastStreamLength = 0;
 		private long _indexChainReplace = 0;
 
-		public void InsertRange<T1, T2>(WriterType<T1> wt1, WriterType<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps) {
+		public void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps) {
 			var pos = this._lastStreamLength;
 
 			if (this._lastStreamLength < 8) {
@@ -43,19 +44,19 @@ namespace StringDB.Writer {
 			var judge = pos + sizeof(byte) + sizeof(long);
 
 			foreach (var i in kvps)
-				judge += wt1.Judge(i.Key) + sizeof(byte) + sizeof(long);
+				judge += wt1.GetLength(i.Key) + sizeof(byte) + sizeof(long);
 
 			// indexes
 
 			foreach (var i in kvps) {
-				var len = wt1.Judge(i.Key);
+				var len = wt1.GetLength(i.Key);
 				if (len >= Consts.MaxLength) throw new ArgumentException($"An index is longer then allowed. Length: {len}");
 
 				this._bw.Write((byte)len);
 				this._bw.Write(judge);
 				wt1.Write(this._bw, i.Key);
 
-				judge += JudgeValueLength(wt2.Judge(i.Value));
+				judge += JudgeValueLength(wt2.GetLength(i.Value));
 			}
 
 			// index chain
@@ -68,7 +69,7 @@ namespace StringDB.Writer {
 			// values
 
 			foreach (var i in kvps) {
-				var len = wt2.Judge(i.Value);
+				var len = wt2.GetLength(i.Value);
 
 				WriteValueLength(len);
 
@@ -86,8 +87,8 @@ namespace StringDB.Writer {
 			this._lastStreamLength = judge + sizeof(byte) + sizeof(long);
 		}
 
-		public void OverwriteValue<T>(WriterType<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos) {
-			var len = wt.Judge(newValue);
+		public void OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos) {
+			var len = wt.GetLength(newValue);
 
 			if (len > oldLen) { //goto the end of the file and just slap it onto the end
 				Seek(this._lastStreamLength);
@@ -137,7 +138,7 @@ namespace StringDB.Writer {
 				this._bw.Write(Consts.IsUIntValue);
 				this._bw.Write((uint)len);
 			} else {
-				this._bw.Write(Consts.IsULongValue);
+				this._bw.Write(Consts.IsLongValue);
 				this._bw.Write((ulong)len);
 			}
 		}

@@ -21,7 +21,7 @@
 		public const byte IsUIntValue = 0x03;
 
 		/// <summary>Used to tell if the next value is a ulong</summary>
-		public const byte IsULongValue = 0x04;
+		public const byte IsLongValue = 0x04;
 
 		/// <summary>An index with zero length tells it that there's nothing after this.</summary>
 		public const byte NoIndex = 0x00;

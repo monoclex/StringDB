@@ -10,7 +10,10 @@ namespace StringDB.Tester {
 	internal class Program {
 		private static void Main(string[] args) {
 			using(var db = Database.FromFile("Test.db")) {
+				db.Insert("lol", "ecks dee");
 
+				foreach (var i in db)
+					Console.WriteLine(i.ToString());
 			}
 		}
 	}
