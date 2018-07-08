@@ -8,7 +8,7 @@ using System.Linq;
 namespace StringDB.Tester {
 
 	internal class Program {
-		private static void Main(string[] args) {
+		private static void Main() {
 			using(var db = Database.FromFile("Test.db")) {
 				db.InsertRange(new KeyValuePair<string, string>[] {
 					new KeyValuePair<string, string>("A", "AVALUE"),
@@ -18,7 +18,7 @@ namespace StringDB.Tester {
 				db.Insert("lol", "ecks dee");
 
 				foreach (var i in db) {
-					//Console.WriteLine(i.ToString());
+					Console.WriteLine(i.ToString());
 					Console.WriteLine(i.GetValueAs<string>());
 					Console.WriteLine();
 					foreach (var j in i.GetValueAs<byte[]>()) Console.Write(Convert.ToChar(j));
@@ -75,7 +75,7 @@ namespace StringDB.Tester {
 			var res = new List<Item>();
 
 			for (var i = 0; i < items; i++) {
-				string usersName = RandomName;
+				var usersName = RandomName;
 				res.Add(new Item() {
 					Identifier = $"{i}.{usersName}",
 					Name = $"{usersName} {RandomName}",

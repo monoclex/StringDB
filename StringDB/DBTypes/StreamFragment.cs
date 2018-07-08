@@ -5,7 +5,7 @@ using System.Text;
 
 namespace StringDB.DBTypes
 {
-	public class StreamFragment : Stream {
+	internal class StreamFragment : Stream {
 		public StreamFragment(Stream main, long pos, long lenAfterPos) {
 			this.Length = lenAfterPos;
 			this._originalPos = pos;

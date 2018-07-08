@@ -24,7 +24,12 @@ namespace StringDB.DBTypes {
 				if (TypeHandlers.TryGetValue(typeof(T), out var _))
 					throw new TypeHandlerExists();
 
-				TypeHandlers.Add(typeof(T), t);
+				try {
+					GetHandlerFor(t.Id);
+					throw new TypeHandlerExists();
+				} catch (TypeHandlerDoesntExist e) {
+					TypeHandlers.Add(typeof(T), t);
+				}
 			}
 		}
 
@@ -40,12 +45,14 @@ namespace StringDB.DBTypes {
 		/// <typeparam name="T">The type of type handler</typeparam>
 		public static TypeHandler<T> GetHandlerFor<T>() {
 			lock (Locker) {
-				if (!TypeHandlers.TryGetValue(typeof(T), out var handler)) throw new TypeHandlerExists();
+				if (!TypeHandlers.TryGetValue(typeof(T), out var handler)) throw new TypeHandlerDoesntExist();
 
 				return handler as TypeHandler<T>;
 			}
 		}
 
+		/// <summary>Returns the TypeHandler given a unique byte identifier.</summary>
+		/// <param name="id">The TypeHandler for the given byte Id</param>
 		public static ITypeHandler GetHandlerFor(byte id) {
 			lock (Locker) {
 				foreach (var i in TypeHandlers)
@@ -56,6 +63,9 @@ namespace StringDB.DBTypes {
 		}
 	}
 
-	public class TypeHandlerExists : Exception { public TypeHandlerExists() : base("The TypeHandler already exists. See OverridingRegisterType if you'd like to override existing types.") { } }
-	public class TypeHandlerDoesntExist : Exception { public TypeHandlerDoesntExist() : base("The TypeHandler doesn't exist. See RegisterType if you'd like to add a type, or if you're trying to read from this database, then there are missing TypeHandlers!.") { } }
+	/// <summary>An exception that gets thrown when attempting to register a Type if it already exists</summary>
+	public class TypeHandlerExists : Exception { internal TypeHandlerExists() : base("The TypeHandler already exists. See OverridingRegisterType if you'd like to override existing types.") { } }
+
+	/// <summary>An exception that gets thrown when attempting to get a Type that doesn't exist.</summary>
+	public class TypeHandlerDoesntExist : Exception { internal TypeHandlerDoesntExist() : base("The TypeHandler doesn't exist. See RegisterType if you'd like to add a type, or if you're trying to read from this database, then there are missing TypeHandlers!.") { } }
 }

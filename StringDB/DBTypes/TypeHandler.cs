@@ -1,23 +1,45 @@
 ﻿using System.IO;
 
 namespace StringDB.DBTypes {
+	/// <summary>A generic interface for a given TypeHandler</summary>
 	public interface ITypeHandler {
+
+		/// <summary>Unique byte identifier. Set it above 0x2F to avoid colliding with the predefined types.</summary>
 		byte Id { get; }
+
+		/// <summary>Returns whatever type it is, typeof(T)</summary>
 		System.Type Type { get; }
 	}
 
+	/// <summary>Allows StringDB to handle a new type, without much effort.</summary>
+	/// <typeparam name="T">The type</typeparam>
 	public abstract class TypeHandler<T> : ITypeHandler {
-		public TypeHandler() { }
 
+		/// <inheritdoc/>
 		public abstract byte Id { get; }
+
+		/// <inheritdoc/>
 		public System.Type Type => typeof(T);
 		
+		/// <summary>Gets the length of an item, or how long it would be when attempting to store it.</summary>
+		/// <param name="item">The item to calculate the length for.</param>
 		public abstract long GetLength(T item);
-		public abstract void Write(BinaryWriter bw, T item, bool writeLength = true);
-		public abstract T Read(BinaryReader br);
 
-		public void WriteLength(BinaryWriter bw, long len) {
-			if(len <= byte.MaxValue) {
+		/// <summary>Write an object to a BinaryWriter. The BinaryWriter should only be used to write the necessary data, and no seeking should be done. All you need to do is write the data, writing the length of the data will be taken care of for you assuming that the GetLength method is implemented properly.</summary>
+		/// <param name="bw">The BinaryWriter to use.</param>
+		/// <param name="item">The item to write.</param>
+		public abstract void Write(BinaryWriter bw, T item);
+
+		/// <summary>Read back the item from a stream, given the length of it. If you're not using the length of it, there's a good chance you're doing something wrong.</summary>
+		/// <param name="br">The BinaryReader.</param>
+		/// <param name="len">The length of the data.</param>
+		public abstract T Read(BinaryReader br, long len);
+	}
+
+	internal static class TypeHandlerLengthManager {
+
+		public static void WriteLength(BinaryWriter bw, long len) {
+			if (len <= byte.MaxValue) {
 				bw.Write(Consts.IsByteValue);
 				bw.Write((byte)len);
 			} else if (len <= ushort.MaxValue) {
@@ -32,8 +54,8 @@ namespace StringDB.DBTypes {
 			}
 		}
 
-		public long ReadLength(BinaryReader br) {
-			switch(br.ReadByte()) {
+		public static long ReadLength(BinaryReader br) {
+			switch (br.ReadByte()) {
 				case Consts.IsByteValue:
 				return br.ReadByte();
 
@@ -45,21 +67,21 @@ namespace StringDB.DBTypes {
 
 				case Consts.IsLongValue:
 				return br.ReadInt64();
-			}
 
-			return 0; // ? ? ?
+				default: return 0;
+			}
 		}
 
-		internal int WriteLengthLength(long len) {
-			if (len <= byte.MaxValue) {
-				return sizeof(byte) + sizeof(byte);
-			} else if (len <= ushort.MaxValue) {
-				return sizeof(byte) + sizeof(ushort);
-			} else if (len <= uint.MaxValue) {
-				return sizeof(byte) + sizeof(uint);
-			} else {
-				return sizeof(byte) + sizeof(long);
-			}
+		internal static long EstimateWriteLengthSize(long len) {
+			const int length = sizeof(byte) + sizeof(byte);
+
+			return len <= byte.MaxValue ?
+				length + sizeof(byte)
+				: len <= ushort.MaxValue ?
+					length + sizeof(ushort)
+					: len <= uint.MaxValue ?
+						length + sizeof(uint)
+						: length + sizeof(long);
 		}
 	}
 }

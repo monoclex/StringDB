@@ -18,11 +18,8 @@ namespace StringDB.Benchmarks {
 
 	internal class Program {
 
-		private static void Main(string[] args) {
+		private static void Main() {
 			var summary = BenchmarkRunner.Run<StringDBBenchmark>();
-			try {
-				System.IO.File.WriteAllText("results.txt", JsonConvert.SerializeObject(summary));
-			} catch { }
 			Console.ReadLine();
 		}
 	}
@@ -68,7 +65,7 @@ namespace StringDB.Benchmarks {
 
 			for (var i = 0; i < items; i++) {
 				var usersName = RandomName;
-				res.Add(new Item() {
+				res.Add(new Item {
 					Identifier = $"{i}.{usersName}",
 					Name = $"{usersName} {RandomName}",
 					Dollars = Rng.Next(GenerateItems.MinIncome, GenerateItems.MaxIncome),
@@ -116,7 +113,7 @@ namespace StringDB.Benchmarks {
 			this.itemsToInsert = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.ItemsToInsert));
 			this.newInserts = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.ItemsToInsert));
 
-			int count = 0;
+			var count = 0;
 			foreach (var i in this.itemsToInsert) {
 				this._end = i.Key;
 				if (count == 0)
@@ -188,23 +185,23 @@ namespace StringDB.Benchmarks {
 
 		[Benchmark]
 		public void GetValueOfFirst() {
-			var t = this.stringdb.GetByIndex(this._begin).Value;
+			var t = this.stringdb.GetByIndex(this._begin).GetValueAs<string>();
 		}
 
 		[Benchmark]
 		public void GetValueOfMiddle() {
-			var t = this.stringdb.GetByIndex(this._middle).Value;
+			var t = this.stringdb.GetByIndex(this._middle).GetValueAs<string>();
 		}
 
 		[Benchmark]
 		public void GetValueOfEnd() {
-			var t = this.stringdb.GetByIndex(this._end).Value;
+			var t = this.stringdb.GetByIndex(this._end).GetValueAs<string>();
 		}
 
 		[Benchmark]
 		public void IterateThroughEveryEntryAndReadValue() {
 			foreach (var i in this.stringdb) {
-				var t = i.Value;
+				var t = i.GetValueAs<string>();
 			}
 		}
 

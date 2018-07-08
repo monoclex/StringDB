@@ -22,15 +22,28 @@ namespace StringDB.Writer {
 
 			if (this._lastStreamLength > 8) {
 				this.Seek(0);
-				this._indexChainReplace = new BinaryReader(this._s).ReadInt64();
+
+				// instead of using a BinaryReader, we'll just do whatever the BinaryReader does
+
+				var m_buffer = new byte[8];
+
+				this._s.Read(m_buffer, 0, 8);
+
+				// https://referencesource.microsoft.com/#mscorlib/system/io/binaryreader.cs,197
+
+				var lo = (uint)(m_buffer[0] | m_buffer[1] << 8 |
+								 m_buffer[2] << 16 | m_buffer[3] << 24);
+				var hi = (uint)(m_buffer[4] | m_buffer[5] << 8 |
+								 m_buffer[6] << 16 | m_buffer[7] << 24);
+				this._indexChainReplace = (long)((ulong)hi) << 32 | lo;
 			}
 		}
 
 		private Stream _s;
 		private BinaryWriter _bw;
 
-		private long _lastStreamLength = 0;
-		private long _indexChainReplace = 0;
+		private long _lastStreamLength;
+		private long _indexChainReplace;
 
 		public void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps) {
 			var pos = this._lastStreamLength;
@@ -54,9 +67,10 @@ namespace StringDB.Writer {
 
 				this._bw.Write((byte)len);
 				this._bw.Write(judge);
-				wt1.Write(this._bw, i.Key, false);
+				wt1.Write(this._bw, i.Key);
 
-				judge += JudgeValueLength(wt2.GetLength(i.Value));
+				var wlen = wt2.GetLength(i.Value);
+				judge += TypeHandlerLengthManager.EstimateWriteLengthSize(wlen) + wlen;
 			}
 
 			// index chain
@@ -70,8 +84,9 @@ namespace StringDB.Writer {
 
 			foreach (var i in kvps) {
 				var len = wt2.GetLength(i.Value);
-
+				
 				this._bw.Write(wt2.Id);
+				TypeHandlerLengthManager.WriteLength(this._bw, wt2.GetLength(i.Value));
 				wt2.Write(this._bw, i.Value);
 			}
 
@@ -92,7 +107,7 @@ namespace StringDB.Writer {
 			if (len > oldLen) { //goto the end of the file and just slap it onto the end
 				Seek(this._lastStreamLength);
 
-				WriteValueLength(len);
+				TypeHandlerLengthManager.WriteLength(this._bw, len);
 				wt.Write(this._bw, newValue);
 
 				//go to posOfDataPos and overwrite that with the new position
@@ -102,114 +117,17 @@ namespace StringDB.Writer {
 
 				// update stream length
 
-				this._lastStreamLength += JudgeValueLength(len);
+				this._lastStreamLength += TypeHandlerLengthManager.EstimateWriteLengthSize(len);
 			} else { // goto the data overwrite it since it's shorter
 				Seek(dataPos);
 
-				WriteValueLength(len);
+				TypeHandlerLengthManager.WriteLength(this._bw, len);
 				wt.Write(this._bw, newValue);
 			}
 
 			// nothin' to update
 		}
 
-		private long JudgeValueLength(long len) {
-			var valueLen = len;
-
-			if (valueLen < byte.MaxValue) valueLen += sizeof(byte);
-			else if (valueLen < ushort.MaxValue) valueLen += sizeof(ushort);
-			else if (valueLen < uint.MaxValue) valueLen += sizeof(uint);
-			else valueLen += sizeof(ulong);
-
-			valueLen += sizeof(byte) + sizeof(byte);
-
-			return valueLen;
-		}
-
-		private void WriteValueLength(long len) {
-			if (len < byte.MaxValue) {
-				this._bw.Write(Consts.IsByteValue);
-				this._bw.Write((byte)len);
-			} else if (len < ushort.MaxValue) {
-				this._bw.Write(Consts.IsUShortValue);
-				this._bw.Write((ushort)len);
-			} else if (len < uint.MaxValue) {
-				this._bw.Write(Consts.IsUIntValue);
-				this._bw.Write((uint)len);
-			} else {
-				this._bw.Write(Consts.IsLongValue);
-				this._bw.Write((ulong)len);
-			}
-		}
-
 		private void Seek(long l) => this._s.Seek(l, SeekOrigin.Begin);
-
-		/*
-		private void WriteValue(string value) {
-			var bytes = value.GetBytes();
-
-			if (bytes.Length <= byte.MaxValue) {
-				this._bw.Write(Consts.IsByteValue);
-				this._bw.Write((byte)bytes.Length);
-			} else if (bytes.Length <= ushort.MaxValue) {
-				this._bw.Write(Consts.IsUShortValue);
-				this._bw.Write((ushort)bytes.Length);
-			} else {
-				this._bw.Write(Consts.IsUIntValue);
-				this._bw.Write(bytes.Length);
-			}
-
-			this._bw.Write(bytes);
-		}
-		 *
-			var streamLength = this._lastLength;
-			var seekToPosition = streamLength < 8 ? 8 : streamLength;
-
-			if (streamLength < 8) {
-				if (streamLength != 0) //no reason to seek to 0 if we're already there
-					_Seek(0);
-
-				this._bw.Write(0L);
-
-				seekToPosition = 8;
-			}
-
-			_Seek(seekToPosition);
-
-			//current pos + index chain
-			var judge = seekToPosition + sizeof(byte) + sizeof(long);
-
-			foreach (var i in items)
-				judge += Judge_WriteIndex(i.Key);
-
-			//foreach item
-			foreach (var i in items) {
-				WriteIndex(i.Key, judge);
-
-				//judge -= Judge_WriteIndex(i.Key);
-				judge += Judge_WriteValue(i.Value);
-			}
-
-			var oldRepl = this._indexChainReplace; //where we need to go to replace the old
-
-			this._bw.Write(Consts.IndexSeperator);
-			this._indexChainReplace = this._stream.Position;
-			this._bw.Write(0L);
-
-			foreach (var i in items) {
-				WriteValue(i.Value);
-			}
-
-			if (oldRepl != 0) { //we'll be seeking and rewriting, so we want to make sure we don't do that
-				_Seek(oldRepl); //seek here to oldRepl
-				this._bw.Write(seekToPosition);
-			}
-
-			_Seek(0); //and then seek to 0 and replace that
-			this._bw.Write(this._indexChainReplace);
-
-			//set the last length to what we judged would be the future
-			//because what we judged is exactly the amount we re-wrote over
-			this._lastLength = judge;*/
 	}
 }

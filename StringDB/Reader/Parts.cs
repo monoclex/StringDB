@@ -58,19 +58,10 @@
 		public long Position { get; } /// <inheritdoc/>
 		public long NextPart { get; }
 
-		public T ReadAs<T>(IRawReader rawReader)
-			=> rawReader.ReadData<T>(this.DataPosition);
-
 		public byte[] Index
 			=> this._indexName;
 
 		public long DataPosition
 			=> this._dataPos;
-
-		public byte[] ReadData(IRawReader rawReader)
-			=> rawReader.ReadDataValueAt(this.DataPosition);
-
-		public long DataLength(IRawReader rawReader)
-			=> rawReader.ReadDataValueLengthAt(this.DataPosition);
 	}
 }

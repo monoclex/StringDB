@@ -9,16 +9,13 @@ namespace StringDB.Reader {
 	internal interface IRawReader {
 
 		T ReadData<T>(long pos);
+		T ReadDataAs<T>(long pos);
+		ITypeHandler ReadType(long pos);
+		long ReadLength(long pos);
 
 		IPart ReadAt(long pos);
 
 		IPart ReadOn(IPart previous);
-
-		Stream GetStreamOfDataAt(long p);
-
-		byte[] ReadDataValueAt(long p);
-
-		long ReadDataValueLengthAt(long p);
 
 		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
 		void DrainBuffer();
@@ -86,9 +83,11 @@ namespace StringDB.Reader {
 					: null;
 
 		public T ReadData<T>(long pos) {
+			this._stream.Seek(pos, SeekOrigin.Begin);
 			var type = ReadType(pos);
 			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
-			return (type as TypeHandler<T>).Read(this._br);
+			var typeHandler = (type as TypeHandler<T>);
+			return typeHandler.Read(this._br, TypeHandlerLengthManager.ReadLength(this._br));
 		}
 
 		public T ReadDataAs<T>(long pos) {
@@ -96,7 +95,8 @@ namespace StringDB.Reader {
 			this._br.ReadByte();
 			var type = TypeManager.GetHandlerFor<T>();
 			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
-			return (type as TypeHandler<T>).Read(this._br);
+			var typeHandler = (type as TypeHandler<T>);
+			return typeHandler.Read(this._br, TypeHandlerLengthManager.ReadLength(this._br));
 		}
 
 		public ITypeHandler ReadType(long pos) {
@@ -104,87 +104,10 @@ namespace StringDB.Reader {
 			return TypeManager.GetHandlerFor(this._br.ReadByte());
 		}
 
-		public long ReadDataValueLengthAt(long p) {
-#if THREAD_SAFE
-			lock(_lock) {
-#endif
-			_Seek(p);
-
-			var b = this._br.ReadBytes(9);
-
-			switch (b[0]) {
-				case Consts.IsByteValue:
-				return b[1];
-
-				case Consts.IsUShortValue:
-				return BitConverter.ToUInt16(b, 1);
-
-				case Consts.IsUIntValue:
-				return BitConverter.ToUInt32(b, 1);
-
-				case Consts.IsLongValue:
-				return (long)BitConverter.ToUInt64(b, 1);
-			}
-
-			return 0;
-#if THREAD_SAFE
-			}
-#endif
-		}
-
-		public Stream GetStreamOfDataAt(long p) {
-#if THREAD_SAFE
-			lock(_lock) {
-#endif
-			var len = ReadDataValueLengthAt(p);
-
-			var newp = p + 1;
-
-			if (len < byte.MaxValue)
-				newp += sizeof(byte);
-			else if (len < ushort.MaxValue)
-				newp += sizeof(ushort);
-			else if (len < uint.MaxValue)
-				newp += sizeof(uint);
-			else if ((ulong)len < ulong.MaxValue)
-				newp += sizeof(ulong);
-
-
-			return new StreamFragment(this._stream, newp, len);
-#if THREAD_SAFE
-			}
-#endif
-		}
-
-		public byte[] ReadDataValueAt(long p) {
-#if THREAD_SAFE
-			lock(_lock) {
-#endif
-			_Seek(p); //don't use the readlength because it slows down performance
-
-			var b = this._br.ReadBytes(9);
-
-			switch (b[0]) {
-				case Consts.IsByteValue:
-				this._stream.Seek(p + 1 + sizeof(byte), SeekOrigin.Begin); //seek backwards a little in the stream to where the data stars
-				return this._br.ReadBytes(b[1]); //read out that data to a byte array
-
-				case Consts.IsUShortValue:
-				this._stream.Seek(p + 1 + sizeof(ushort), SeekOrigin.Begin);
-				return this._br.ReadBytes(BitConverter.ToUInt16(b, 1));
-
-				case Consts.IsUIntValue:
-				this._stream.Seek(p + 1 + sizeof(uint), SeekOrigin.Begin);
-				return this._br.ReadBytes((int)BitConverter.ToUInt32(b, 1));
-
-				case Consts.IsLongValue:
-				return this._br.ReadBytes((int)BitConverter.ToUInt64(b, 1));
-			}
-
-			return null;
-#if THREAD_SAFE
-			}
-#endif
+		public long ReadLength(long pos) {
+			this._stream.Seek(pos, SeekOrigin.Begin);
+			this._br.ReadByte();
+			return TypeHandlerLengthManager.ReadLength(this._br);
 		}
 
 		public void DrainBuffer() {
