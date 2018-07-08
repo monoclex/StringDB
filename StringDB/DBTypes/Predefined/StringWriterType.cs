@@ -6,6 +6,7 @@ namespace StringDB.DBTypes.Predefined {
 		public override byte Id => 0x02;
 
 		public override long GetLength(string item) => item.GetBytes().Length; //TODO: use length in more modern frameworks
+
 		public override string Read(BinaryReader br, long len)
 			=> br.ReadBytes((int)len).GetString();
 

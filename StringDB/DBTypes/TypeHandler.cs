@@ -1,6 +1,7 @@
 ﻿using System.IO;
 
 namespace StringDB.DBTypes {
+
 	/// <summary>A generic interface for a given TypeHandler</summary>
 	public interface ITypeHandler {
 
@@ -20,7 +21,7 @@ namespace StringDB.DBTypes {
 
 		/// <inheritdoc/>
 		public System.Type Type => typeof(T);
-		
+
 		/// <summary>Gets the length of an item, or how long it would be when attempting to store it.</summary>
 		/// <param name="item">The item to calculate the length for.</param>
 		public abstract long GetLength(T item);

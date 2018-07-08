@@ -1,6 +1,4 @@
-﻿//#define THREAD_SAFE
-
-using StringDB.DBTypes;
+﻿using StringDB.DBTypes;
 using StringDB.Reader;
 
 using System;
@@ -28,11 +26,11 @@ namespace StringDB.Writer {
 	/// <inheritdoc/>
 	public class Writer : IWriter {
 
-		public Writer(Stream s, object @lock) {
-			this._rawWriter = new RawWriter(s);
-		}
+		/// <summary>Create a new Writer.</summary>
+		/// <param name="s">The stream</param>
+		public Writer(Stream s) => this._rawWriter = new RawWriter(s);
 
-		private IRawWriter _rawWriter;
+		private readonly IRawWriter _rawWriter;
 
 		/// <inheritdoc/>
 		public void Dispose() {
@@ -42,8 +40,11 @@ namespace StringDB.Writer {
 
 		/// <inheritdoc/>
 		public void Insert<T1, T2>(T1 index, T2 value) => this.Insert(new KeyValuePair<T1, T2>(index, value)); /// <inheritdoc/>
+
 		public void Insert<T1, T2>(KeyValuePair<T1, T2> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+
 		public void InsertRange<T1, T2>(IEnumerable<KeyValuePair<T1, T2>> items) => this._rawWriter.InsertRange<T1, T2>(TypeManager.GetHandlerFor<T1>(), TypeManager.GetHandlerFor<T2>(), items); /// <inheritdoc/>
+
 		public void OverwriteValue<T>(ReaderPair replacePair, T newValue) => this._rawWriter.OverwriteValue(TypeManager.GetHandlerFor<T>(), newValue, replacePair.ValueLength, replacePair._dp.DataPosition, replacePair._dp.Position + sizeof(byte));
 	}
 }

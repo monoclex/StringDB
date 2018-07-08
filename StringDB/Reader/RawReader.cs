@@ -1,6 +1,5 @@
-﻿//#define THREAD_SAFE
+﻿using StringDB.DBTypes;
 
-using StringDB.DBTypes;
 using System;
 using System.IO;
 
@@ -9,8 +8,11 @@ namespace StringDB.Reader {
 	internal interface IRawReader {
 
 		T ReadData<T>(long pos);
+
 		T ReadDataAs<T>(long pos);
+
 		ITypeHandler ReadType(long pos);
+
 		long ReadLength(long pos);
 
 		IPart ReadAt(long pos);
@@ -23,26 +25,20 @@ namespace StringDB.Reader {
 
 	internal class RawReader : IRawReader {
 
-		internal RawReader(Stream s, object @lock = null) {
+		internal RawReader(Stream s) {
 			this._stream = s;
 			this._br = new BinaryReader(s);
-			this._lock = @lock;
-
-			if (this._lock == null)
-				this._lock = new object();
 		}
 
-		private Stream _stream;
-		private BinaryReader _br;
+		private readonly Stream _stream;
+		private readonly BinaryReader _br;
 
-		private object _lock = null;
-
-		private static readonly int BufferSize = 0x1000; //1MiB
-		private static readonly int MinusBufferSize = -1 - BufferSize;
+		private const int BufferSize = 0x1000; //1MiB
+		private const int MinusBufferSize = -1 - BufferSize;
 
 		private long _bufferReadPos = MinusBufferSize; //the position we read the buffer at in the filestream
 		private int _bufferPos = MinusBufferSize; //the position within the buffer
-		private byte[] _bufferRead = new byte[BufferSize];
+		private readonly byte[] _bufferRead = new byte[BufferSize];
 
 		public IPart ReadAt(long pos) {
 #if THREAD_SAFE
@@ -55,10 +51,10 @@ namespace StringDB.Reader {
 			var intVal = BitConverter.ToInt64(this._bufferRead, p + 1);
 
 			if (importantByte == Consts.IndexSeperator) {
-				if (intVal == 0)
-					return null;
-				else
-					return new PartIndexChain(importantByte, pos, intVal);
+				return
+					intVal == 0 ?
+					(IPart)null
+					: new PartIndexChain(importantByte, pos, intVal);
 			} else {
 				if (importantByte == Consts.NoIndex) return null;
 
@@ -141,7 +137,5 @@ namespace StringDB.Reader {
 				this._stream.Read(this._bufferRead, 0, BufferSize);
 			} else this._bufferPos = (int)(pos - this._bufferReadPos);
 		}
-
-		private void _Seek(long pos) => this._stream.Seek(pos, SeekOrigin.Begin);
 	}
 }

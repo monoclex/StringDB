@@ -76,7 +76,7 @@ namespace StringDB.Tester {
 
 			for (var i = 0; i < items; i++) {
 				var usersName = RandomName;
-				res.Add(new Item() {
+				res.Add(new Item {
 					Identifier = $"{i}.{usersName}",
 					Name = $"{usersName} {RandomName}",
 					Dollars = Rng.Next(GenerateItems.MinIncome, GenerateItems.MaxIncome),

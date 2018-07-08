@@ -24,13 +24,13 @@ namespace StringDB.Reader {
 	/// <summary>A Reader that reads out a StringDB database file.</summary>
 	public class Reader : IReader {
 
-		internal Reader(Stream stream, object @lock = null) {
+		internal Reader(Stream stream) {
 			this._stream = stream ?? throw new ArgumentNullException(nameof(stream));
-			this._rawReader = new RawReader(this._stream, @lock);
+			this._rawReader = new RawReader(this._stream);
 		}
 
-		private Stream _stream;
-		private IRawReader _rawReader;
+		private readonly Stream _stream;
+		private readonly IRawReader _rawReader;
 
 		/// <inheritdoc/>
 		public ReaderPair First() {

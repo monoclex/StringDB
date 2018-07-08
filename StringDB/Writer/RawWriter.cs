@@ -1,4 +1,5 @@
 ﻿using StringDB.DBTypes;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,8 +40,8 @@ namespace StringDB.Writer {
 			}
 		}
 
-		private Stream _s;
-		private BinaryWriter _bw;
+		private readonly Stream _s;
+		private readonly BinaryWriter _bw;
 
 		private long _lastStreamLength;
 		private long _indexChainReplace;
@@ -84,7 +85,7 @@ namespace StringDB.Writer {
 
 			foreach (var i in kvps) {
 				var len = wt2.GetLength(i.Value);
-				
+
 				this._bw.Write(wt2.Id);
 				TypeHandlerLengthManager.WriteLength(this._bw, wt2.GetLength(i.Value));
 				wt2.Write(this._bw, i.Value);

@@ -28,11 +28,11 @@ namespace StringDB {
 				return false;
 
 			fixed (byte* bytes1 = mainBytes, bytes2 = compareTo) {
-				int len = mainBytes.Length;
-				int rem = len % (sizeof(long) * 16);
-				long* b1 = (long*)bytes1;
-				long* b2 = (long*)bytes2;
-				long* e1 = (long*)(bytes1 + len - rem);
+				var len = mainBytes.Length;
+				var rem = len % (sizeof(long) * 16);
+				var b1 = (long*)bytes1;
+				var b2 = (long*)bytes2;
+				var e1 = (long*)(bytes1 + len - rem);
 
 				while (b1 < e1) {
 					if (*(b1) != *(b2) || *(b1 + 1) != *(b2 + 1) ||
@@ -48,7 +48,7 @@ namespace StringDB {
 					b2 += 16;
 				}
 
-				for (int i = 0; i < rem; i++)
+				for (var i = 0; i < rem; i++)
 					if (mainBytes[len - 1 - i] != compareTo[len - 1 - i])
 						return false;
 

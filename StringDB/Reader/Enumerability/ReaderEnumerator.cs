@@ -12,7 +12,7 @@ namespace StringDB.Reader {
 		}
 
 		private IRawReader _rawReader;
-		private IPart _partOn = null;
+		private IPart _partOn;
 
 		/// <summary>What the current element is on.</summary>
 		public ReaderPair Current => new ReaderPair((PartDataPair)this._partOn, this._rawReader);

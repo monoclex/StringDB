@@ -24,13 +24,11 @@ namespace StringDB {
 	public class Database : IDatabase {
 
 		internal Database(Stream s, bool disposeStream) {
-			this._lock = new object();
-
 			this._disposeStream = disposeStream;
 
 			this._stream = s;
-			this._reader = new Reader.Reader(s, this._lock);
-			this._writer = new Writer.Writer(s, this._lock);
+			this._reader = new Reader.Reader(s);
+			this._writer = new Writer.Writer(s);
 		}
 
 		/// <summary>Create a new Database from a stream</summary><param name="s">The stream to be using</param><param name="disposeStream">If the stream should be disposed after we're done using it</param>
@@ -39,10 +37,8 @@ namespace StringDB {
 		/// <summary>Create a new Database from a string name to open a file</summary><param name="name">The name of the file</param>
 		public static Database FromFile(string name) => new Database(File.Open(name, FileMode.OpenOrCreate), true);
 
-		private object _lock;
-
-		private bool _disposeStream;
-		private Stream _stream;
+		private readonly bool _disposeStream;
+		private readonly Stream _stream;
 		private IReader _reader;
 		private IWriter _writer; /// <inheritdoc/>
 
@@ -82,14 +78,16 @@ namespace StringDB {
 				this._stream.Dispose();
 		}
 
-		private IEnumerable<KeyValuePair<byte[], Stream>> FromDatabase(IDatabase other) {
+		private static IEnumerable<KeyValuePair<byte[], Stream>> FromDatabase(IDatabase other) {
 			foreach (var i in other)
 				yield return new KeyValuePair<byte[], Stream>(i.ByteArrayIndex, i.GetValueAs<Stream>());
 		}
 
 		/// <inheritdoc/>
 		public void Insert<T1, T2>(T1 index, T2 value) => this._writer.Insert(index, value); /// <inheritdoc/>
+
 		public void Insert<T1, T2>(KeyValuePair<T1, T2> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
+
 		public void InsertRange<T1, T2>(IEnumerable<KeyValuePair<T1, T2>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
 
 		public void OverwriteValue<T>(ReaderPair replacePair, T newValue) {

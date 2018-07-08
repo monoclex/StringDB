@@ -8,6 +8,7 @@ namespace StringDB.DBTypes.Predefined {
 		public override byte Id => 0x03;
 
 		public override long GetLength(Stream item) => item.Length - item.Position;
+
 		public override void Write(BinaryWriter bw, Stream item) => Write(bw, item, StreamWriterCacheSize);
 
 		public override Stream Read(BinaryReader br, long len)

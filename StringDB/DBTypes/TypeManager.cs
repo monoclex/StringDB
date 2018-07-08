@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
-using StringDB.DBTypes.Predefined;
+﻿using StringDB.DBTypes.Predefined;
+
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace StringDB.DBTypes {
+
 	/// <summary>Manages the types StringDB can read and write. Add your own if you need more types!</summary>
 	public static class TypeManager {
+
 		static TypeManager() {
 			TypeHandlers = new Dictionary<Type, ITypeHandler>();
 
@@ -27,7 +29,7 @@ namespace StringDB.DBTypes {
 				try {
 					GetHandlerFor(t.Id);
 					throw new TypeHandlerExists();
-				} catch (TypeHandlerDoesntExist e) {
+				} catch (TypeHandlerDoesntExist _) {
 					TypeHandlers.Add(typeof(T), t);
 				}
 			}

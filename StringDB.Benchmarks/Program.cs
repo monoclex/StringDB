@@ -106,7 +106,7 @@ namespace StringDB.Benchmarks {
 		private string _middle { get; set; }
 		private string _end { get; set; }
 
-		private int lastdb = 0;
+		private int lastdb;
 
 		[GlobalSetup]
 		public void SetupMethod() {
@@ -155,9 +155,7 @@ namespace StringDB.Benchmarks {
 #if WRITER_TESTS
 
 		[Benchmark]
-		public void InsertRangeItems() {
-			this.stringdb.InsertRange(this.itemsToInsert);
-		}
+		public void InsertRangeItems() => this.stringdb.InsertRange(this.itemsToInsert);
 
 		[Benchmark]
 		public void SingleInsertItems() {

@@ -20,8 +20,9 @@
 			this.NextPart = nextPart;
 		}
 
-		private static Part _cacheStart = new Part(0x00, 8, 8); //cache the start for possibly better performance?
-		public static Part Start => _cacheStart; /// <inheritdoc/>
+		public static Part Start { get; } = new Part(0x00, 8, 8);
+
+		/// <inheritdoc/>
 
 		public byte InitialByte { get; } /// <inheritdoc/>
 		public long Position { get; } /// <inheritdoc/>
