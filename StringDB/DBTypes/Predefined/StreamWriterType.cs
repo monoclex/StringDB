@@ -7,7 +7,7 @@ namespace StringDB.DBTypes.Predefined {
 		public override byte Id => 0x03;
 
 		public override long GetLength(Stream item) => item.Length - item.Position;
-		public override void Write(BinaryWriter bw, Stream item) => Write(bw, item, StreamWriterCacheSize);
+		public override void Write(BinaryWriter bw, Stream item, bool writeLength = true) => Write(bw, item, writeLength, StreamWriterCacheSize);
 
 		public override Stream Read(BinaryReader br) {
 			var len = this.ReadLength(br);
@@ -15,8 +15,8 @@ namespace StringDB.DBTypes.Predefined {
 			return new StreamFragment(br.BaseStream, br.BaseStream.Position, len);
 		}
 
-		public void Write(BinaryWriter bw, Stream item, int cacheSize) {
-			bw.Write(GetLength(item));
+		public void Write(BinaryWriter bw, Stream item, bool writeLength, int cacheSize) {
+			if(writeLength) bw.Write(GetLength(item));
 
 			var cache = new byte[cacheSize];
 			var len = 0;

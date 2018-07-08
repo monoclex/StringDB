@@ -1,13 +1,19 @@
 ﻿using System.IO;
 
 namespace StringDB.DBTypes {
-	public abstract class TypeHandler<T> {
+	public interface ITypeHandler {
+		byte Id { get; }
+		System.Type Type { get; }
+	}
+
+	public abstract class TypeHandler<T> : ITypeHandler {
 		public TypeHandler() { }
 
 		public abstract byte Id { get; }
+		public System.Type Type => typeof(T);
 
 		public abstract long GetLength(T item);
-		public abstract void Write(BinaryWriter bw, T item);
+		public abstract void Write(BinaryWriter bw, T item, bool writeLength = true);
 		public abstract T Read(BinaryReader br);
 
 		public void WriteLength(BinaryWriter bw, long len) {

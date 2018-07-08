@@ -8,10 +8,11 @@ namespace StringDB.DBTypes.Predefined {
 		public override string Read(BinaryReader br)
 			=> br.ReadBytes((int)this.ReadLength(br)).GetString();
 
-		public override void Write(BinaryWriter bw, string item) {
+		public override void Write(BinaryWriter bw, string item, bool writeLength = true) {
 			var bytes = item.GetBytes();
 
-			this.WriteLength(bw, bytes.Length);
+			if(writeLength) this.WriteLength(bw, bytes.Length);
+
 			bw.Write(bytes);
 		}
 	}

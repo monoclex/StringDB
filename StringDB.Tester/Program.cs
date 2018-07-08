@@ -15,6 +15,8 @@ namespace StringDB.Tester {
 				foreach (var i in db)
 					Console.WriteLine(i.ToString());
 			}
+
+			Console.ReadLine();
 		}
 	}
 

@@ -54,7 +54,7 @@ namespace StringDB.Writer {
 
 				this._bw.Write((byte)len);
 				this._bw.Write(judge);
-				wt1.Write(this._bw, i.Key);
+				wt1.Write(this._bw, i.Key, false);
 
 				judge += JudgeValueLength(wt2.GetLength(i.Value));
 			}

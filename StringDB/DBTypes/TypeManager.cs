@@ -1,29 +1,30 @@
 ﻿using System.Collections.Generic;
 using StringDB.DBTypes.Predefined;
 using System;
+using System.Linq;
 
 namespace StringDB.DBTypes {
 	/// <summary>Manages the types StringDB can read and write. Add your own if you need more types!</summary>
 	public static class TypeManager {
 		static TypeManager() {
-			Types = new Dictionary<Type, object>();
+			TypeHandlers = new Dictionary<Type, ITypeHandler>();
 
 			RegisterType(new ByteArrayType());
 			RegisterType(new StringType());
 			RegisterType(new StreamType());
 		}
 
-		internal static Dictionary<Type, object> Types { get; private set; }
+		internal static Dictionary<Type, ITypeHandler> TypeHandlers { get; private set; }
 		internal static readonly object Locker = new object();
 
 		/// <summary>Register a type</summary>
 		/// <param name="t">The type to register</param>
 		public static void RegisterType<T>(TypeHandler<T> t) {
 			lock (Locker) {
-				if (Types.TryGetValue(typeof(T), out var _))
+				if (TypeHandlers.TryGetValue(typeof(T), out var _))
 					throw new TypeHandlerExists();
 
-				Types.Add(typeof(T), t);
+				TypeHandlers.Add(typeof(T), t);
 			}
 		}
 
@@ -31,7 +32,7 @@ namespace StringDB.DBTypes {
 		/// <param name="t">The type to override</param>
 		public static void OverridingRegisterType<T>(TypeHandler<T> t) {
 			lock (Locker) {
-				Types[typeof(T)] = t;
+				TypeHandlers[typeof(T)] = t;
 			}
 		}
 
@@ -39,13 +40,22 @@ namespace StringDB.DBTypes {
 		/// <typeparam name="T">The type of type handler</typeparam>
 		public static TypeHandler<T> GetHandlerFor<T>() {
 			lock (Locker) {
-				if (!Types.TryGetValue(typeof(T), out var handler)) throw new TypeHandlerExists();
+				if (!TypeHandlers.TryGetValue(typeof(T), out var handler)) throw new TypeHandlerExists();
 
 				return handler as TypeHandler<T>;
+			}
+		}
+
+		public static ITypeHandler GetHandlerFor(byte id) {
+			lock (Locker) {
+				foreach (var i in TypeHandlers)
+					if (i.Value.Id == id)
+						return i.Value;
+				throw new TypeHandlerDoesntExist();
 			}
 		}
 	}
 
 	public class TypeHandlerExists : Exception { public TypeHandlerExists() : base("The TypeHandler already exists. See OverridingRegisterType if you'd like to override existing types.") { } }
-	public class TypeHandlerDoesntExist : Exception { public TypeHandlerDoesntExist() : base("The TypeHandler doesn't exist. See RegisterType if you'd like to add a type.") { } }
+	public class TypeHandlerDoesntExist : Exception { public TypeHandlerDoesntExist() : base("The TypeHandler doesn't exist. See RegisterType if you'd like to add a type, or if you're trying to read from this database, then there are missing TypeHandlers!.") { } }
 }
