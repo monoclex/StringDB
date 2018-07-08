@@ -11,7 +11,7 @@ namespace StringDB.DBTypes {
 
 		public abstract byte Id { get; }
 		public System.Type Type => typeof(T);
-
+		
 		public abstract long GetLength(T item);
 		public abstract void Write(BinaryWriter bw, T item, bool writeLength = true);
 		public abstract T Read(BinaryReader br);
@@ -48,6 +48,18 @@ namespace StringDB.DBTypes {
 			}
 
 			return 0; // ? ? ?
+		}
+
+		internal int WriteLengthLength(long len) {
+			if (len <= byte.MaxValue) {
+				return sizeof(byte) + sizeof(byte);
+			} else if (len <= ushort.MaxValue) {
+				return sizeof(byte) + sizeof(ushort);
+			} else if (len <= uint.MaxValue) {
+				return sizeof(byte) + sizeof(uint);
+			} else {
+				return sizeof(byte) + sizeof(long);
+			}
 		}
 	}
 }

@@ -19,6 +19,9 @@
 		internal string _strIndexCache { get; set; } = null;
 		internal string _strValueCache { get; set; } = null;
 
+		public T GetValueAs<T>()
+			=> this._dp.ReadAs<T>(this._rawReader);
+
 		/// <summary>Get the index as a byte array instead.</summary>
 		public byte[] ByteArrayIndex => this._byteIndexCache;
 

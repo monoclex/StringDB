@@ -10,10 +10,25 @@ namespace StringDB.Tester {
 	internal class Program {
 		private static void Main(string[] args) {
 			using(var db = Database.FromFile("Test.db")) {
+				db.InsertRange(new KeyValuePair<string, string>[] {
+					new KeyValuePair<string, string>("A", "AVALUE"),
+					new KeyValuePair<string, string>("B", "BVALUE")
+				});
+
 				db.Insert("lol", "ecks dee");
 
-				foreach (var i in db)
-					Console.WriteLine(i.ToString());
+				foreach (var i in db) {
+					//Console.WriteLine(i.ToString());
+					Console.WriteLine(i.GetValueAs<string>());
+					Console.WriteLine();
+					foreach (var j in i.GetValueAs<byte[]>()) Console.Write(Convert.ToChar(j));
+					Console.WriteLine();
+					Console.WriteLine();
+
+
+					//Console.WriteLine(i.GetValueAs<byte[]>());
+					//Console.WriteLine(i.GetValueAs<Stream>());
+				}
 			}
 
 			Console.ReadLine();

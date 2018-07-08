@@ -8,6 +8,8 @@ namespace StringDB.Reader {
 
 	internal interface IRawReader {
 
+		T ReadData<T>(long pos);
+
 		IPart ReadAt(long pos);
 
 		IPart ReadOn(IPart previous);
@@ -82,6 +84,25 @@ namespace StringDB.Reader {
 				: !(previous.NextPart == 0) ?
 					this.ReadAt(previous.NextPart)
 					: null;
+
+		public T ReadData<T>(long pos) {
+			var type = ReadType(pos);
+			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
+			return (type as TypeHandler<T>).Read(this._br);
+		}
+
+		public T ReadDataAs<T>(long pos) {
+			this._stream.Seek(pos, SeekOrigin.Begin);
+			this._br.ReadByte();
+			var type = TypeManager.GetHandlerFor<T>();
+			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
+			return (type as TypeHandler<T>).Read(this._br);
+		}
+
+		public ITypeHandler ReadType(long pos) {
+			this._stream.Seek(pos, SeekOrigin.Begin);
+			return TypeManager.GetHandlerFor(this._br.ReadByte());
+		}
 
 		public long ReadDataValueLengthAt(long p) {
 #if THREAD_SAFE

@@ -71,8 +71,7 @@ namespace StringDB.Writer {
 			foreach (var i in kvps) {
 				var len = wt2.GetLength(i.Value);
 
-				WriteValueLength(len);
-
+				this._bw.Write(wt2.Id);
 				wt2.Write(this._bw, i.Value);
 			}
 
@@ -122,7 +121,7 @@ namespace StringDB.Writer {
 			else if (valueLen < uint.MaxValue) valueLen += sizeof(uint);
 			else valueLen += sizeof(ulong);
 
-			valueLen += sizeof(byte);
+			valueLen += sizeof(byte) + sizeof(byte);
 
 			return valueLen;
 		}
