@@ -12,5 +12,8 @@ namespace StringDB.DBTypes.Predefined {
 
 		public override void Write(BinaryWriter bw, string item)
 			=> bw.Write(item.GetBytes());
+
+		public override bool Compare(string item1, string item2)
+			=> item1.GetBytes().EqualToFast(item2.GetBytes());
 	}
 }

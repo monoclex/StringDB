@@ -1,4 +1,6 @@
-﻿using System;
+﻿using StringDB.DBTypes;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -12,10 +14,13 @@ namespace StringDB.Reader {
 		ReaderPair First();
 
 		/// <summary>Gets the ReaderPair responsible for a given index</summary>
-		ReaderPair GetByIndex(string index, out bool foundItem);
+		ReaderPair GetValue<T>(T index);
+
+		/// <summary>Attempts to get the ReaderPair</summary>
+		bool TryGetValue<T>(T index, out ReaderPair value);
 
 		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
-		IEnumerable<ReaderPair> GetMultipleByIndex(string index);
+		IEnumerable<ReaderPair> GetMultipleByIndex<T>(T index);
 
 		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
 		void DrainBuffer();
@@ -44,37 +49,55 @@ namespace StringDB.Reader {
 			while (!(p is PartDataPair));
 
 			return ((PartDataPair)p).ToReaderPair(this._rawReader);
-		} /// <inheritdoc/>
+		}
 
-		public ReaderPair GetByIndex(string index, out bool foundItem) {
+		/// <inheritdoc/>
+		public ReaderPair GetValue<T>(T index) {
 			// prevent the re-use of code
 
-			foundItem = true;
-
 			using (var enumer = this.GetMultipleByIndex(index).GetEnumerator()) {
-				if (enumer.MoveNext())
+				if (enumer.MoveNext()) {
 					return enumer.Current;
+				}
 			}
 
-			foundItem = false;
-			return new ReaderPair(); // null;
-		} /// <inheritdoc/>
+			throw new InvalidOperationException($"Unable to find the given index {index}");
+		}
 
-		public IEnumerable<ReaderPair> GetMultipleByIndex(string index) {
+		/// <inheritdoc/>
+		public bool TryGetValue<T>(T index, out ReaderPair value) {
+			// prevent the re-use of code
+
+			using (var enumer = this.GetMultipleByIndex(index).GetEnumerator()) {
+				if (enumer.MoveNext()) {
+					value = enumer.Current;
+					return true;
+				}
+			}
+
+			value = default(ReaderPair);
+			return false;
+		}
+
+		/// <inheritdoc/>
+		public IEnumerable<ReaderPair> GetMultipleByIndex<T>(T index) {
 			if (this._stream.Length <= 8)
 				yield break;
 
-			var comparing = index.GetBytes();
+			var typeHandler = TypeManager.GetHandlerFor<T>();
 
 			foreach (var i in this)
-				if (comparing.EqualTo(i.ByteArrayIndex))
+				if (typeHandler.Compare(index, i.GetIndexAs<T>()))
 					yield return i;
-		} /// <inheritdoc/>
+		}
 
-		public IEnumerator<ReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader); /// <inheritdoc/>
+		/// <inheritdoc/>
+		public IEnumerator<ReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader);
 
-		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator(); /// <inheritdoc/>
+		/// <inheritdoc/>
+		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
+		/// <inheritdoc/>
 		public void DrainBuffer() =>
 			this._rawReader.DrainBuffer();
 	}

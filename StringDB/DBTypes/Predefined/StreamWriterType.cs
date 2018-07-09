@@ -14,6 +14,24 @@ namespace StringDB.DBTypes.Predefined {
 		public override Stream Read(BinaryReader br, long len)
 			=> new StreamFragment(br.BaseStream, br.BaseStream.Position, len);
 
+		public override bool Compare(Stream item1, Stream item2) {
+			var s1p = item1.Position;
+			var s2p = item2.Position;
+
+			int ia, ib;
+			bool success;
+
+			do {
+				ia = item1.ReadByte();
+				ib = item2.ReadByte();
+			} while (success = (ia == ib));
+
+			item1.Seek(s1p, SeekOrigin.Begin);
+			item2.Seek(s2p, SeekOrigin.Begin);
+
+			return success;
+		}
+
 		public static void Write(BinaryWriter bw, Stream item, int cacheSize) {
 			var cache = new byte[cacheSize];
 			var len = 0;

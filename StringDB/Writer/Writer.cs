@@ -1,7 +1,6 @@
 ﻿using StringDB.DBTypes;
 using StringDB.Reader;
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 

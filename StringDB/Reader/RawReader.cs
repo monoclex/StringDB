@@ -7,17 +7,17 @@ namespace StringDB.Reader {
 
 	internal interface IRawReader {
 
+		IPart ReadAt(long pos);
+
+		IPart ReadOn(IPart previous);
+
 		T ReadData<T>(long pos);
 
 		T ReadDataAs<T>(long pos);
 
-		ITypeHandler ReadType(long pos);
-
 		long ReadLength(long pos);
 
-		IPart ReadAt(long pos);
-
-		IPart ReadOn(IPart previous);
+		ITypeHandler ReadType(long pos);
 
 		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
 		void DrainBuffer();
@@ -44,7 +44,7 @@ namespace StringDB.Reader {
 #if THREAD_SAFE
 			lock (_lock) {
 #endif
-			_BufferSeek(pos);
+			BufferSeek(pos);
 
 			var p = this.ReadBytes(9); //set the important values right NOW, since later the buffer can chnage and screw things up.
 			var importantByte = this._bufferRead[p]; //set these variables incase the buffer changes later when reading more bytes
@@ -59,8 +59,8 @@ namespace StringDB.Reader {
 				if (importantByte == Consts.NoIndex) return null;
 
 				var val_pos = this.ReadBytes(importantByte);
-
 				var val = new byte[importantByte];
+
 				for (var i = 0; i < val.Length; i++)
 					val[i] = this._bufferRead[val_pos + i];
 
@@ -94,15 +94,15 @@ namespace StringDB.Reader {
 			return typeHandler.Read(this._br, TypeHandlerLengthManager.ReadLength(this._br));
 		}
 
-		public ITypeHandler ReadType(long pos) {
-			this._stream.Seek(pos, SeekOrigin.Begin);
-			return TypeManager.GetHandlerFor(this._br.ReadByte());
-		}
-
 		public long ReadLength(long pos) {
 			this._stream.Seek(pos, SeekOrigin.Begin);
 			this._br.ReadByte();
 			return TypeHandlerLengthManager.ReadLength(this._br);
+		}
+
+		public ITypeHandler ReadType(long pos) {
+			this._stream.Seek(pos, SeekOrigin.Begin);
+			return TypeManager.GetHandlerFor(this._br.ReadByte());
 		}
 
 		public void DrainBuffer() {
@@ -127,7 +127,7 @@ namespace StringDB.Reader {
 			return this._bufferPos - amt;
 		}
 
-		private void _BufferSeek(long pos) {
+		private void BufferSeek(long pos) {
 			if (Math.Abs(this._bufferReadPos - pos) >= BufferSize || pos <= this._bufferReadPos) {
 				this._bufferReadPos = pos; //move the buffer reading pos
 				this._bufferPos = 0; //move the buffer pos

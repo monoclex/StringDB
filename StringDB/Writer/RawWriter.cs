@@ -22,7 +22,7 @@ namespace StringDB.Writer {
 			this._lastStreamLength += this._s.Length;
 
 			if (this._lastStreamLength > 8) {
-				this.Seek(0);
+				this._s.Seek(0);
 
 				// instead of using a BinaryReader, we'll just do whatever the BinaryReader does
 
@@ -50,10 +50,10 @@ namespace StringDB.Writer {
 			var pos = this._lastStreamLength;
 
 			if (this._lastStreamLength < 8) {
-				Seek(0);
+				this._s.Seek(0);
 				this._bw.Write(0L);
 				pos = sizeof(long);
-			} else Seek(this._lastStreamLength);
+			} else this._s.Seek(this._lastStreamLength);
 
 			var judge = pos + sizeof(byte) + sizeof(long);
 
@@ -92,11 +92,11 @@ namespace StringDB.Writer {
 			}
 
 			if (repl != 0) {
-				Seek(repl);
+				this._s.Seek(repl);
 				this._bw.Write(this._lastStreamLength);
 			}
 
-			Seek(0);
+			this._s.Seek(0);
 			this._bw.Write(this._indexChainReplace);
 
 			this._lastStreamLength = judge + sizeof(byte) + sizeof(long);
@@ -106,21 +106,21 @@ namespace StringDB.Writer {
 			var len = wt.GetLength(newValue);
 
 			if (len > oldLen) { //goto the end of the file and just slap it onto the end
-				Seek(this._lastStreamLength);
+				this._s.Seek(this._lastStreamLength);
 
 				TypeHandlerLengthManager.WriteLength(this._bw, len);
 				wt.Write(this._bw, newValue);
 
 				//go to posOfDataPos and overwrite that with the new position
 
-				Seek(posOfDataPos);
+				this._s.Seek(posOfDataPos);
 				this._bw.Write(this._lastStreamLength);
 
 				// update stream length
 
 				this._lastStreamLength += TypeHandlerLengthManager.EstimateWriteLengthSize(len);
 			} else { // goto the data overwrite it since it's shorter
-				Seek(dataPos);
+				this._s.Seek(dataPos);
 
 				TypeHandlerLengthManager.WriteLength(this._bw, len);
 				wt.Write(this._bw, newValue);
@@ -128,7 +128,5 @@ namespace StringDB.Writer {
 
 			// nothin' to update
 		}
-
-		private void Seek(long l) => this._s.Seek(l, SeekOrigin.Begin);
 	}
 }

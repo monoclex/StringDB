@@ -35,6 +35,11 @@ namespace StringDB.DBTypes {
 		/// <param name="br">The BinaryReader.</param>
 		/// <param name="len">The length of the data.</param>
 		public abstract T Read(BinaryReader br, long len);
+
+		/// <summary>Compare if two items are the same.</summary>
+		/// <param name="item1">The first item to compare</param>
+		/// <param name="item2">The second item to compare</param>
+		public abstract bool Compare(T item1, T item2);
 	}
 
 	internal static class TypeHandlerLengthManager {

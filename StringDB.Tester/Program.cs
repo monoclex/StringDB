@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace StringDB.Tester {
@@ -20,6 +19,10 @@ namespace StringDB.Tester {
 		private static void Main() {
 
 			using (var db = Database.FromFile("struct.db")) {
+
+				if(db.TryGetValue("help", out var _)) {
+
+				}
 
 				var len = 0;
 				foreach (var i in db) len++;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace StringDB {
@@ -16,12 +17,15 @@ namespace StringDB {
 			yield return item;
 		}
 
+		public static void Seek(this Stream s, long p)
+			=> s.Seek(p, SeekOrigin.Begin);
+
 		//  ___
 		// /. .\
 
 		//https://stackoverflow.com/a/33307903
 
-		internal static unsafe bool EqualTo(this byte[] mainBytes, byte[] compareTo) {
+		internal static unsafe bool EqualToFast(this byte[] mainBytes, byte[] compareTo) {
 			if (mainBytes == compareTo)
 				return true;
 			if (mainBytes.Length != compareTo.Length)

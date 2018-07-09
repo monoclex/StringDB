@@ -43,16 +43,16 @@ namespace StringDB {
 		private IWriter _writer;
 
 		/// <inheritdoc/>
-		public void CleanTo(IDatabase dbCleanTo) =>
-			dbCleanTo.InsertRange(FromDatabase(this));
+		public ReaderPair GetValue<T>(T index) =>
+			this._reader.GetValue<T>(index);
 
 		/// <inheritdoc/>
-		public void CleanFrom(IDatabase dbCleanFrom) =>
-			this.InsertRange(FromDatabase(dbCleanFrom));
+		public bool TryGetValue<T>(T index, out ReaderPair value) =>
+			this._reader.TryGetValue<T>(index, out value);
 
 		/// <inheritdoc/>
-		public void DrainBuffer() =>
-			this._reader.DrainBuffer();
+		public IEnumerable<ReaderPair> GetMultipleByIndex<T>(T index) =>
+			this._reader.GetMultipleByIndex<T>(index);
 
 		/// <inheritdoc/>
 		public IEnumerator<ReaderPair> GetEnumerator() =>
@@ -65,30 +65,6 @@ namespace StringDB {
 		/// <inheritdoc/>
 		public ReaderPair First() =>
 			this._reader.First();
-
-		/// <inheritdoc/>
-		public ReaderPair GetByIndex(string index, out bool foundItem) =>
-			this._reader.GetByIndex(index ?? throw new ArgumentNullException(nameof(index)), out foundItem);
-
-		/// <inheritdoc/>
-		public IEnumerable<ReaderPair> GetMultipleByIndex(string index) =>
-			this._reader.GetMultipleByIndex(index ?? throw new ArgumentNullException(nameof(index)));
-
-		/// <inheritdoc/>
-		public void Dispose() {
-			this._writer = null;
-			this._reader = null;
-
-			this._stream.Flush();
-
-			if (this._disposeStream)
-				this._stream.Dispose();
-		}
-
-		private static IEnumerable<KeyValuePair<byte[], Stream>> FromDatabase(IDatabase other) {
-			foreach (var i in other)
-				yield return new KeyValuePair<byte[], Stream>(i.ByteArrayIndex, i.GetValueAs<Stream>());
-		}
 
 		/// <inheritdoc/>
 		public void Insert<T1, T2>(T1 index, T2 value)
@@ -106,6 +82,34 @@ namespace StringDB {
 		public void OverwriteValue<T>(ReaderPair replacePair, T newValue) {
 			this._writer.OverwriteValue(replacePair, newValue);
 			this._reader.DrainBuffer();
+		}
+
+		/// <inheritdoc/>
+		public void CleanTo(IDatabase dbCleanTo) =>
+			dbCleanTo.InsertRange(FromDatabase(this));
+
+		/// <inheritdoc/>
+		public void CleanFrom(IDatabase dbCleanFrom) =>
+			this.InsertRange(FromDatabase(dbCleanFrom));
+
+		/// <inheritdoc/>
+		public void DrainBuffer() =>
+			this._reader.DrainBuffer();
+
+		/// <inheritdoc/>
+		public void Dispose() {
+			this._writer = null;
+			this._reader = null;
+
+			this._stream.Flush();
+
+			if (this._disposeStream)
+				this._stream.Dispose();
+		}
+
+		private static IEnumerable<KeyValuePair<byte[], Stream>> FromDatabase(IDatabase other) {
+			foreach (var i in other)
+				yield return new KeyValuePair<byte[], Stream>(i.ByteArrayIndex, i.GetValueAs<Stream>());
 		}
 	}
 }
