@@ -2,107 +2,88 @@
 using StringDB.Reader;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace StringDB.Tester {
 
 	internal class Program {
+		private static KeyValuePair<byte[], byte[]> cache = new KeyValuePair<byte[], byte[]>(new byte[100], new byte[1000]);
+
+		public static IEnumerable<KeyValuePair<byte[], byte[]>> get() {
+			for (int i = 0; i < 1_000_000; i++)
+				yield return cache;
+		}
+
 		private static void Main() {
-			using(var db = Database.FromFile("Test.db")) {
-				db.InsertRange(new KeyValuePair<string, string>[] {
-					new KeyValuePair<string, string>("A", "AVALUE"),
-					new KeyValuePair<string, string>("B", "BVALUE")
-				});
 
-				db.Insert("lol", "ecks dee");
+			using (var db = Database.FromFile("struct.db")) {
 
-				foreach (var i in db) {
-					Console.WriteLine(i.ToString());
-					Console.WriteLine(i.GetValueAs<string>());
-					Console.WriteLine();
-					foreach (var j in i.GetValueAs<byte[]>()) Console.Write(Convert.ToChar(j));
-					Console.WriteLine();
-					Console.WriteLine();
+				var len = 0;
+				foreach (var i in db) len++;
 
+				if(len == 0)
+					db.InsertRange(get());
 
-					//Console.WriteLine(i.GetValueAs<byte[]>());
-					//Console.WriteLine(i.GetValueAs<Stream>());
-				}
+				Time(5_000, () => { }, () => { foreach (var i in db) { } }, () => { });
+				Time(5_000, () => { }, () => { foreach (var i in db) { i.GetValueAs<byte[]>(); } }, () => { });
+				Time(5_000, () => { }, () => { Parallel.ForEach(db, (i) => { }); }, () => { });
+				Time(5_000, () => { }, () => { Parallel.ForEach(db, (i) => { lock (db) { } }); }, () => { });
+				Time(5_000, () => { }, () => { Parallel.ForEach(db, (i) => { lock (db) { i.GetValueAs<byte[]>(); } }); }, () => { });
+
 			}
 
 			Console.ReadLine();
 		}
-	}
 
-	public static class GenerateItems {
-		public const int ItemsToInsert = 10_000;
+		private static void Time(int estTime, Action before, Action method, Action after) {
 
-		public const int MinIncome = 100;
-		public const int MaxIncome = 10_000;
+			var est = GetStopwatch(1, before, method, after);
+			var amt = 5_000 / (double)est.ElapsedMilliseconds;
 
-		public const int FriendsToGenerate = 20;
+			if (amt < 1)
+				amt = 1;
 
-		private static Random _random;
-		public static Random Rng => _random ?? (_random = new Random());
+			Console.WriteLine($"Beginning iteration amount: {amt}");
 
-		internal static int LastDatabaseIDGenerated = Rng.Next(0, int.MaxValue / 2);
+			var time = GetStopwatch((int)amt,
+				before, method, (() => { Console.Write('.'); after(); })
+			);
 
-		public static Database NewStringDB() => Database.FromFile(GenerateDatabaseName(LastDatabaseIDGenerated++));
+			Console.WriteLine($"Took {time.ElapsedMilliseconds} for {amt} operations ({(double)time.ElapsedMilliseconds / amt} est ms/op)");
 
-		public static string GenerateDatabaseName(int id) => $"{id}-stringdb.db";
+			//we want it to take estTime seconds
 
-		public static readonly string[] RandomNames = {
-			"Jimbo",
-			"Josh",
-			"Shelby",
-			"Kelly",
-			"Jimmy",
-			"John",
-			"Sarah",
-			"Hailee",
-			"Kevin",
-			"Alex",
-			"Elizabeth",
-			"Skyler"
-		};
+			var timeTaken = (double)estTime / ((double)time.ElapsedMilliseconds / amt);
 
-		public static string RandomName => RandomNames[Rng.Next(0, RandomNames.Length)];
+			if (timeTaken < 1)
+				timeTaken = 1;
 
-		//we are NOT using yield return because we will get random things *every time* we iterate over it
+			Console.WriteLine($"Repeating test {(int)timeTaken} times");
 
-		public static IEnumerable<Item> GetItems(int items) {
-			var res = new List<Item>();
+			var elapse = GetStopwatch((int)timeTaken,
+				before, method, after
+			);
 
-			for (var i = 0; i < items; i++) {
-				var usersName = RandomName;
-				res.Add(new Item {
-					Identifier = $"{i}.{usersName}",
-					Name = $"{usersName} {RandomName}",
-					Dollars = Rng.Next(GenerateItems.MinIncome, GenerateItems.MaxIncome),
-					Friends = GenerateFriends(GenerateItems.FriendsToGenerate).ToArray()
-				});
+			Console.WriteLine($"Iterations: {(int)timeTaken}\tTotal Elapsed MS: {elapse.ElapsedMilliseconds}\tPer Op: {(double)elapse.ElapsedMilliseconds / (double)(int)timeTaken}");
+		}
+
+		private static Stopwatch GetStopwatch(int times, Action before, Action method, Action after) {
+			var stp = new Stopwatch();
+
+			for (int i = 0; i < times; i++) {
+				before();
+
+				stp.Start();
+				method();
+				stp.Stop();
+
+				after();
 			}
 
-			return res;
-		}
-
-		public static IEnumerable<KeyValuePair<string, string>> GetItemsAsKVP(IEnumerable<Item> items) {
-			foreach (var i in items)
-				yield return new KeyValuePair<string, string>(i.Identifier, JsonConvert.SerializeObject(i));
-		}
-
-		public static IEnumerable<string> GenerateFriends(int amount) {
-			for (var i = 0; i < amount; i++)
-				yield return RandomName;
-		}
-
-		public class Item {
-			public string Identifier { get; set; }
-
-			public string Name { get; set; }
-			public int Dollars { get; set; }
-			public string[] Friends { get; set; }
+			return stp;
 		}
 	}
 }

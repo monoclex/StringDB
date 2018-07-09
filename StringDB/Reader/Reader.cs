@@ -12,7 +12,7 @@ namespace StringDB.Reader {
 		ReaderPair First();
 
 		/// <summary>Gets the ReaderPair responsible for a given index</summary>
-		ReaderPair GetByIndex(string index);
+		ReaderPair GetByIndex(string index, out bool foundItem);
 
 		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
 		IEnumerable<ReaderPair> GetMultipleByIndex(string index);
@@ -35,25 +35,29 @@ namespace StringDB.Reader {
 		/// <inheritdoc/>
 		public ReaderPair First() {
 			if (this._stream.Length <= 8)
-				return null;
+				return new ReaderPair(); // null;
 
 			var p = this._rawReader.ReadOn(Part.Start);
 
-			while (!(p is PartDataPair))
+			do
 				p = this._rawReader.ReadOn(p);
+			while (!(p is PartDataPair));
 
-			return new ReaderPair((PartDataPair)p, this._rawReader);
+			return ((PartDataPair)p).ToReaderPair(this._rawReader);
 		} /// <inheritdoc/>
 
-		public ReaderPair GetByIndex(string index) {
+		public ReaderPair GetByIndex(string index, out bool foundItem) {
 			// prevent the re-use of code
+
+			foundItem = true;
 
 			using (var enumer = this.GetMultipleByIndex(index).GetEnumerator()) {
 				if (enumer.MoveNext())
 					return enumer.Current;
 			}
 
-			return null;
+			foundItem = false;
+			return new ReaderPair(); // null;
 		} /// <inheritdoc/>
 
 		public IEnumerable<ReaderPair> GetMultipleByIndex(string index) {

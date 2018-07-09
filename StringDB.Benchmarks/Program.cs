@@ -1,7 +1,7 @@
 ﻿#define SETUP
-#define WRITER_TESTS
+//#define WRITER_TESTS
 #define READER_TESTS
-#define CLEAN_TESTS
+//#define CLEAN_TESTS
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Exporters;
@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace StringDB.Benchmarks {
 
@@ -110,8 +111,8 @@ namespace StringDB.Benchmarks {
 
 		[GlobalSetup]
 		public void SetupMethod() {
-			this.itemsToInsert = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.ItemsToInsert));
-			this.newInserts = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.ItemsToInsert));
+			this.itemsToInsert = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.ItemsToInsert)).ToList();
+			this.newInserts = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.ItemsToInsert)).ToList();
 
 			var count = 0;
 			foreach (var i in this.itemsToInsert) {
@@ -128,8 +129,6 @@ namespace StringDB.Benchmarks {
 					this._middle = i.Key;
 				c++;
 			}
-
-			Console.WriteLine($"Beginning, middle, end: {this._begin}, {this._middle}, {this._end}");
 		}
 
 		[IterationSetup]
@@ -182,6 +181,13 @@ namespace StringDB.Benchmarks {
 		}
 
 		[Benchmark]
+		public void IterateThroughEveryEntryAndReadValue() {
+			foreach (var i in this.stringdb) {
+				var t = i.GetValueAs<string>();
+			}
+		}
+
+		[Benchmark]
 		public void GetValueOfFirst() {
 			var t = this.stringdb.GetByIndex(this._begin).GetValueAs<string>();
 		}
@@ -197,10 +203,13 @@ namespace StringDB.Benchmarks {
 		}
 
 		[Benchmark]
-		public void IterateThroughEveryEntryAndReadValue() {
-			foreach (var i in this.stringdb) {
-				var t = i.GetValueAs<string>();
-			}
+		public void ParallelIterateThroughEveryEntry() {
+			Parallel.ForEach(this.stringdb, (i) => { });
+		}
+
+		[Benchmark]
+		public void ParallelIterateThroughEveryEntryAndReadValue() {
+			Parallel.ForEach(this.stringdb, (i) => { var t = i.GetValueAs<string>(); });
 		}
 
 #endif

@@ -22,10 +22,8 @@
 
 		public static Part Start { get; } = new Part(0x00, 8, 8);
 
-		/// <inheritdoc/>
-
-		public byte InitialByte { get; } /// <inheritdoc/>
-		public long Position { get; } /// <inheritdoc/>
+		public byte InitialByte { get; }
+		public long Position { get; }
 		public long NextPart { get; }
 	}
 
@@ -35,10 +33,10 @@
 			this.InitialByte = initByte;
 			this.Position = pos;
 			this.NextPart = nextPart;
-		} /// <inheritdoc/>
+		}
 
-		public byte InitialByte { get; } /// <inheritdoc/>
-		public long Position { get; } /// <inheritdoc/>
+		public byte InitialByte { get; }
+		public long Position { get; }
 		public long NextPart { get; }
 	}
 
@@ -48,21 +46,18 @@
 			this.InitialByte = initByte;
 			this.Position = pos;
 			this.NextPart = pos + sizeof(byte) + sizeof(long) + (long)initByte;
-			this._dataPos = dataPos;
-			this._indexName = indexName;
+			this.DataPosition = dataPos;
+			this.Index = indexName;
 		}
 
-		private long _dataPos { get; }
-		private byte[] _indexName { get; } /// <inheritdoc/>
+		public long DataPosition;
+		public byte[] Index;
 
-		public byte InitialByte { get; } /// <inheritdoc/>
-		public long Position { get; } /// <inheritdoc/>
+		public byte InitialByte { get; }
+		public long Position { get; }
 		public long NextPart { get; }
 
-		public byte[] Index
-			=> this._indexName;
-
-		public long DataPosition
-			=> this._dataPos;
+		public ReaderPair ToReaderPair(IRawReader rawReader)
+			=> new ReaderPair(this.DataPosition, this.Position, this.Index, rawReader);
 	}
 }

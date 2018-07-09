@@ -15,7 +15,7 @@ namespace StringDB.Reader {
 		private IPart _partOn;
 
 		/// <summary>What the current element is on.</summary>
-		public ReaderPair Current => new ReaderPair((PartDataPair)this._partOn, this._rawReader);
+		public ReaderPair Current => ((PartDataPair)this._partOn).ToReaderPair(this._rawReader);
 
 		object IEnumerator.Current => this.Current;
 

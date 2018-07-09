@@ -40,32 +40,41 @@ namespace StringDB {
 		private readonly bool _disposeStream;
 		private readonly Stream _stream;
 		private IReader _reader;
-		private IWriter _writer; /// <inheritdoc/>
+		private IWriter _writer;
 
+		/// <inheritdoc/>
 		public void CleanTo(IDatabase dbCleanTo) =>
-			dbCleanTo.InsertRange(FromDatabase(this)); /// <inheritdoc/>
+			dbCleanTo.InsertRange(FromDatabase(this));
 
+		/// <inheritdoc/>
 		public void CleanFrom(IDatabase dbCleanFrom) =>
-			this.InsertRange(FromDatabase(dbCleanFrom)); /// <inheritdoc/>
+			this.InsertRange(FromDatabase(dbCleanFrom));
 
+		/// <inheritdoc/>
 		public void DrainBuffer() =>
-			this._reader.DrainBuffer(); /// <inheritdoc/>
+			this._reader.DrainBuffer();
 
+		/// <inheritdoc/>
 		public IEnumerator<ReaderPair> GetEnumerator() =>
-			this._reader.GetEnumerator(); /// <inheritdoc/>
+			this._reader.GetEnumerator();
 
+		/// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() =>
-			this._reader.GetEnumerator(); /// <inheritdoc/>
+			this._reader.GetEnumerator();
 
+		/// <inheritdoc/>
 		public ReaderPair First() =>
-			this._reader.First(); /// <inheritdoc/>
+			this._reader.First();
 
-		public ReaderPair GetByIndex(string index) =>
-			this._reader.GetByIndex(index ?? throw new ArgumentNullException(nameof(index))); /// <inheritdoc/>
+		/// <inheritdoc/>
+		public ReaderPair GetByIndex(string index, out bool foundItem) =>
+			this._reader.GetByIndex(index ?? throw new ArgumentNullException(nameof(index)), out foundItem);
 
+		/// <inheritdoc/>
 		public IEnumerable<ReaderPair> GetMultipleByIndex(string index) =>
-			this._reader.GetMultipleByIndex(index ?? throw new ArgumentNullException(nameof(index))); /// <inheritdoc/>
+			this._reader.GetMultipleByIndex(index ?? throw new ArgumentNullException(nameof(index)));
 
+		/// <inheritdoc/>
 		public void Dispose() {
 			this._writer.Dispose();
 			this._writer = null;
@@ -84,12 +93,18 @@ namespace StringDB {
 		}
 
 		/// <inheritdoc/>
-		public void Insert<T1, T2>(T1 index, T2 value) => this._writer.Insert(index, value); /// <inheritdoc/>
+		public void Insert<T1, T2>(T1 index, T2 value)
+			=> this._writer.Insert(index, value);
+		
+		/// <inheritdoc/>
+		public void Insert<T1, T2>(KeyValuePair<T1, T2> kvp)
+			=> this._writer.Insert(kvp);
+		
+		/// <inheritdoc/>
+		public void InsertRange<T1, T2>(IEnumerable<KeyValuePair<T1, T2>> items)
+			=> this._writer.InsertRange(items);
 
-		public void Insert<T1, T2>(KeyValuePair<T1, T2> kvp) => this._writer.Insert(kvp); /// <inheritdoc/>
-
-		public void InsertRange<T1, T2>(IEnumerable<KeyValuePair<T1, T2>> items) => this._writer.InsertRange(items); /// <inheritdoc/>
-
+		/// <inheritdoc/>
 		public void OverwriteValue<T>(ReaderPair replacePair, T newValue) {
 			this._writer.OverwriteValue(replacePair, newValue);
 			this._reader.DrainBuffer();

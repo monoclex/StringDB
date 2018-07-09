@@ -88,10 +88,9 @@ namespace StringDB.Reader {
 
 		public T ReadDataAs<T>(long pos) {
 			this._stream.Seek(pos, SeekOrigin.Begin);
-			this._br.ReadByte();
-			var type = TypeManager.GetHandlerFor<T>();
-			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
-			var typeHandler = (type as TypeHandler<T>);
+			this._br.ReadByte(); // ignore identifier
+
+			var typeHandler = (TypeManager.GetHandlerFor<T>() as TypeHandler<T>);
 			return typeHandler.Read(this._br, TypeHandlerLengthManager.ReadLength(this._br));
 		}
 

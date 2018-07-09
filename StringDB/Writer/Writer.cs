@@ -39,12 +39,19 @@ namespace StringDB.Writer {
 		// lol if this isn't a wall of text i don't know what is
 
 		/// <inheritdoc/>
-		public void Insert<T1, T2>(T1 index, T2 value) => this.Insert(new KeyValuePair<T1, T2>(index, value)); /// <inheritdoc/>
+		public void Insert<T1, T2>(T1 index, T2 value)
+			=> this.Insert(new KeyValuePair<T1, T2>(index, value));
 
-		public void Insert<T1, T2>(KeyValuePair<T1, T2> kvp) => this.InsertRange(kvp.AsEnumerable()); /// <inheritdoc/>
+		/// <inheritdoc/>
+		public void Insert<T1, T2>(KeyValuePair<T1, T2> kvp)
+			=> this.InsertRange(kvp.AsEnumerable());
 
-		public void InsertRange<T1, T2>(IEnumerable<KeyValuePair<T1, T2>> items) => this._rawWriter.InsertRange<T1, T2>(TypeManager.GetHandlerFor<T1>(), TypeManager.GetHandlerFor<T2>(), items); /// <inheritdoc/>
+		/// <inheritdoc/>
+		public void InsertRange<T1, T2>(IEnumerable<KeyValuePair<T1, T2>> items)
+			=> this._rawWriter.InsertRange<T1, T2>(TypeManager.GetHandlerFor<T1>(), TypeManager.GetHandlerFor<T2>(), items);
 
-		public void OverwriteValue<T>(ReaderPair replacePair, T newValue) => this._rawWriter.OverwriteValue(TypeManager.GetHandlerFor<T>(), newValue, replacePair.ValueLength, replacePair._dp.DataPosition, replacePair._dp.Position + sizeof(byte));
+		/// <inheritdoc/>
+		public void OverwriteValue<T>(ReaderPair replacePair, T newValue)
+			=> this._rawWriter.OverwriteValue(TypeManager.GetHandlerFor<T>(), newValue, replacePair.ValueLength, replacePair._dataPos, replacePair._pos + sizeof(byte));
 	}
 }

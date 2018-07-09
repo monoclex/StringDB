@@ -29,7 +29,7 @@ namespace StringDB.DBTypes {
 				try {
 					GetHandlerFor(t.Id);
 					throw new TypeHandlerExists();
-				} catch (TypeHandlerDoesntExist _) {
+				} catch (TypeHandlerDoesntExist) {
 					TypeHandlers.Add(typeof(T), t);
 				}
 			}

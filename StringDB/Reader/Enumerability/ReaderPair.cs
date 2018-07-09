@@ -1,45 +1,43 @@
 ﻿namespace StringDB.Reader {
 
 	/// <summary>A pair of data - this correlates an index to it's corresponding value.</summary>
-	public class ReaderPair {
+	public struct ReaderPair {
 
-		internal ReaderPair(PartDataPair dp, IRawReader rawReader) {
-			this._dp = dp;
+		internal ReaderPair(long dataPos, long pos, byte[] index, IRawReader rawReader) {
 			this._rawReader = rawReader;
-
-			this._byteIndexCache = this._dp.Index;
+			this._dataPos = dataPos;
+			this._index = index;
+			this._pos = pos;
 		}
-
-		internal PartDataPair _dp { get; }
+		
 		private IRawReader _rawReader { get; }
-
-		internal byte[] _byteIndexCache { get; set; }
-		internal string _strIndexCache { get; set; } = null;
+		internal long _dataPos { get; }
+		internal long _pos { get; }
+		internal byte[] _index { get; }
 
 		/// <summary>Get the index as a byte array instead.</summary>
-		public byte[] ByteArrayIndex => this._byteIndexCache;
+		public byte[] ByteArrayIndex => this._index;
 
 		/// <summary>Whatever the index is.</summary>
-		public string Index => this._strIndexCache ?? (this._strIndexCache = this._dp.Index.GetString());
+		public string Index => this._index.GetString();
 
 		/// <summary>Read the data stored at the index as the type it was meant to be.</summary>
 		/// <remarks>See GetValueAs to try convert the value into the specified type.</remarks>
 		/// <typeparam name="T">The type of the data that is stored.</typeparam>
 		public T GetValue<T>()
-			=> this._rawReader.ReadData<T>(this._dp.DataPosition);
+			=> this._rawReader.ReadData<T>(this._dataPos);
 
 		/// <summary>Read the data stored at the index and ignore the type it should be, and try to convert it.</summary>
 		/// <typeparam name="T">The type you want it to be.</typeparam>
 		public T GetValueAs<T>()
-			=> this._rawReader.ReadDataAs<T>(this._dp.DataPosition);
+			=> this._rawReader.ReadDataAs<T>(this._dataPos);
 
 		/// <summary>Get how long the value is without reading it into memory.</summary>
 		public long ValueLength
-			=> this._rawReader.ReadLength(this._dp.DataPosition);
+			=> this._rawReader.ReadLength(this._dataPos);
 
 		/// <summary>A simple string form of the item.</summary>
-		/// <returns>[index, value]</returns>
 		public override string ToString() =>
-			$"[{this.Index}, {this.ValueLength} bytes]";
+			$"[\"{this.Index}\", Identifier 0x{this._rawReader.ReadType(this._dataPos).Id.ToString("x2")}, \"{this.ValueLength} bytes\"]";
 	}
 }
