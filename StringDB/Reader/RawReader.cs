@@ -15,6 +15,8 @@ namespace StringDB.Reader {
 
 		T ReadDataAs<T>(long pos);
 
+		T ReadDataAs<T>(long pos, long len);
+
 		long ReadLength(long pos);
 
 		ITypeHandler ReadType(long pos);
@@ -37,7 +39,9 @@ namespace StringDB.Reader {
 
 		private long _bufferReadPos = MinusBufferSize; //the position we read the buffer at in the filestream
 		private int _bufferPos = MinusBufferSize; //the position within the buffer
-		private readonly byte[] _bufferRead = new byte[BufferSize];
+		private byte[] _bufferRead = new byte[BufferSize];
+
+		private byte[] _oneByteBuffer = new byte[1];
 
 		public IPart ReadAt(long pos) {
 #if THREAD_SAFE
@@ -87,16 +91,23 @@ namespace StringDB.Reader {
 		}
 
 		public T ReadDataAs<T>(long pos) {
-			this._stream.Seek(pos); // seek to the data and ignore the type identifier
-			this._br.ReadByte();
+			return GetTypeHandlerAs<T>(pos).Read(this._br); // read the data
+		}
 
-			var typeHandler = (TypeManager.GetHandlerFor<T>() as TypeHandler<T>); // get the type handler for T
-			return typeHandler.Read(this._br); // read the data
+		public T ReadDataAs<T>(long pos, long len) {
+			return GetTypeHandlerAs<T>(pos).Read(this._br, len); // read the data
+		}
+
+		private TypeHandler<T> GetTypeHandlerAs<T>(long pos) {
+			this._stream.Seek(pos); // seek to the data and ignore the type identifier
+			this._stream.Read(this._oneByteBuffer, 0, 1);
+
+			return (TypeManager.GetHandlerFor<T>() as TypeHandler<T>); // get the type handler for T
 		}
 
 		public long ReadLength(long pos) {
 			this._stream.Seek(pos); // seek to the data and ignore the type
-			this._br.ReadByte();
+			this._stream.Read(this._oneByteBuffer, 0, 1);
 
 			return TypeHandlerLengthManager.ReadLength(this._br); // read the length of the data
 		}

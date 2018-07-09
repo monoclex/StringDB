@@ -110,6 +110,7 @@ namespace StringDB.Benchmarks {
 		}
 
 		[Benchmark]
+
 		public void IterateThroughEveryEntryAndReadValue() {
 			foreach (var i in this.stringdb) {
 				var t = i.GetValueAs<string>();
@@ -163,7 +164,7 @@ namespace StringDB.Benchmarks {
 	}
 
 	public static class GenerateItems {
-		public const int ItemsToInsert = 100_000;
+		public const int ItemsToInsert = 10_000;
 
 		public const int MinIncome = 1_000;
 		public const int MaxIncome = 10_000;

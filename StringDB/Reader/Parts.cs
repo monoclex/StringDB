@@ -58,6 +58,6 @@
 		public long NextPart { get; }
 
 		public ReaderPair ToReaderPair(IRawReader rawReader)
-			=> new ReaderPair(this.DataPosition, this.Position, this.Index, rawReader);
+			=> new ReaderPair(this.DataPosition, this.Position, this.Index, this.InitialByte, rawReader);
 	}
 }

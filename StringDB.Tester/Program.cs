@@ -18,21 +18,17 @@ namespace StringDB.Tester {
 
 		private static void Main() {
 
-			using (var db = Database.FromFile("struct.db")) {
+			using (var db = Database.FromFile("struc2t.db")) {
 
-				var _ = db.GetValue(1337);
+				//var len = 0;
+				//foreach (var i in db) len++;
 
-				var len = 0;
-				foreach (var i in db) len++;
+				//if(len == 0)
+				//	db.InsertRange(GetSampleData());
 
-				if(len == 0)
-					db.InsertRange(GetSampleData());
-
-				Time(5_000, () => { }, () => { foreach (var i in db) { } }, () => { });
-				Time(5_000, () => { }, () => { foreach (var i in db) { i.GetValueAs<byte[]>(); } }, () => { });
-				Time(5_000, () => { }, () => { Parallel.ForEach(db, (i) => { }); }, () => { });
-				Time(5_000, () => { }, () => { Parallel.ForEach(db, (i) => { lock (db) { } }); }, () => { });
-				Time(5_000, () => { }, () => { Parallel.ForEach(db, (i) => { lock (db) { i.GetValueAs<byte[]>(); } }); }, () => { });
+				db.Insert("im", "gay");
+				var val = db.GetValue("im");
+				Console.WriteLine(val.GetValueAs<string>());
 
 			}
 

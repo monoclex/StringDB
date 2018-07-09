@@ -3,7 +3,8 @@
 	/// <summary>A pair of data - this correlates an index to it's corresponding value.</summary>
 	public struct ReaderPair {
 
-		internal ReaderPair(long dataPos, long pos, byte[] index, IRawReader rawReader) {
+		internal ReaderPair(long dataPos, long pos, byte[] index, byte identifier, IRawReader rawReader) {
+			this._identifier = identifier;
 			this._rawReader = rawReader;
 			this._dataPos = dataPos;
 			this._index = index;
@@ -14,6 +15,7 @@
 		internal long _dataPos { get; }
 		internal long _pos { get; }
 		internal byte[] _index { get; }
+		internal byte _identifier { get; }
 
 		/// <summary>Get the index as a byte array instead.</summary>
 		public byte[] ByteArrayIndex => this._index;
@@ -24,7 +26,7 @@
 		/// <summary>Get the index as any type the TypeHandler can handle.</summary>
 		/// <typeparam name="T">The type to read the index as.</typeparam>
 		public T GetIndexAs<T>()
-			=> this._rawReader.ReadDataAs<T>(this._pos + sizeof(long));
+			=> this._rawReader.ReadDataAs<T>(this._pos + sizeof(long), (long)this._identifier);
 
 		/// <summary>Read the data stored at the index as the type it was meant to be.</summary>
 		/// <remarks>See GetValueAs to try convert the value into the specified type.</remarks>
