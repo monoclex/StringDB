@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace StringDB.Reader {
 
 	/// <summary>Used to enumerate over a StringDB.</summary>
-	public class ReaderEnumerator : IEnumerator<ReaderPair> {
+	internal class ReaderEnumerator : IEnumerator<IReaderPair> {
 
 		internal ReaderEnumerator(IRawReader rawReader) {
 			this._rawReader = rawReader;
@@ -15,7 +15,7 @@ namespace StringDB.Reader {
 		private IPart _partOn;
 
 		/// <summary>What the current element is on.</summary>
-		public ReaderPair Current => ((PartDataPair)this._partOn).ToReaderPair(this._rawReader);
+		public IReaderPair Current => ((PartDataPair)this._partOn).ToReaderPair(this._rawReader);
 
 		object IEnumerator.Current => this.Current;
 

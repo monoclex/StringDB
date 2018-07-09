@@ -20,7 +20,7 @@ namespace StringDB.Reader {
 		long ReadLength(long pos);
 
 		ITypeHandler ReadType(long pos);
-		
+
 		void DrainBuffer();
 	}
 
@@ -90,13 +90,9 @@ namespace StringDB.Reader {
 			return typeHandler.Read(this._br);
 		}
 
-		public T ReadDataAs<T>(long pos) {
-			return GetTypeHandlerAs<T>(pos).Read(this._br); // read the data
-		}
+		public T ReadDataAs<T>(long pos) => GetTypeHandlerAs<T>(pos).Read(this._br); // read the data
 
-		public T ReadDataAs<T>(long pos, long len) {
-			return GetTypeHandlerAs<T>(pos).Read(this._br, len); // read the data
-		}
+		public T ReadDataAs<T>(long pos, long len) => GetTypeHandlerAs<T>(pos).Read(this._br, len); // read the data
 
 		private TypeHandler<T> GetTypeHandlerAs<T>(long pos) {
 			this._stream.Seek(pos); // seek to the data and ignore the type identifier

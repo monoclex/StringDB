@@ -8,19 +8,19 @@ using System.IO;
 namespace StringDB.Reader {
 
 	/// <summary>Defines a reader. Use it to read out data</summary>
-	public interface IReader : IEnumerable<ReaderPair> {
+	public interface IReader : IEnumerable<IReaderPair> {
 
 		/// <summary>Gets the very first element in the database</summary>
-		ReaderPair First();
+		IReaderPair First();
 
 		/// <summary>Gets the ReaderPair responsible for a given index</summary>
-		ReaderPair Get<T>(T index);
+		IReaderPair Get<T>(T index);
 
 		/// <summary>Attempts to get the ReaderPair</summary>
-		bool TryGetValue<T>(T index, out ReaderPair value);
+		bool TryGet<T>(T index, out IReaderPair value);
 
 		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
-		IEnumerable<ReaderPair> GetMultipleByIndex<T>(T index);
+		IEnumerable<IReaderPair> GetAll<T>(T index);
 
 		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
 		void DrainBuffer();
@@ -38,7 +38,7 @@ namespace StringDB.Reader {
 		private readonly IRawReader _rawReader;
 
 		/// <inheritdoc/>
-		public ReaderPair First() {
+		public IReaderPair First() {
 			if (this._stream.Length <= 8)
 				return default(ReaderPair); // newly created DBs have nothing
 
@@ -51,10 +51,10 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
-		public ReaderPair Get<T>(T index) {
+		public IReaderPair Get<T>(T index) {
 			// prevent the re-use of code
 
-			using (var enumer = this.GetMultipleByIndex(index).GetEnumerator()) { // loop through the multiple found
+			using (var enumer = this.GetAll(index).GetEnumerator()) { // loop through the multiple found
 				if (enumer.MoveNext()) {
 					return enumer.Current; // return the first one of the ones we found
 				}
@@ -64,10 +64,10 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
-		public bool TryGetValue<T>(T index, out ReaderPair value) {
+		public bool TryGet<T>(T index, out IReaderPair value) {
 			// prevent the re-use of code
 
-			using (var enumer = this.GetMultipleByIndex(index).GetEnumerator()) { // loop through the multiple found
+			using (var enumer = this.GetAll(index).GetEnumerator()) { // loop through the multiple found
 				if (enumer.MoveNext()) {
 					value = enumer.Current;
 					return true; // return the first one
@@ -81,7 +81,7 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
-		public IEnumerable<ReaderPair> GetMultipleByIndex<T>(T index) {
+		public IEnumerable<IReaderPair> GetAll<T>(T index) {
 			if (this._stream.Length <= 8) // newly created DBs
 				yield break;
 
@@ -93,7 +93,7 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
-		public IEnumerator<ReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader);
+		public IEnumerator<IReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader);
 
 		/// <inheritdoc/>
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();

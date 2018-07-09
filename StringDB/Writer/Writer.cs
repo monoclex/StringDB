@@ -19,7 +19,7 @@ namespace StringDB.Writer {
 		void InsertRange<T1, T2>(IEnumerable<KeyValuePair<T1, T2>> items);
 
 		/// <summary>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</summary>
-		void OverwriteValue<T>(Reader.ReaderPair replacePair, T newValue);
+		void OverwriteValue<T>(IReaderPair replacePair, T newValue);
 	}
 
 	/// <inheritdoc/>
@@ -46,7 +46,7 @@ namespace StringDB.Writer {
 			=> this._rawWriter.InsertRange<T1, T2>(TypeManager.GetHandlerFor<T1>(), TypeManager.GetHandlerFor<T2>(), items);
 
 		/// <inheritdoc/>
-		public void OverwriteValue<T>(ReaderPair replacePair, T newValue)
-			=> this._rawWriter.OverwriteValue<T>(TypeManager.GetHandlerFor<T>(), newValue, replacePair.ValueLength, replacePair._dataPos, replacePair._pos + sizeof(byte));
+		public void OverwriteValue<T>(IReaderPair replacePair, T newValue)
+			=> this._rawWriter.OverwriteValue<T>(TypeManager.GetHandlerFor<T>(), newValue, replacePair.ValueLength, replacePair.DataPosition, replacePair.Position + sizeof(byte));
 	}
 }

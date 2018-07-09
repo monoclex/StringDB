@@ -43,19 +43,19 @@ namespace StringDB {
 		private IWriter _writer;
 
 		/// <inheritdoc/>
-		public ReaderPair Get<T>(T index) =>
+		public IReaderPair Get<T>(T index) =>
 			this._reader.Get<T>(index);
 
 		/// <inheritdoc/>
-		public bool TryGetValue<T>(T index, out ReaderPair value) =>
-			this._reader.TryGetValue<T>(index, out value);
+		public bool TryGet<T>(T index, out IReaderPair value) =>
+			this._reader.TryGet<T>(index, out value);
 
 		/// <inheritdoc/>
-		public IEnumerable<ReaderPair> GetMultipleByIndex<T>(T index) =>
-			this._reader.GetMultipleByIndex<T>(index);
+		public IEnumerable<IReaderPair> GetAll<T>(T index) =>
+			this._reader.GetAll<T>(index);
 
 		/// <inheritdoc/>
-		public IEnumerator<ReaderPair> GetEnumerator() =>
+		public IEnumerator<IReaderPair> GetEnumerator() =>
 			this._reader.GetEnumerator();
 
 		/// <inheritdoc/>
@@ -63,7 +63,7 @@ namespace StringDB {
 			this._reader.GetEnumerator();
 
 		/// <inheritdoc/>
-		public ReaderPair First() =>
+		public IReaderPair First() =>
 			this._reader.First();
 
 		/// <inheritdoc/>
@@ -79,7 +79,7 @@ namespace StringDB {
 			=> this._writer.InsertRange(items);
 
 		/// <inheritdoc/>
-		public void OverwriteValue<T>(ReaderPair replacePair, T newValue) {
+		public void OverwriteValue<T>(IReaderPair replacePair, T newValue) {
 			this._writer.OverwriteValue(replacePair, newValue);
 			this._reader.DrainBuffer(); // drain the buffer on an overwrite so the reader will update it's buffer to read the latest data that's just been inserted
 		}

@@ -135,7 +135,7 @@ namespace StringDB.Benchmarks {
 		[Benchmark]
 		public void CleanFromDatabase() {
 			//TODO: remove new StringDb and generate database name from the benchmark
-			
+
 			using (var db = GenerateItems.NewStringDB()) {
 				db.CleanFrom(this.stringdb);
 			}
@@ -144,7 +144,7 @@ namespace StringDB.Benchmarks {
 		[Benchmark]
 		public void CleanToDatabase() {
 			//TODO: remove new StringDb and generate database name from the benchmark
-			
+
 			using (var db = GenerateItems.NewStringDB()) {
 				this.stringdb.CleanTo(db);
 			}
@@ -184,7 +184,7 @@ namespace StringDB.Benchmarks {
 
 		public static string RandomName => RandomNames[Rng.Next(0, RandomNames.Length)];
 
-		// yield + ToList = works
+		// running a yield and a ToList = works
 
 		public static IEnumerable<Item> GetItems(int items) {
 			for (var i = 0; i < items; i++) {

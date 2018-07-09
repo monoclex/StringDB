@@ -19,11 +19,17 @@ namespace StringDB.Tester {
 		private static void Main() {
 
 
-			using (var db = Database.FromFile("str3wruc2t.db")) {
+			using (var db = ThreadSafeDatabase.FromDatabase(Database.FromFile("testdb.db"))) {
 
-				Time(30_000, () => { }, () => {
-					db.Insert("BLUE", "IM");
-				}, () => { });
+				Parallel.For(0, 100_000, (i) => {
+					db.Insert("EEE", "AAA");
+				});
+
+				Console.WriteLine("for loop done");
+
+				Parallel.ForEach(db, (i) => {
+					Console.WriteLine(i.ToString());
+				});
 
 			}
 
@@ -83,9 +89,7 @@ namespace StringDB.Tester {
 		}
 	}
 
-	public static class helper {
-
-
+	public static class Helper {
 		public static IEnumerable<T> AsEnumerable<T>(this T item) {
 			yield return item;
 		}
