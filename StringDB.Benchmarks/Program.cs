@@ -68,13 +68,9 @@ namespace StringDB.Benchmarks {
 
 		[IterationCleanup]
 		public void IterationCleanup() {
-			this.lastdb = GenerateItems.LastDatabaseIDGenerated;
-
 			try {
 				if (this.stringdb != null)
 					this.stringdb.Dispose();
-
-				File.Delete(GenerateItems.GenerateDatabaseName(this.lastdb));
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 			}
@@ -139,24 +135,19 @@ namespace StringDB.Benchmarks {
 		[Benchmark]
 		public void CleanFromDatabase() {
 			//TODO: remove new StringDb and generate database name from the benchmark
-
-			var clean = GenerateItems.LastDatabaseIDGenerated;
+			
 			using (var db = GenerateItems.NewStringDB()) {
 				db.CleanFrom(this.stringdb);
 			}
-			File.Delete(GenerateItems.GenerateDatabaseName(clean));
 		}
 
 		[Benchmark]
 		public void CleanToDatabase() {
 			//TODO: remove new StringDb and generate database name from the benchmark
-
-			var clean = GenerateItems.LastDatabaseIDGenerated;
+			
 			using (var db = GenerateItems.NewStringDB()) {
 				this.stringdb.CleanTo(db);
 			}
-
-			File.Delete(GenerateItems.GenerateDatabaseName(clean));
 		}
 
 #endif
@@ -164,7 +155,7 @@ namespace StringDB.Benchmarks {
 	}
 
 	public static class GenerateItems {
-		public const int ItemsToInsert = 10_000;
+		public const int ItemsToInsert = 100_000;
 
 		public const int MinIncome = 1_000;
 		public const int MaxIncome = 10_000;
@@ -174,11 +165,7 @@ namespace StringDB.Benchmarks {
 		private static Random _random;
 		public static Random Rng => _random ?? (_random = new Random());
 
-		internal static int LastDatabaseIDGenerated = Rng.Next(0, int.MaxValue / 2);
-
-		public static Database NewStringDB() => Database.FromFile(GenerateDatabaseName(LastDatabaseIDGenerated++));
-
-		public static string GenerateDatabaseName(int id) => $"{id}-stringdb.db";
+		public static Database NewStringDB() => Database.FromStream(new MemoryStream(), true);
 
 		public static readonly string[] RandomNames = {
 			"Jimbo",

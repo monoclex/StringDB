@@ -18,43 +18,12 @@ namespace StringDB.Tester {
 
 		private static void Main() {
 
-			using (var newdb = Database.FromFile("example.db")) {
-				newdb.InsertRange(new List<KeyValuePair<string, string>>() {
-					new KeyValuePair<string, string>("INDEX_1", "VALUE_FOR_INDEX_1"),
-					new KeyValuePair<string, string>("INDEX_2", "VALUE_FOR_INDEX_2"),
-				});
-				newdb.InsertRange(new List<KeyValuePair<string, string>>() {
-					new KeyValuePair<string, string>("INDEX_3", "VALUE_FOR_INDEX_3"),
-					new KeyValuePair<string, string>("INDEX_4", "VALUE_FOR_INDEX_4"),
-				});
 
-				newdb.OverwriteValue(newdb.Get("INDEX_3"), "new value for the index at pos 3");
+			using (var db = Database.FromFile("str3wruc2t.db")) {
 
-				Console.WriteLine(newdb.Get("INDEX_3").GetValueAs<string>());
-
-				foreach (var i in newdb)
-					Console.WriteLine(i);
-			}
-
-			Console.ReadLine();
-
-			using (var db = Database.FromFile("struc2t.db")) {
-
-				db.Insert("BLUE", "IM");
-				db.OverwriteValue(db.Get("BLUE"), "I'M");
-				Console.WriteLine(db.Get("BLUE").GetValueAs<string>());
-
-				Console.ReadLine();
-
-				//var len = 0;
-				//foreach (var i in db) len++;
-
-				//if(len == 0)
-				//	db.InsertRange(GetSampleData());
-
-				db.Insert("im", "gay");
-				var val = db.Get("im");
-				Console.WriteLine(val.GetValueAs<string>());
+				Time(30_000, () => { }, () => {
+					db.Insert("BLUE", "IM");
+				}, () => { });
 
 			}
 
@@ -111,6 +80,14 @@ namespace StringDB.Tester {
 			}
 
 			return stp;
+		}
+	}
+
+	public static class helper {
+
+
+		public static IEnumerable<T> AsEnumerable<T>(this T item) {
+			yield return item;
 		}
 	}
 }
