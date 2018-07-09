@@ -81,7 +81,7 @@ namespace StringDB {
 		/// <inheritdoc/>
 		public void OverwriteValue<T>(ReaderPair replacePair, T newValue) {
 			this._writer.OverwriteValue(replacePair, newValue);
-			this._reader.DrainBuffer();
+			this._reader.DrainBuffer(); // drain the buffer on an overwrite so the reader will update it's buffer to read the latest data that's just been inserted
 		}
 
 		/// <inheritdoc/>

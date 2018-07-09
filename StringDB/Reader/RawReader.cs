@@ -18,8 +18,7 @@ namespace StringDB.Reader {
 		long ReadLength(long pos);
 
 		ITypeHandler ReadType(long pos);
-
-		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
+		
 		void DrainBuffer();
 	}
 
@@ -46,22 +45,22 @@ namespace StringDB.Reader {
 #endif
 			BufferSeek(pos);
 
-			var p = this.ReadBytes(9); //set the important values right NOW, since later the buffer can chnage and screw things up.
-			var importantByte = this._bufferRead[p]; //set these variables incase the buffer changes later when reading more bytes
-			var intVal = BitConverter.ToInt64(this._bufferRead, p + 1);
+			var p = this.ReadBytes(9); // read the length, and the data pos
+			var importantByte = this._bufferRead[p]; // store the index type incase the buffer updates
+			var intVal = BitConverter.ToInt64(this._bufferRead, p + 1); // use BitConverter to get it as a long
 
-			if (importantByte == Consts.IndexSeperator) {
+			if (importantByte == Consts.IndexSeperator) { // if it's an index seperator
 				return
-					intVal == 0 ?
+					intVal == 0 ? // if it goes to 0, we know we've hit the end of the DB.
 					(IPart)null
 					: new PartIndexChain(importantByte, pos, intVal);
 			} else {
-				if (importantByte == Consts.NoIndex) return null;
+				if (importantByte == Consts.NoIndex) return null; // if the index length is 0, we know we've probably hit the end of the DB as well.
 
-				var val_pos = this.ReadBytes(importantByte);
+				var val_pos = this.ReadBytes(importantByte); // read the length of the index
 				var val = new byte[importantByte];
 
-				for (var i = 0; i < val.Length; i++)
+				for (var i = 0; i < val.Length; i++) // loop through the buffer and read bytes ( safe because buffer is larger then Consts.MaxLength )
 					val[i] = this._bufferRead[val_pos + i];
 
 				return new PartDataPair(importantByte, pos, intVal, val);
@@ -71,38 +70,40 @@ namespace StringDB.Reader {
 #endif
 		}
 
-		public IPart ReadOn(IPart previous) =>
-			!(previous is PartIndexChain) ?
+		public IPart ReadOn(IPart previous) => // only read on if the next part can be found
+			previous.NextPart != 0 ?
 				this.ReadAt(previous.NextPart)
-				: !(previous.NextPart == 0) ?
-					this.ReadAt(previous.NextPart)
-					: null;
+				: null;
 
 		public T ReadData<T>(long pos) {
-			this._stream.Seek(pos, SeekOrigin.Begin);
-			var type = ReadType(pos);
+			var type = ReadType(pos); // get the proper type handler
+
+			// throw an exception if we're reading the wrong type
 			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
+
+			// read it properly
 			var typeHandler = (type as TypeHandler<T>);
-			return typeHandler.Read(this._br, TypeHandlerLengthManager.ReadLength(this._br));
+			return typeHandler.Read(this._br);
 		}
 
 		public T ReadDataAs<T>(long pos) {
-			this._stream.Seek(pos, SeekOrigin.Begin);
-			this._br.ReadByte(); // ignore identifier
+			this._stream.Seek(pos); // seek to the data and ignore the type identifier
+			this._br.ReadByte();
 
-			var typeHandler = (TypeManager.GetHandlerFor<T>() as TypeHandler<T>);
-			return typeHandler.Read(this._br, TypeHandlerLengthManager.ReadLength(this._br));
+			var typeHandler = (TypeManager.GetHandlerFor<T>() as TypeHandler<T>); // get the type handler for T
+			return typeHandler.Read(this._br); // read the data
 		}
 
 		public long ReadLength(long pos) {
-			this._stream.Seek(pos, SeekOrigin.Begin);
+			this._stream.Seek(pos); // seek to the data and ignore the type
 			this._br.ReadByte();
-			return TypeHandlerLengthManager.ReadLength(this._br);
+
+			return TypeHandlerLengthManager.ReadLength(this._br); // read the length of the data
 		}
 
 		public ITypeHandler ReadType(long pos) {
-			this._stream.Seek(pos, SeekOrigin.Begin);
-			return TypeManager.GetHandlerFor(this._br.ReadByte());
+			this._stream.Seek(pos); // seek to the position
+			return TypeManager.GetHandlerFor(this._br.ReadByte()); // get the handler for the type of data
 		}
 
 		public void DrainBuffer() {

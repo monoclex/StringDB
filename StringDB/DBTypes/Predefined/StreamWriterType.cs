@@ -15,18 +15,18 @@ namespace StringDB.DBTypes.Predefined {
 			=> new StreamFragment(br.BaseStream, br.BaseStream.Position, len);
 
 		public override bool Compare(Stream item1, Stream item2) {
-			var s1p = item1.Position;
+			var s1p = item1.Position; // store the position
 			var s2p = item2.Position;
 
 			int ia, ib;
 			bool success;
 
 			do {
-				ia = item1.ReadByte();
-				ib = item2.ReadByte();
-			} while (success = (ia == ib));
+				ia = item1.ReadByte(); // while both of these equal eachother
+				ib = item2.ReadByte(); // and while it's not the end of the stream
+			} while (success = (ia == ib) && ia != -1);
 
-			item1.Seek(s1p, SeekOrigin.Begin);
+			item1.Seek(s1p, SeekOrigin.Begin); // seek back to the beginning
 			item2.Seek(s2p, SeekOrigin.Begin);
 
 			return success;

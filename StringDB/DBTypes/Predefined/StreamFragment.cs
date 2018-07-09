@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace StringDB.DBTypes {
+namespace StringDB.DBTypes.Predefined {
 
 	internal class StreamFragment : Stream {
 

@@ -22,10 +22,8 @@ namespace StringDB.Reader {
 		/// <summary>Retireves the next element in the sequence</summary>
 		/// <returns>True if there is an element, false if there isn't.</returns>
 		public bool MoveNext() {
-			this._partOn = this._rawReader.ReadOn(this._partOn);
-
-			while (this._partOn != null && (this._partOn is PartIndexChain)) //we don't want index chains lol
-				this._partOn = this._rawReader.ReadOn(this._partOn);
+			do this._partOn = this._rawReader.ReadOn(this._partOn); // read the data
+			while (this._partOn != null && (this._partOn is PartIndexChain)); // as long as it isn't null or an index chain
 
 			return this._partOn != null;
 		}

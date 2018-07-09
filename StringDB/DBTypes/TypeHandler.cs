@@ -44,10 +44,10 @@ namespace StringDB.DBTypes {
 
 	internal static class TypeHandlerLengthManager {
 
-		public static void WriteLength(BinaryWriter bw, long len) {
-			if (len <= byte.MaxValue) {
-				bw.Write(Consts.IsByteValue);
-				bw.Write((byte)len);
+		public static void WriteLength(BinaryWriter bw, long len) { // write out the length
+			if (len <= byte.MaxValue) { // depending on the length
+				bw.Write(Consts.IsByteValue); // write the identifier for it
+				bw.Write((byte)len); // and the length
 			} else if (len <= ushort.MaxValue) {
 				bw.Write(Consts.IsUShortValue);
 				bw.Write((ushort)len);
@@ -60,7 +60,7 @@ namespace StringDB.DBTypes {
 			}
 		}
 
-		public static long ReadLength(BinaryReader br) {
+		public static long ReadLength(BinaryReader br) { // read the length depending on the identifier
 			switch (br.ReadByte()) {
 				case Consts.IsByteValue:
 				return br.ReadByte();
@@ -78,7 +78,7 @@ namespace StringDB.DBTypes {
 			}
 		}
 
-		internal static long EstimateWriteLengthSize(long len) {
+		internal static long EstimateWriteLengthSize(long len) { // estimate how big in bytes a WriteLength would be with a given length
 			const int length = sizeof(byte) + sizeof(byte);
 
 			return len <= byte.MaxValue ?

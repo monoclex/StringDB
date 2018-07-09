@@ -40,12 +40,11 @@ namespace StringDB.Reader {
 		/// <inheritdoc/>
 		public ReaderPair First() {
 			if (this._stream.Length <= 8)
-				return new ReaderPair(); // null;
+				return default(ReaderPair); // newly created DBs have nothing
 
-			var p = this._rawReader.ReadOn(Part.Start);
+			var p = this._rawReader.ReadOn(Part.Start); // read on from the start
 
-			do
-				p = this._rawReader.ReadOn(p);
+			do p = this._rawReader.ReadOn(p); //read on while it's not a datapair
 			while (!(p is PartDataPair));
 
 			return ((PartDataPair)p).ToReaderPair(this._rawReader);
@@ -55,9 +54,9 @@ namespace StringDB.Reader {
 		public ReaderPair GetValue<T>(T index) {
 			// prevent the re-use of code
 
-			using (var enumer = this.GetMultipleByIndex(index).GetEnumerator()) {
+			using (var enumer = this.GetMultipleByIndex(index).GetEnumerator()) { // loop through the multiple found
 				if (enumer.MoveNext()) {
-					return enumer.Current;
+					return enumer.Current; // return the first one of the ones we found
 				}
 			}
 
@@ -68,12 +67,14 @@ namespace StringDB.Reader {
 		public bool TryGetValue<T>(T index, out ReaderPair value) {
 			// prevent the re-use of code
 
-			using (var enumer = this.GetMultipleByIndex(index).GetEnumerator()) {
+			using (var enumer = this.GetMultipleByIndex(index).GetEnumerator()) { // loop through the multiple found
 				if (enumer.MoveNext()) {
 					value = enumer.Current;
-					return true;
+					return true; // return the first one
 				}
 			}
+
+			// couldn't find anything
 
 			value = default(ReaderPair);
 			return false;
@@ -81,13 +82,13 @@ namespace StringDB.Reader {
 
 		/// <inheritdoc/>
 		public IEnumerable<ReaderPair> GetMultipleByIndex<T>(T index) {
-			if (this._stream.Length <= 8)
+			if (this._stream.Length <= 8) // newly created DBs
 				yield break;
 
 			var typeHandler = TypeManager.GetHandlerFor<T>();
 
-			foreach (var i in this)
-				if (typeHandler.Compare(index, i.GetIndexAs<T>()))
+			foreach (var i in this) // for every ReaderPair we got
+				if (typeHandler.Compare(index, i.GetIndexAs<T>())) // compare thats one's index with this one's index
 					yield return i;
 		}
 

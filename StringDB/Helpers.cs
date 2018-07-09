@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StringDB.DBTypes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -7,10 +8,10 @@ namespace StringDB {
 
 	internal static class Helpers {
 
-		public static byte[] GetBytes(this string s) =>
+		public static byte[] GetBytes(this string s) => // convert a string to bytes
 			Encoding.UTF8.GetBytes(s ?? throw new ArgumentNullException(nameof(s), "A key or value was probably null, can you check?"));
 
-		public static string GetString(this byte[] b) =>
+		public static string GetString(this byte[] b) => // convert bytes to a string
 			Encoding.UTF8.GetString(b ?? throw new ArgumentNullException(nameof(b), "A key or value was probably null, can you check?"));
 
 		public static IEnumerable<T> AsEnumerable<T>(this T item) { // make a single item enumberable ;D
@@ -19,6 +20,9 @@ namespace StringDB {
 
 		public static void Seek(this Stream s, long p)
 			=> s.Seek(p, SeekOrigin.Begin);
+
+		public static T Read<T>(this TypeHandler<T> typeHandler, BinaryReader br)
+			=> typeHandler.Read(br, TypeHandlerLengthManager.ReadLength(br));
 
 		//  ___
 		// /. .\

@@ -47,22 +47,22 @@ namespace StringDB.Writer {
 		private long _indexChainReplace;
 
 		public void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps) {
-			var pos = this._lastStreamLength;
+			var pos = this._lastStreamLength; // get the length of the stream
 
-			if (this._lastStreamLength < 8) {
+			if (this._lastStreamLength < 8) { // handle a newly created database
 				this._s.Seek(0);
 				this._bw.Write(0L);
 				pos = sizeof(long);
 			} else this._s.Seek(this._lastStreamLength);
 
-			var judge = pos + sizeof(byte) + sizeof(long);
+			var judge = pos + sizeof(byte) + sizeof(long); // the position and the index chain linker lengths
 
-			foreach (var i in kvps)
+			foreach (var i in kvps) // get the approximate length of every index so we know the length of the value in the future
 				judge += wt1.GetLength(i.Key) + sizeof(byte) + sizeof(long);
 
 			// indexes
 
-			foreach (var i in kvps) {
+			foreach (var i in kvps) { // write the index
 				var len = wt1.GetLength(i.Key);
 				if (len >= Consts.MaxLength) throw new ArgumentException($"An index is longer then allowed. Length: {len}");
 
@@ -70,20 +70,20 @@ namespace StringDB.Writer {
 				this._bw.Write(judge);
 				wt1.Write(this._bw, i.Key);
 
-				var wlen = wt2.GetLength(i.Value);
+				var wlen = wt2.GetLength(i.Value); // judge the next value pos
 				judge += TypeHandlerLengthManager.EstimateWriteLengthSize(wlen) + wlen;
 			}
 
 			// index chain
 
-			var repl = this._indexChainReplace;
+			var repl = this._indexChainReplace; // repl for replacing the index chain at the beginning | write the index
 			this._indexChainReplace = this._s.Position + sizeof(byte);
 			this._bw.Write(Consts.IndexSeperator);
 			this._bw.Write(0L);
 
 			// values
 
-			foreach (var i in kvps) {
+			foreach (var i in kvps) { // write each value with the value's respective type and length
 				var len = wt2.GetLength(i.Value);
 
 				this._bw.Write(wt2.Id);
@@ -91,15 +91,15 @@ namespace StringDB.Writer {
 				wt2.Write(this._bw, i.Value);
 			}
 
-			if (repl != 0) {
+			if (repl != 0) { // if it's not 0 ( newly created dbs ), we'll seek to the old index chain and replace it
 				this._s.Seek(repl);
 				this._bw.Write(this._lastStreamLength);
 			}
 
-			this._s.Seek(0);
+			this._s.Seek(0); // seek to the beginning of the file and write the new index chain to replace
 			this._bw.Write(this._indexChainReplace);
 
-			this._lastStreamLength = judge + sizeof(byte) + sizeof(long);
+			this._lastStreamLength = judge + sizeof(byte) + sizeof(long); // set the new length of the file
 		}
 
 		public void OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos) {

@@ -17,21 +17,17 @@ namespace StringDB.DBTypes {
 		}
 
 		internal static Dictionary<Type, ITypeHandler> TypeHandlers { get; private set; }
-		internal static readonly object Locker = new object();
+		internal static readonly object Locker = new object(); // thread safeness since it's a static class
 
 		/// <summary>Register a type</summary>
 		/// <param name="t">The type to register</param>
 		public static void RegisterType<T>(TypeHandler<T> t) {
 			lock (Locker) {
-				if (TypeHandlers.TryGetValue(typeof(T), out var _))
+				if (TypeHandlers.TryGetValue(typeof(T), out var _)) // check if the type itself exists
 					throw new TypeHandlerExists();
 
-				try {
-					GetHandlerFor(t.Id);
-					throw new TypeHandlerExists();
-				} catch (TypeHandlerDoesntExist) {
-					TypeHandlers.Add(typeof(T), t);
-				}
+				if (UniqueByteIdExists(t)) throw new TypeHandlerExists(); // make sure the unique byte handler doesn't exist
+				else TypeHandlers.Add(typeof(T), t);
 			}
 		}
 
@@ -39,6 +35,8 @@ namespace StringDB.DBTypes {
 		/// <param name="t">The type to override</param>
 		public static void OverridingRegisterType<T>(TypeHandler<T> t) {
 			lock (Locker) {
+				if (UniqueByteIdExists(t)) throw new TypeHandlerExists(); // make sure the unique byte handler doesn't exist
+
 				TypeHandlers[typeof(T)] = t;
 			}
 		}
@@ -61,6 +59,15 @@ namespace StringDB.DBTypes {
 					if (i.Value.Id == id)
 						return i.Value;
 				throw new TypeHandlerDoesntExist();
+			}
+		}
+
+		private static bool UniqueByteIdExists<T>(TypeHandler<T> t) {
+			try { // check if the unique byte identifier exists
+				GetHandlerFor(t.Id);
+				return true;
+			} catch (TypeHandlerDoesntExist) {
+				return false;
 			}
 		}
 	}
