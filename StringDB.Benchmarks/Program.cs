@@ -119,17 +119,17 @@ namespace StringDB.Benchmarks {
 
 		[Benchmark]
 		public void GetValueOfFirst() {
-			var t = this.stringdb.GetValue(this._begin).GetValueAs<string>();
+			var t = this.stringdb.Get(this._begin).GetValueAs<string>();
 		}
 
 		[Benchmark]
 		public void GetValueOfMiddle() {
-			var t = this.stringdb.GetValue(this._middle).GetValueAs<string>();
+			var t = this.stringdb.Get(this._middle).GetValueAs<string>();
 		}
 
 		[Benchmark]
 		public void GetValueOfEnd() {
-			var t = this.stringdb.GetValue(this._end).GetValueAs<string>();
+			var t = this.stringdb.Get(this._end).GetValueAs<string>();
 		}
 
 #endif

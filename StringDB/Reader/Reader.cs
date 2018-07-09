@@ -14,7 +14,7 @@ namespace StringDB.Reader {
 		ReaderPair First();
 
 		/// <summary>Gets the ReaderPair responsible for a given index</summary>
-		ReaderPair GetValue<T>(T index);
+		ReaderPair Get<T>(T index);
 
 		/// <summary>Attempts to get the ReaderPair</summary>
 		bool TryGetValue<T>(T index, out ReaderPair value);
@@ -51,7 +51,7 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
-		public ReaderPair GetValue<T>(T index) {
+		public ReaderPair Get<T>(T index) {
 			// prevent the re-use of code
 
 			using (var enumer = this.GetMultipleByIndex(index).GetEnumerator()) { // loop through the multiple found

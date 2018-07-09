@@ -43,8 +43,8 @@ namespace StringDB {
 		private IWriter _writer;
 
 		/// <inheritdoc/>
-		public ReaderPair GetValue<T>(T index) =>
-			this._reader.GetValue<T>(index);
+		public ReaderPair Get<T>(T index) =>
+			this._reader.Get<T>(index);
 
 		/// <inheritdoc/>
 		public bool TryGetValue<T>(T index, out ReaderPair value) =>

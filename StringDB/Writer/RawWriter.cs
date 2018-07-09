@@ -57,14 +57,14 @@ namespace StringDB.Writer {
 
 			var judge = pos + sizeof(byte) + sizeof(long); // the position and the index chain linker lengths
 
-			foreach (var i in kvps) // get the approximate length of every index so we know the length of the value in the future
+			foreach (var i in kvps) // get the approximate length of every index so we know where the position of the data will be
 				judge += wt1.GetLength(i.Key) + sizeof(byte) + sizeof(long);
 
 			// indexes
 
 			foreach (var i in kvps) { // write the index
 				var len = wt1.GetLength(i.Key);
-				if (len >= Consts.MaxLength) throw new ArgumentException($"An index is longer then allowed. Length: {len}");
+				if (len >= Consts.MaxLength) throw new ArgumentException($"An index is longer then allowed ({Consts.MaxLength}). Length: {len}");
 
 				this._bw.Write((byte)len);
 				this._bw.Write(judge);
@@ -108,6 +108,7 @@ namespace StringDB.Writer {
 			if (len > oldLen) { //goto the end of the file and just slap it onto the end
 				this._s.Seek(this._lastStreamLength);
 
+				this._bw.Write(wt.Id);
 				TypeHandlerLengthManager.WriteLength(this._bw, len);
 				wt.Write(this._bw, newValue);
 
@@ -118,10 +119,11 @@ namespace StringDB.Writer {
 
 				// update stream length
 
-				this._lastStreamLength += TypeHandlerLengthManager.EstimateWriteLengthSize(len);
+				this._lastStreamLength += TypeHandlerLengthManager.EstimateWriteLengthSize(len) + len + sizeof(byte);
 			} else { // goto the data overwrite it since it's shorter
 				this._s.Seek(dataPos);
 
+				this._bw.Write(wt.Id);
 				TypeHandlerLengthManager.WriteLength(this._bw, len);
 				wt.Write(this._bw, newValue);
 			}
