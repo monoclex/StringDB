@@ -19,7 +19,7 @@ namespace StringDB.Tester {
 		private static void Main() {
 
 
-			using (var db = ThreadSafeDatabase.FromDatabase(Database.FromFile("testdb.db"))) {
+			using (var db = Database.FromFile("testdb.db").MakeThreadSafe()) {
 
 				Parallel.For(0, 100_000, (i) => {
 					db.Insert("EEE", "AAA");

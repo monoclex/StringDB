@@ -42,6 +42,8 @@ namespace StringDB {
 		private IReader _reader;
 		private IWriter _writer;
 
+		public IDatabase MakeThreadSafe() => new ThreadSafeDatabase(this);
+
 		/// <inheritdoc/>
 		public IReaderPair Get<T>(T index) =>
 			this._reader.Get<T>(index);
