@@ -25,87 +25,16 @@ namespace StringDB.Benchmarks {
 		}
 	}
 
-	public static class GenerateItems {
-		public const int ItemsToInsert = 10_000;
-
-		public const int MinIncome = 100;
-		public const int MaxIncome = 10_000;
-
-		public const int FriendsToGenerate = 20;
-
-		private static Random _random;
-		public static Random Rng => _random ?? (_random = new Random());
-
-		internal static int LastDatabaseIDGenerated = Rng.Next(0, int.MaxValue / 2);
-
-		public static Database NewStringDB() => Database.FromFile(GenerateDatabaseName(LastDatabaseIDGenerated++));
-
-		public static string GenerateDatabaseName(int id) => $"{id}-stringdb.db";
-
-		public static readonly string[] RandomNames = {
-			"Jimbo",
-			"Josh",
-			"Shelby",
-			"Kelly",
-			"Jimmy",
-			"John",
-			"Sarah",
-			"Hailee",
-			"Kevin",
-			"Alex",
-			"Elizabeth",
-			"Skyler"
-		};
-
-		public static string RandomName => RandomNames[Rng.Next(0, RandomNames.Length)];
-
-		//we are NOT using yield return because we will get random things *every time* we iterate over it
-
-		public static IEnumerable<Item> GetItems(int items) {
-			var res = new List<Item>(items);
-
-			for (var i = 0; i < items; i++) {
-				var usersName = RandomName;
-				res.Add(new Item {
-					Identifier = $"{i}.{usersName}",
-					Name = $"{usersName} {RandomName}",
-					Dollars = Rng.Next(GenerateItems.MinIncome, GenerateItems.MaxIncome),
-					Friends = GenerateFriends(GenerateItems.FriendsToGenerate).ToArray()
-				});
-			}
-
-			return res;
-		}
-
-		public static IEnumerable<KeyValuePair<string, string>> GetItemsAsKVP(IEnumerable<Item> items) {
-			foreach (var i in items)
-				yield return new KeyValuePair<string, string>(i.Identifier, JsonConvert.SerializeObject(i));
-		}
-
-		public static IEnumerable<string> GenerateFriends(int amount) {
-			for (var i = 0; i < amount; i++)
-				yield return RandomName;
-		}
-
-		public class Item {
-			public string Identifier { get; set; }
-
-			public string Name { get; set; }
-			public int Dollars { get; set; }
-			public string[] Friends { get; set; }
-		}
-	}
-
 	[HtmlExporter]
 	public class StringDBBenchmark {
 #if SETUP
 		public Database stringdb;
-		private IEnumerable<KeyValuePair<string, string>> itemsToInsert;
-		private IEnumerable<KeyValuePair<string, string>> newInserts;
+		private IEnumerable<KeyValuePair<byte[], byte[]>> itemsToInsert;
+		private IEnumerable<KeyValuePair<byte[], byte[]>> newInserts;
 
-		private string _begin { get; set; }
-		private string _middle { get; set; }
-		private string _end { get; set; }
+		private byte[] _begin { get; set; }
+		private byte[] _middle { get; set; }
+		private byte[] _end { get; set; }
 
 		private int lastdb;
 
@@ -231,5 +160,72 @@ namespace StringDB.Benchmarks {
 
 #endif
 #endif
+	}
+
+	public static class GenerateItems {
+		public const int ItemsToInsert = 100_000;
+
+		public const int MinIncome = 1_000;
+		public const int MaxIncome = 10_000;
+
+		public const int FriendsToGenerate = 20;
+
+		private static Random _random;
+		public static Random Rng => _random ?? (_random = new Random());
+
+		internal static int LastDatabaseIDGenerated = Rng.Next(0, int.MaxValue / 2);
+
+		public static Database NewStringDB() => Database.FromFile(GenerateDatabaseName(LastDatabaseIDGenerated++));
+
+		public static string GenerateDatabaseName(int id) => $"{id}-stringdb.db";
+
+		public static readonly string[] RandomNames = {
+			"Jimbo",
+			"Josh",
+			"Shelby",
+			"Kelly",
+			"Jimmy",
+			"John",
+			"Sarah",
+			"Hailee",
+			"Kevin",
+			"Alex",
+			"Elizabeth",
+			"Skyler"
+		};
+
+		public static string RandomName => RandomNames[Rng.Next(0, RandomNames.Length)];
+
+		// yield + ToList = works
+
+		public static IEnumerable<Item> GetItems(int items) {
+			for (var i = 0; i < items; i++) {
+				var usersName = RandomName;
+				yield return new Item {
+					Identifier = $"{i}.{usersName}",
+					Name = $"{usersName} {RandomName}",
+					Dollars = Rng.Next(GenerateItems.MinIncome, GenerateItems.MaxIncome),
+					Friends = GenerateFriends(GenerateItems.FriendsToGenerate).ToArray()
+				};
+			}
+		}
+
+		public static IEnumerable<KeyValuePair<byte[], byte[]>> GetItemsAsKVP(IEnumerable<Item> items) {
+			foreach (var i in items)
+				yield return new KeyValuePair<byte[], byte[]>(System.Text.Encoding.UTF8.GetBytes(i.Identifier), System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(i)));
+		}
+
+		public static IEnumerable<string> GenerateFriends(int amount) {
+			for (var i = 0; i < amount; i++)
+				yield return RandomName;
+		}
+
+		public class Item {
+			public string Identifier { get; set; }
+
+			public string Name { get; set; }
+			public int Dollars { get; set; }
+			public string[] Friends { get; set; }
+		}
 	}
 }
