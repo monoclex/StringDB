@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace StringDB.DBTypes {
 
@@ -9,14 +10,14 @@ namespace StringDB.DBTypes {
 	public static class TypeManager {
 
 		static TypeManager() {
-			TypeHandlers = new Dictionary<Type, ITypeHandler>();
+			TypeHandlers = new ConcurrentDictionary<Type, ITypeHandler>();
 
 			RegisterType(new ByteArrayType());
 			RegisterType(new StringType());
 			RegisterType(new StreamType());
 		}
 
-		private static Dictionary<Type, ITypeHandler> TypeHandlers { get; set; }
+		private static ConcurrentDictionary<Type, ITypeHandler> TypeHandlers { get; set; }
 		private static readonly object _locker = new object(); // thread safeness since it's a static class
 
 		/// <summary>Register a type</summary>
@@ -27,7 +28,12 @@ namespace StringDB.DBTypes {
 					throw new TypeHandlerExists(typeof(T));
 
 				if (UniqueByteIdExists(t)) throw new TypeHandlerExists(typeof(T)); // make sure the unique byte handler doesn't exist
-				else TypeHandlers.Add(typeof(T), t);
+				else {
+					bool success;
+
+					do success = TypeHandlers.TryAdd(typeof(T), t);
+					while (!success);
+				}
 			}
 		}
 
