@@ -1,7 +1,7 @@
 ﻿#define SETUP
-//#define WRITER_TESTS
+#define WRITER_TESTS
 #define READER_TESTS
-//#define CLEAN_TESTS
+#define CLEAN_TESTS
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Exporters;
@@ -189,27 +189,17 @@ namespace StringDB.Benchmarks {
 
 		[Benchmark]
 		public void GetValueOfFirst() {
-			var t = this.stringdb.GetByIndex(this._begin).GetValueAs<string>();
+			var t = this.stringdb.GetByIndex(this._begin, out var _).GetValueAs<string>();
 		}
 
 		[Benchmark]
 		public void GetValueOfMiddle() {
-			var t = this.stringdb.GetByIndex(this._middle).GetValueAs<string>();
+			var t = this.stringdb.GetByIndex(this._middle, out var _).GetValueAs<string>();
 		}
 
 		[Benchmark]
 		public void GetValueOfEnd() {
-			var t = this.stringdb.GetByIndex(this._end).GetValueAs<string>();
-		}
-
-		[Benchmark]
-		public void ParallelIterateThroughEveryEntry() {
-			Parallel.ForEach(this.stringdb, (i) => { });
-		}
-
-		[Benchmark]
-		public void ParallelIterateThroughEveryEntryAndReadValue() {
-			Parallel.ForEach(this.stringdb, (i) => { var t = i.GetValueAs<string>(); });
+			var t = this.stringdb.GetByIndex(this._end, out var _).GetValueAs<string>();
 		}
 
 #endif

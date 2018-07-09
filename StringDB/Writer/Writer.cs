@@ -8,7 +8,7 @@ using System.IO;
 namespace StringDB.Writer {
 
 	/// <summary>Some kind of wwriter that writes stuff.</summary>
-	public interface IWriter : IDisposable {
+	public interface IWriter {
 
 		/// <summary>Insert an item into the database</summary>
 		void Insert<T1, T2>(T1 index, T2 value);
@@ -31,10 +31,6 @@ namespace StringDB.Writer {
 		public Writer(Stream s) => this._rawWriter = new RawWriter(s);
 
 		private readonly IRawWriter _rawWriter;
-
-		/// <inheritdoc/>
-		public void Dispose() {
-		}
 
 		// lol if this isn't a wall of text i don't know what is
 

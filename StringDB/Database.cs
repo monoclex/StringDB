@@ -76,9 +76,7 @@ namespace StringDB {
 
 		/// <inheritdoc/>
 		public void Dispose() {
-			this._writer.Dispose();
 			this._writer = null;
-
 			this._reader = null;
 
 			this._stream.Flush();
@@ -95,11 +93,11 @@ namespace StringDB {
 		/// <inheritdoc/>
 		public void Insert<T1, T2>(T1 index, T2 value)
 			=> this._writer.Insert(index, value);
-		
+
 		/// <inheritdoc/>
 		public void Insert<T1, T2>(KeyValuePair<T1, T2> kvp)
 			=> this._writer.Insert(kvp);
-		
+
 		/// <inheritdoc/>
 		public void InsertRange<T1, T2>(IEnumerable<KeyValuePair<T1, T2>> items)
 			=> this._writer.InsertRange(items);

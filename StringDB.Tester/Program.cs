@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 namespace StringDB.Tester {
 
 	internal class Program {
-		private static KeyValuePair<byte[], byte[]> cache = new KeyValuePair<byte[], byte[]>(new byte[100], new byte[1000]);
+		private static KeyValuePair<byte[], byte[]> CacheKVP = new KeyValuePair<byte[], byte[]>(new byte[100], new byte[1000]);
 
-		public static IEnumerable<KeyValuePair<byte[], byte[]>> get() {
-			for (int i = 0; i < 1_000_000; i++)
-				yield return cache;
+		public static IEnumerable<KeyValuePair<byte[], byte[]>> GetSampleData() {
+			for (var i = 0; i < 1_000_000; i++)
+				yield return CacheKVP;
 		}
 
 		private static void Main() {
@@ -25,7 +25,7 @@ namespace StringDB.Tester {
 				foreach (var i in db) len++;
 
 				if(len == 0)
-					db.InsertRange(get());
+					db.InsertRange(GetSampleData());
 
 				Time(5_000, () => { }, () => { foreach (var i in db) { } }, () => { });
 				Time(5_000, () => { }, () => { foreach (var i in db) { i.GetValueAs<byte[]>(); } }, () => { });
@@ -49,7 +49,7 @@ namespace StringDB.Tester {
 			Console.WriteLine($"Beginning iteration amount: {amt}");
 
 			var time = GetStopwatch((int)amt,
-				before, method, (() => { Console.Write('.'); after(); })
+				before, method, (() => { Console.Write('.'); after?.Invoke(); })
 			);
 
 			Console.WriteLine($"Took {time.ElapsedMilliseconds} for {amt} operations ({(double)time.ElapsedMilliseconds / amt} est ms/op)");
@@ -73,14 +73,18 @@ namespace StringDB.Tester {
 		private static Stopwatch GetStopwatch(int times, Action before, Action method, Action after) {
 			var stp = new Stopwatch();
 
-			for (int i = 0; i < times; i++) {
-				before();
+			for (var i = 0; i < times; i++) {
+				before?.Invoke();
+
+				if (method == null) throw new NullReferenceException(nameof(method));
 
 				stp.Start();
+#pragma warning disable CC0031 // Check for null before calling a delegate
 				method();
+#pragma warning restore CC0031 // Check for null before calling a delegate
 				stp.Stop();
 
-				after();
+				after?.Invoke();
 			}
 
 			return stp;

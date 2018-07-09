@@ -9,7 +9,7 @@
 			this._index = index;
 			this._pos = pos;
 		}
-		
+
 		private IRawReader _rawReader { get; }
 		internal long _dataPos { get; }
 		internal long _pos { get; }
@@ -20,6 +20,11 @@
 
 		/// <summary>Whatever the index is.</summary>
 		public string Index => this._index.GetString();
+
+		/// <summary>Get the index as any type the TypeHandler can handle.</summary>
+		/// <typeparam name="T">The type to read the index as.</typeparam>
+		public T GetIndexAs<T>()
+			=> this._rawReader.ReadDataAs<T>(this._pos + sizeof(long));
 
 		/// <summary>Read the data stored at the index as the type it was meant to be.</summary>
 		/// <remarks>See GetValueAs to try convert the value into the specified type.</remarks>
