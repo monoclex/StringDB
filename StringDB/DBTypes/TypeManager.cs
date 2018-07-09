@@ -16,17 +16,17 @@ namespace StringDB.DBTypes {
 			RegisterType(new StreamType());
 		}
 
-		internal static Dictionary<Type, ITypeHandler> TypeHandlers { get; private set; }
-		internal static readonly object Locker = new object(); // thread safeness since it's a static class
+		private static Dictionary<Type, ITypeHandler> TypeHandlers { get; set; }
+		private static readonly object _locker = new object(); // thread safeness since it's a static class
 
 		/// <summary>Register a type</summary>
 		/// <param name="t">The type to register</param>
 		public static void RegisterType<T>(TypeHandler<T> t) {
-			lock (Locker) {
+			lock (_locker) {
 				if (TypeHandlers.TryGetValue(typeof(T), out var _)) // check if the type itself exists
-					throw new TypeHandlerExists();
+					throw new TypeHandlerExists(typeof(T));
 
-				if (UniqueByteIdExists(t)) throw new TypeHandlerExists(); // make sure the unique byte handler doesn't exist
+				if (UniqueByteIdExists(t)) throw new TypeHandlerExists(typeof(T)); // make sure the unique byte handler doesn't exist
 				else TypeHandlers.Add(typeof(T), t);
 			}
 		}
@@ -34,8 +34,8 @@ namespace StringDB.DBTypes {
 		/// <summary>Overrides an existing type register, or adds it if it doesn't exist.</summary>
 		/// <param name="t">The type to override</param>
 		public static void OverridingRegisterType<T>(TypeHandler<T> t) {
-			lock (Locker) {
-				if (UniqueByteIdExists(t)) throw new TypeHandlerExists(); // make sure the unique byte handler doesn't exist
+			lock (_locker) {
+				if (UniqueByteIdExists(t)) throw new TypeHandlerExists(typeof(T)); // make sure the unique byte handler doesn't exist
 
 				TypeHandlers[typeof(T)] = t;
 			}
@@ -44,8 +44,8 @@ namespace StringDB.DBTypes {
 		/// <summary>Get the type handler for a type</summary>
 		/// <typeparam name="T">The type of type handler</typeparam>
 		public static TypeHandler<T> GetHandlerFor<T>() {
-			lock (Locker) {
-				if (!TypeHandlers.TryGetValue(typeof(T), out var handler)) throw new TypeHandlerDoesntExist();
+			lock (_locker) {
+				if (!TypeHandlers.TryGetValue(typeof(T), out var handler)) throw new TypeHandlerDoesntExist(typeof(T));
 
 				return handler as TypeHandler<T>;
 			}
@@ -54,11 +54,11 @@ namespace StringDB.DBTypes {
 		/// <summary>Returns the TypeHandler given a unique byte identifier.</summary>
 		/// <param name="id">The TypeHandler for the given byte Id</param>
 		public static ITypeHandler GetHandlerFor(byte id) {
-			lock (Locker) {
+			lock (_locker) {
 				foreach (var i in TypeHandlers)
 					if (i.Value.Id == id)
 						return i.Value;
-				throw new TypeHandlerDoesntExist();
+				throw new TypeHandlerDoesntExist(id);
 			}
 		}
 
@@ -73,8 +73,8 @@ namespace StringDB.DBTypes {
 	}
 
 	/// <summary>An exception that gets thrown when attempting to register a Type if it already exists</summary>
-	public class TypeHandlerExists : Exception { internal TypeHandlerExists() : base("The TypeHandler already exists. See OverridingRegisterType if you'd like to override existing types.") { } }
+	public class TypeHandlerExists : Exception { internal TypeHandlerExists(Type t) : base($"The TypeHandler already exists ({t}). See OverridingRegisterType if you'd like to override existing types.") { } }
 
 	/// <summary>An exception that gets thrown when attempting to get a Type that doesn't exist.</summary>
-	public class TypeHandlerDoesntExist : Exception { internal TypeHandlerDoesntExist() : base("The TypeHandler doesn't exist. See RegisterType if you'd like to add a type, or if you're trying to read from this database, then there are missing TypeHandlers!.") { } }
+	public class TypeHandlerDoesntExist : Exception { internal TypeHandlerDoesntExist(object t) : base($"The TypeHandler ({t}) doesn't exist. See RegisterType if you'd like to add a type, or if you're trying to read from this database, then there are missing TypeHandlers.") { } }
 }

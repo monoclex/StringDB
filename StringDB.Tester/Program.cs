@@ -20,9 +20,7 @@ namespace StringDB.Tester {
 
 			using (var db = Database.FromFile("struct.db")) {
 
-				if(db.TryGetValue("help", out var _)) {
-
-				}
+				var _ = db.GetValue(1337);
 
 				var len = 0;
 				foreach (var i in db) len++;
