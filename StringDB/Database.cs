@@ -1,4 +1,5 @@
-﻿using StringDB.Reader;
+﻿using StringDB.DBTypes;
+using StringDB.Reader;
 using StringDB.Writer;
 
 using System;
@@ -42,6 +43,7 @@ namespace StringDB {
 		private IReader _reader;
 		private IWriter _writer;
 
+		/// <summary>Wraps this database into thread safety using a ThreadSafeDatabase</summary>
 		public IDatabase MakeThreadSafe() => new ThreadSafeDatabase(this);
 
 		/// <inheritdoc/>
@@ -55,6 +57,18 @@ namespace StringDB {
 		/// <inheritdoc/>
 		public IEnumerable<IReaderPair> GetAll<T>(T index) =>
 			this._reader.GetAll<T>(index);
+
+		/// <inheritdoc/>
+		public IReaderPair Get<T>(TypeHandler<T> typeHandler, T index) =>
+			this._reader.Get<T>(typeHandler, index);
+
+		/// <inheritdoc/>
+		public bool TryGet<T>(TypeHandler<T> typeHandler, T index, out IReaderPair value) =>
+			this._reader.TryGet<T>(typeHandler, index, out value);
+
+		/// <inheritdoc/>
+		public IEnumerable<IReaderPair> GetAll<T>(TypeHandler<T> typeHandler, T index) =>
+			this._reader.GetAll<T>(typeHandler, index);
 
 		/// <inheritdoc/>
 		public IEnumerator<IReaderPair> GetEnumerator() =>
@@ -83,6 +97,24 @@ namespace StringDB {
 		/// <inheritdoc/>
 		public void OverwriteValue<T>(IReaderPair replacePair, T newValue) {
 			this._writer.OverwriteValue(replacePair, newValue);
+			this._reader.DrainBuffer(); // drain the buffer on an overwrite so the reader will update it's buffer to read the latest data that's just been inserted
+		}
+
+		/// <inheritdoc/>
+		public void Insert<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, T1 index, T2 value)
+			=> this._writer.Insert(typeHandlerT1, typeHandlerT2, index, value);
+
+		/// <inheritdoc/>
+		public void Insert<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, KeyValuePair<T1, T2> kvp)
+			=> this._writer.Insert(typeHandlerT1, typeHandlerT2, kvp);
+
+		/// <inheritdoc/>
+		public void InsertRange<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, IEnumerable<KeyValuePair<T1, T2>> items)
+			=> this._writer.InsertRange(typeHandlerT1, typeHandlerT2, items);
+
+		/// <inheritdoc/>
+		public void OverwriteValue<T>(TypeHandler<T> typeHandler, IReaderPair replacePair, T newValue) {
+			this._writer.OverwriteValue(typeHandler, replacePair, newValue);
 			this._reader.DrainBuffer(); // drain the buffer on an overwrite so the reader will update it's buffer to read the latest data that's just been inserted
 		}
 

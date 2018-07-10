@@ -1,10 +1,13 @@
-﻿using StringDB.Reader;
+﻿using StringDB.DBTypes;
+using StringDB.Reader;
 
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace StringDB {
 
+	/// <summary>Uses a lock before doing any action to add thread safety</summary>
 	public class ThreadSafeDatabase : IDatabase {
 
 		internal ThreadSafeDatabase(IDatabase other) {
@@ -33,6 +36,21 @@ namespace StringDB {
 		/// <inheritdoc/>
 		public IEnumerable<IReaderPair> GetAll<T>(T index) {
 			lock (this._lock) return this._other.GetAll<T>(index);
+		}
+
+		/// <inheritdoc/>
+		public IReaderPair Get<T>(TypeHandler<T> typeHandler, T index) {
+			lock (this._lock) return this._other.Get<T>(typeHandler, index);
+		}
+
+		/// <inheritdoc/>
+		public bool TryGet<T>(TypeHandler<T> typeHandler, T index, out IReaderPair value) {
+			lock (this._lock) return this._other.TryGet<T>(typeHandler, index, out value);
+		}
+
+		/// <inheritdoc/>
+		public IEnumerable<IReaderPair> GetAll<T>(TypeHandler<T> typeHandler, T index) {
+			lock (this._lock) return this._other.GetAll<T>(typeHandler, index);
 		}
 
 		/// <inheritdoc/>
@@ -71,14 +89,30 @@ namespace StringDB {
 		}
 
 		/// <inheritdoc/>
-		public void CleanTo(IDatabase dbCleanTo) {
-			lock (this._lock) this._other.CleanTo(dbCleanTo);
+		public void Insert<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, T1 index, T2 value) {
+			lock (this._lock) this._other.Insert<T1, T2>(typeHandlerT1, typeHandlerT2, index, value);
 		}
 
 		/// <inheritdoc/>
-		public void CleanFrom(IDatabase dbCleanFrom) {
-			lock (this._lock) this._other.CleanFrom(dbCleanFrom);
+		public void Insert<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, KeyValuePair<T1, T2> kvp) {
+			lock (this._lock) this._other.Insert<T1, T2>(typeHandlerT1, typeHandlerT2, kvp);
 		}
+
+		/// <inheritdoc/>
+		public void InsertRange<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, IEnumerable<KeyValuePair<T1, T2>> items) {
+			lock (this._lock) this._other.InsertRange<T1, T2>(typeHandlerT1, typeHandlerT2, items);
+		}
+
+		/// <inheritdoc/>
+		public void OverwriteValue<T>(TypeHandler<T> typeHandler, IReaderPair replacePair, T newValue) {
+			lock (this._lock) this._other.OverwriteValue<T>(typeHandler, replacePair, newValue);
+		}
+
+		/// <inheritdoc/>
+		public void CleanTo(IDatabase dbCleanTo) => dbCleanTo.InsertRange(Wrap(this, this._lock));
+
+		/// <inheritdoc/>
+		public void CleanFrom(IDatabase dbCleanFrom) => this.InsertRange(Wrap(dbCleanFrom, this._lock));
 
 		/// <inheritdoc/>
 		public void DrainBuffer() {
@@ -93,9 +127,11 @@ namespace StringDB {
 			}
 		}
 
-		private static IEnumerable<IReaderPair> Wrap(IEnumerable<IReaderPair> readerPairs, object @lock) {
-			foreach (var i in readerPairs)
-				yield return ThreadSafeReaderPair.FromPair(i, @lock);
+		private static IEnumerable<KeyValuePair<byte[], Stream>> Wrap(IEnumerable<IReaderPair> readerPairs, object @lock) {
+			foreach (var i in readerPairs) {
+				var t = ThreadSafeReaderPair.FromPair(i, @lock);
+				yield return new KeyValuePair<byte[], Stream>(t.ByteArrayIndex, t.GetValueAs<Stream>());
+			}
 		}
 	}
 }

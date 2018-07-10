@@ -22,6 +22,15 @@ namespace StringDB.Reader {
 		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
 		IEnumerable<IReaderPair> GetAll<T>(T index);
 
+		/// <summary>Gets the ReaderPair responsible for a given index</summary>
+		IReaderPair Get<T>(TypeHandler<T> typeHandler, T index);
+
+		/// <summary>Attempts to get the ReaderPair</summary>
+		bool TryGet<T>(TypeHandler<T> typeHandler, T index, out IReaderPair value);
+
+		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
+		IEnumerable<IReaderPair> GetAll<T>(TypeHandler<T> typeHandler, T index);
+
 		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
 		void DrainBuffer();
 	}
@@ -51,10 +60,22 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
-		public IReaderPair Get<T>(T index) {
+		public IReaderPair Get<T>(T index)
+			=> Get<T>(TypeManager.GetHandlerFor<T>(), index);
+
+		/// <inheritdoc/>
+		public bool TryGet<T>(T index, out IReaderPair value)
+			=> TryGet<T>(TypeManager.GetHandlerFor<T>(), index, out value);
+
+		/// <inheritdoc/>
+		public IEnumerable<IReaderPair> GetAll<T>(T index)
+			=> GetAll<T>(TypeManager.GetHandlerFor<T>(), index);
+
+		/// <inheritdoc/>
+		public IReaderPair Get<T>(TypeHandler<T> typeHandler, T index) {
 			// prevent the re-use of code
 
-			using (var enumer = this.GetAll(index).GetEnumerator()) { // loop through the multiple found
+			using (var enumer = this.GetAll(typeHandler, index).GetEnumerator()) { // loop through the multiple found
 				if (enumer.MoveNext()) {
 					return enumer.Current; // return the first one of the ones we found
 				}
@@ -64,10 +85,10 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
-		public bool TryGet<T>(T index, out IReaderPair value) {
+		public bool TryGet<T>(TypeHandler<T> typeHandler, T index, out IReaderPair value) {
 			// prevent the re-use of code
 
-			using (var enumer = this.GetAll(index).GetEnumerator()) { // loop through the multiple found
+			using (var enumer = this.GetAll(typeHandler, index).GetEnumerator()) { // loop through the multiple found
 				if (enumer.MoveNext()) {
 					value = enumer.Current;
 					return true; // return the first one
@@ -81,11 +102,9 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
-		public IEnumerable<IReaderPair> GetAll<T>(T index) {
+		public IEnumerable<IReaderPair> GetAll<T>(TypeHandler<T> typeHandler, T index) {
 			if (this._stream.Length <= 8) // newly created DBs
 				yield break;
-
-			var typeHandler = TypeManager.GetHandlerFor<T>();
 
 			foreach (var i in this) // for every ReaderPair we got
 				if (typeHandler.Compare(index, i.GetIndexAs<T>())) // compare thats one's index with this one's index

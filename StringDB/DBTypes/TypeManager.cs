@@ -10,26 +10,31 @@ namespace StringDB.DBTypes {
 	public static class TypeManager {
 
 		static TypeManager() {
-			TypeHandlers = new ConcurrentDictionary<Type, ITypeHandler>();
+			lock (_initLock)
+				if (_shouldInit) {
+					_shouldInit = false;
+					TypeHandlers = new ConcurrentDictionary<Type, ITypeHandler>();
 
-			RegisterType(new ByteArrayType(), int.MaxValue);
-			RegisterType(new StringType());
-			RegisterType(new StreamType());
+					RegisterType(new ByteArrayType());
+					RegisterType(new StringType());
+					RegisterType(new StreamType());
+				}
 		}
 
+		private static object _initLock = new object();
+		private static bool _shouldInit = true;
 		private static ConcurrentDictionary<Type, ITypeHandler> TypeHandlers { get; set; }
 
 		/// <summary>Register a type</summary>
 		/// <param name="t">The type to register</param>
-		/// <param name="maxTries">The maximum number of tries that should happen before throwing an InvalidOperationException. Set it to 0 to try to repeatedly add until it can't.</param>
-		public static void RegisterType<T>(TypeHandler<T> t, int maxTries = 10) {
+		public static void RegisterType<T>(TypeHandler<T> t) {
 			if (!TypeHandlers.TryAdd(typeof(T), t))
 				throw new TypeHandlerExists(typeof(T));
 
 			var tmp = TypeHandlers;
 
 			foreach (var i in tmp)
-				if (i.Value.Id == t.Id)
+				if (i.Value.Id == t.Id && i.Key != typeof(T))
 					if(TypeHandlers.TryRemove(typeof(T), out var _))
 						throw new TypeHandlerExists(typeof(T));
 		}
@@ -68,7 +73,7 @@ namespace StringDB.DBTypes {
 			}
 		}
 	}
-	
+
 	/// <summary>An exception that gets thrown when attempting to register a Type if it already exists</summary>
 	public class TypeHandlerExists : Exception { internal TypeHandlerExists(Type t) : base($"The TypeHandler already exists ({t}). See OverridingRegisterType if you'd like to override existing types.") { } }
 

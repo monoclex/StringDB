@@ -20,6 +20,18 @@ namespace StringDB.Writer {
 
 		/// <summary>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</summary>
 		void OverwriteValue<T>(IReaderPair replacePair, T newValue);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, T1 index, T2 value);
+
+		/// <summary>Insert an item into the database</summary>
+		void Insert<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, KeyValuePair<T1, T2> kvp);
+
+		/// <summary>Insert multiple items into the database.</summary>
+		void InsertRange<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, IEnumerable<KeyValuePair<T1, T2>> items);
+
+		/// <summary>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</summary>
+		void OverwriteValue<T>(TypeHandler<T> typeHandler, IReaderPair replacePair, T newValue);
 	}
 
 	/// <inheritdoc/>
@@ -48,5 +60,21 @@ namespace StringDB.Writer {
 		/// <inheritdoc/>
 		public void OverwriteValue<T>(IReaderPair replacePair, T newValue)
 			=> this._rawWriter.OverwriteValue<T>(TypeManager.GetHandlerFor<T>(), newValue, replacePair.ValueLength, replacePair.DataPosition, replacePair.Position + sizeof(byte));
+
+		/// <inheritdoc/>
+		public void Insert<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, T1 index, T2 value)
+			=> this.Insert<T1, T2>(typeHandlerT1, typeHandlerT2, new KeyValuePair<T1, T2>(index, value));
+
+		/// <inheritdoc/>
+		public void Insert<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, KeyValuePair<T1, T2> kvp)
+			=> this.InsertRange<T1, T2>(typeHandlerT1, typeHandlerT2, kvp.AsEnumerable());
+
+		/// <inheritdoc/>
+		public void InsertRange<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, IEnumerable<KeyValuePair<T1, T2>> items)
+			=> this._rawWriter.InsertRange<T1, T2>(typeHandlerT1, typeHandlerT2, items);
+
+		/// <inheritdoc/>
+		public void OverwriteValue<T>(TypeHandler<T> typeHandler, IReaderPair replacePair, T newValue)
+			=> this._rawWriter.OverwriteValue<T>(typeHandler, newValue, replacePair.ValueLength, replacePair.DataPosition, replacePair.Position + sizeof(byte));
 	}
 }

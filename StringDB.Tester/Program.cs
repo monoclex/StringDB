@@ -28,10 +28,17 @@ namespace StringDB.Tester {
 				Console.WriteLine("for loop done");
 
 				Parallel.ForEach(db, (i) => {
-					Console.WriteLine(i.ToString());
+					//Console.WriteLine(i.ToString());
 				});
-
+				
+				using(var other = Database.FromFile("eee.db").MakeThreadSafe()) {
+					Parallel.For(0, 1_000_000, (i) => {
+						other.CleanFrom(db);
+					});
+				}
 			}
+
+			Console.WriteLine("ayy");
 
 			Console.ReadLine();
 		}
