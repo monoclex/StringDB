@@ -12,60 +12,51 @@ namespace StringDB.DBTypes {
 		static TypeManager() {
 			TypeHandlers = new ConcurrentDictionary<Type, ITypeHandler>();
 
-			RegisterType(new ByteArrayType());
+			RegisterType(new ByteArrayType(), int.MaxValue);
 			RegisterType(new StringType());
 			RegisterType(new StreamType());
 		}
 
 		private static ConcurrentDictionary<Type, ITypeHandler> TypeHandlers { get; set; }
-		private static readonly object _locker = new object(); // thread safeness since it's a static class
 
 		/// <summary>Register a type</summary>
 		/// <param name="t">The type to register</param>
-		public static void RegisterType<T>(TypeHandler<T> t) {
-			lock (_locker) {
-				if (TypeHandlers.TryGetValue(typeof(T), out var _)) // check if the type itself exists
-					throw new TypeHandlerExists(typeof(T));
+		/// <param name="maxTries">The maximum number of tries that should happen before throwing an InvalidOperationException. Set it to 0 to try to repeatedly add until it can't.</param>
+		public static void RegisterType<T>(TypeHandler<T> t, int maxTries = 10) {
+			if (!TypeHandlers.TryAdd(typeof(T), t))
+				throw new TypeHandlerExists(typeof(T));
 
-				if (UniqueByteIdExists(t)) throw new TypeHandlerExists(typeof(T)); // make sure the unique byte handler doesn't exist
-				else {
-					bool success;
+			var tmp = TypeHandlers;
 
-					do success = TypeHandlers.TryAdd(typeof(T), t);
-					while (!success);
-				}
-			}
+			foreach (var i in tmp)
+				if (i.Value.Id == t.Id)
+					if(TypeHandlers.TryRemove(typeof(T), out var _))
+						throw new TypeHandlerExists(typeof(T));
 		}
 
 		/// <summary>Overrides an existing type register, or adds it if it doesn't exist.</summary>
 		/// <param name="t">The type to override</param>
 		public static void OverridingRegisterType<T>(TypeHandler<T> t) {
-			lock (_locker) {
-				if (UniqueByteIdExists(t)) throw new TypeHandlerExists(typeof(T)); // make sure the unique byte handler doesn't exist
+			if (UniqueByteIdExists(t)) throw new TypeHandlerExists(typeof(T)); // make sure the unique byte handler doesn't exist
 
-				TypeHandlers[typeof(T)] = t;
-			}
+			TypeHandlers[typeof(T)] = t;
 		}
 
 		/// <summary>Get the type handler for a type</summary>
 		/// <typeparam name="T">The type of type handler</typeparam>
 		public static TypeHandler<T> GetHandlerFor<T>() {
-			lock (_locker) {
-				if (!TypeHandlers.TryGetValue(typeof(T), out var handler)) throw new TypeHandlerDoesntExist(typeof(T));
+			if (!TypeHandlers.TryGetValue(typeof(T), out var handler)) throw new TypeHandlerDoesntExist(typeof(T));
 
-				return handler as TypeHandler<T>;
-			}
+			return handler as TypeHandler<T>;
 		}
 
 		/// <summary>Returns the TypeHandler given a unique byte identifier.</summary>
 		/// <param name="id">The TypeHandler for the given byte Id</param>
 		public static ITypeHandler GetHandlerFor(byte id) {
-			lock (_locker) {
-				foreach (var i in TypeHandlers)
-					if (i.Value.Id == id)
-						return i.Value;
-				throw new TypeHandlerDoesntExist(id);
-			}
+			foreach (var i in TypeHandlers)
+				if (i.Value.Id == id)
+					return i.Value;
+			throw new TypeHandlerDoesntExist(id);
 		}
 
 		private static bool UniqueByteIdExists<T>(TypeHandler<T> t) {
@@ -77,7 +68,7 @@ namespace StringDB.DBTypes {
 			}
 		}
 	}
-
+	
 	/// <summary>An exception that gets thrown when attempting to register a Type if it already exists</summary>
 	public class TypeHandlerExists : Exception { internal TypeHandlerExists(Type t) : base($"The TypeHandler already exists ({t}). See OverridingRegisterType if you'd like to override existing types.") { } }
 
