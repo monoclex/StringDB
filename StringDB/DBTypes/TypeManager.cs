@@ -1,13 +1,19 @@
-﻿using StringDB.DBTypes.Predefined;
+﻿#if !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6
+#define USE_ASSEMBLIES
+#endif
+
+using StringDB.DBTypes.Predefined;
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using StringDB.DBTypes;
+using System.Reflection;
 
-namespace StringDB.DBTypes {
+namespace StringDB {
 
 	/// <summary>Manages the types StringDB can read and write. Add your own if you need more types!</summary>
-	public static class TypeManager {
+	public static partial class TypeManager {
 
 		static TypeManager() {
 			lock (_initLock)
@@ -18,6 +24,10 @@ namespace StringDB.DBTypes {
 					RegisterType(new ByteArrayType());
 					RegisterType(new StringType());
 					RegisterType(new StreamType());
+
+#if USE_ASSEMBLIES
+					AutoRegister.RegisterTypes();
+#endif
 				}
 		}
 
@@ -27,16 +37,18 @@ namespace StringDB.DBTypes {
 
 		/// <summary>Register a type</summary>
 		/// <param name="t">The type to register</param>
-		public static void RegisterType<T>(TypeHandler<T> t) {
-			if (!TypeHandlers.TryAdd(typeof(T), t))
-				throw new TypeHandlerExists(typeof(T));
+		public static void RegisterType<T>(TypeHandler<T> t) => RegisterType(typeof(T), t);
+
+		private static void RegisterType(Type t, ITypeHandler typeHandler) {
+			if (!TypeHandlers.TryAdd(t, typeHandler))
+				throw new TypeHandlerExists(t);
 
 			var tmp = TypeHandlers;
 
 			foreach (var i in tmp)
-				if (i.Value.Id == t.Id && i.Key != typeof(T))
-					if(TypeHandlers.TryRemove(typeof(T), out var _))
-						throw new TypeHandlerExists(typeof(T));
+				if (i.Value.Id == typeHandler.Id && i.Key != t)
+					if (TypeHandlers.TryRemove(t, out var _))
+						throw new TypeHandlerExists(t);
 		}
 
 		/// <summary>Overrides an existing type register, or adds it if it doesn't exist.</summary>
@@ -57,7 +69,7 @@ namespace StringDB.DBTypes {
 
 		/// <summary>Returns the TypeHandler given a unique byte identifier.</summary>
 		/// <param name="id">The TypeHandler for the given byte Id</param>
-		public static ITypeHandler GetHandlerFor(byte id) {
+		internal static ITypeHandler GetHandlerFor(byte id) {
 			foreach (var i in TypeHandlers)
 				if (i.Value.Id == id)
 					return i.Value;

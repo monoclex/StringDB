@@ -8,6 +8,16 @@ using System.Threading.Tasks;
 
 namespace StringDB.Tester {
 
+	[TypeManager.AutoRegister]
+	public class Example : TypeHandler<int> {
+		public override byte Id => 0x2F;
+
+		public override bool Compare(int item1, int item2) => item1 == item2;
+		public override long GetLength(int item) => sizeof(int);
+		public override int Read(BinaryReader br, long len) => len == 4 ? br.ReadInt32() : throw new Exception("that's not a freaking int");
+		public override void Write(BinaryWriter bw, int item) => bw.Write(item);
+	}
+
 	internal class Program {
 		private static KeyValuePair<byte[], byte[]> CacheKVP = new KeyValuePair<byte[], byte[]>(new byte[100], new byte[1000]);
 
@@ -18,6 +28,24 @@ namespace StringDB.Tester {
 
 		private static void Main() {
 
+			var lol = TypeManager.GetHandlerFor<int>();
+
+			using(var cooldb = Database.FromFile("lol.db")) {
+				cooldb.Insert(0, "Hello!");
+				cooldb.Insert(1, "World!");
+
+				for (int i = 0; i < 2; i++)
+					Console.WriteLine(cooldb.Get(i).GetValueAs<string>());
+			}
+
+			Console.ReadLine();
+
+			Console.WriteLine("begin");
+			using (var db = Database.FromFile("stringdb5.0.0.db")) {
+				for (int i = 0; i < 1_000_000; i++)
+					db.Insert("HELLO", "WORLD!");
+			}
+			Console.WriteLine("end");
 
 			using (var db = Database.FromFile("testdb.db").MakeThreadSafe()) {
 

@@ -1,9 +1,9 @@
 ﻿using System.IO;
 
-namespace StringDB.DBTypes {
+namespace StringDB {
 
 	/// <summary>A generic interface for a given TypeHandler</summary>
-	public interface ITypeHandler {
+	internal interface ITypeHandler {
 
 		/// <summary>Unique byte identifier. Set it above 0x2F to avoid colliding with the predefined types.</summary>
 		byte Id { get; }
