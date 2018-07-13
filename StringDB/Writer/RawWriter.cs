@@ -8,6 +8,8 @@ namespace StringDB.Writer {
 
 	internal interface IRawWriter {
 
+		void Flush();
+
 		void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps);
 
 		void OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos);
@@ -45,6 +47,8 @@ namespace StringDB.Writer {
 
 		private long _lastStreamLength;
 		private long _indexChainReplace;
+
+		public void Flush() => this._bw.Flush();
 
 		public void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps) {
 			var pos = this._lastStreamLength; // get the length of the stream

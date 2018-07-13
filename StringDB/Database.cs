@@ -49,7 +49,8 @@ namespace StringDB {
 		/// <summary>Wraps this database into thread safety using a ThreadSafeDatabase</summary>
 		public IDatabase MakeThreadSafe() => new ThreadSafeDatabase(this);
 
-		public void Flush() => this._stream.Flush();
+		/// <inheritdoc/>
+		public void Flush() => this._writer.Flush();
 
 		/// <inheritdoc/>
 		public IReaderPair Get<T>(T index) =>

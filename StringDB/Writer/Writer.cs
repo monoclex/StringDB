@@ -32,6 +32,9 @@ namespace StringDB.Writer {
 
 		/// <summary>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</summary>
 		void OverwriteValue<T>(TypeHandler<T> typeHandler, IReaderPair replacePair, T newValue);
+
+		/// <summary>Flushes the prepending data to write to the stream</summary>
+		void Flush();
 	}
 
 	/// <inheritdoc/>
@@ -76,5 +79,9 @@ namespace StringDB.Writer {
 		/// <inheritdoc/>
 		public void OverwriteValue<T>(TypeHandler<T> typeHandler, IReaderPair replacePair, T newValue)
 			=> this._rawWriter.OverwriteValue<T>(typeHandler, newValue, replacePair.ValueLength, replacePair.DataPosition, replacePair.Position + sizeof(byte));
+
+		/// <inheritdoc/>
+		public void Flush()
+			=> this._rawWriter.Flush();
 	}
 }
