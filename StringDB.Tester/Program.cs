@@ -37,7 +37,7 @@ namespace StringDB.Tester {
 				for (int i = 0; i < 2; i++)
 					Console.WriteLine(cooldb.Get(i).GetValueAs<string>());
 			}
-
+			return;
 			Console.ReadLine();
 
 			Console.WriteLine("begin");
