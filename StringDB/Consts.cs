@@ -1,6 +1,6 @@
 ﻿namespace StringDB {
-	internal static class Consts {
 
+	internal static class Consts {
 		//TODO: move specifyLen const to here
 
 		/// <summary>The maximum value for an index. After this point, bytes are </summary>

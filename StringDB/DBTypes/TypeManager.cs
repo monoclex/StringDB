@@ -5,13 +5,9 @@
 using StringDB.DBTypes.Predefined;
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
-using StringDB.DBTypes;
-using System.Reflection;
 
 namespace StringDB {
-
 	//TODO: mild cleanup with USE_ASSEMBLIES
 
 	/// <summary>Manages the types StringDB can read and write. Add your own if you need more types!</summary>

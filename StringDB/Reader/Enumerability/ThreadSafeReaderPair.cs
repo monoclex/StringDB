@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StringDB.Reader {
+﻿namespace StringDB.Reader {
 
 	/// <summary>Make a ReaderPair thread safe.</summary>
 	internal struct ThreadSafeReaderPair : IReaderPair {
@@ -20,7 +18,7 @@ namespace StringDB.Reader {
 		private object _lock;
 
 		/// <inheritdoc/>
-		public long DataPosition { get => this._readerPair.DataPosition; }
+		public long DataPosition => this._readerPair.DataPosition;
 
 		/// <inheritdoc/>
 		public long Position => this._readerPair.Position;

@@ -1,6 +1,4 @@
-﻿using StringDB.DBTypes;
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +32,7 @@ namespace StringDB.Reader {
 		/// <summary>Clears out the buffer. Will cause performance issues if you do it too often.</summary>
 		void DrainBuffer();
 	}
-	
+
 	//TODO: protected reader/writer to prevent from inheriting
 
 	/// <summary>A Reader that reads out a StringDB database file.</summary>

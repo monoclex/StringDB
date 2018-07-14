@@ -1,6 +1,4 @@
-﻿using StringDB.DBTypes;
-
-using System;
+﻿using System;
 using System.IO;
 
 namespace StringDB.Reader {
@@ -25,6 +23,9 @@ namespace StringDB.Reader {
 
 		void DrainBuffer();
 	}
+
+	//TODO: remove IRawRewader
+	//TODO: cleanup code
 
 	internal class RawReader : IRawReader {
 

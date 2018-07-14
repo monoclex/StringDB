@@ -1,5 +1,4 @@
-﻿using StringDB.DBTypes;
-using StringDB.Reader;
+﻿using StringDB.Reader;
 using StringDB.Writer;
 
 using System;

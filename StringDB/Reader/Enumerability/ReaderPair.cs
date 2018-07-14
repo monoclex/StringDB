@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StringDB.Reader {
+﻿namespace StringDB.Reader {
 
 	/// <summary>A pair of data - this correlates an index to it's corresponding value.</summary>
 	public interface IReaderPair {
@@ -16,14 +14,14 @@ namespace StringDB.Reader {
 
 		/// <summary>Whatever the index is.</summary>
 		string StringIndex { get; }
-		
+
 		RuntimeValue Index { get; }
 		RuntimeValue Value { get; }
 
 		/*
 		/// <summary>Get the proper type of the index.</summary>
 		Type GetIndexType();
-		
+
 		/// <summary>Get the index as the type it was meant to be.</summary>
 		/// <remarks>See GetIndexAs to try convert the value into the specified type.</remarks>
 		/// <typeparam name="T">The type of the data that is stored.</typeparam>

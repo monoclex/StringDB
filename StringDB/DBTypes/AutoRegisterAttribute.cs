@@ -6,16 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace StringDB {
-
 #if USE_ASSEMBLIES
 	public static partial class TypeManager {
 		[AttributeUsage(AttributeTargets.Class)]
 		public class AutoRegister : Attribute {
 			public AutoRegister() {
-
 			}
 
 			internal static void RegisterTypes() {
@@ -24,17 +21,15 @@ namespace StringDB {
 				// make sure we can use the cool assembly things
 
 				//TODO: verify AutoRegister works
-				
 				foreach (var assembly in GetDependentAssemblies(typeof(TypeManager).Assembly)) {
 					foreach (var type in assembly.GetTypes())
 						// if it has the attribute
 						if (type.IsDefined(typeof(AutoRegister)))
 							if (type.GetInterfaces().Contains(typeof(ITypeHandler))) {
 								var typeHandler = (ITypeHandler)Activator.CreateInstance(type);
-								
+
 								TypeManager.RegisterType(typeHandler.Type, typeHandler);
 							} else throw new Exception($"The AutoRegister attribute can only go on TypeHandler<T>'s children!");
-
 				}
 			}
 

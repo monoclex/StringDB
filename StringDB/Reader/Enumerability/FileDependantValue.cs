@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace StringDB.Reader {
+
 	public interface IRuntimeValue {
+
 		T Get<T>();
+
 		T Get<T>(TypeHandler<T> typeHandler);
 
 		T GetAs<T>();
+
 		T GetAs<T>(TypeHandler<T> typeHandler);
 
 		Type Type();
