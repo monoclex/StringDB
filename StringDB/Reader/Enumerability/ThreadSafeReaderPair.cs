@@ -1,4 +1,6 @@
-﻿namespace StringDB.Reader {
+﻿using System;
+
+namespace StringDB.Reader {
 
 	/// <summary>Make a ReaderPair thread safe.</summary>
 	internal struct ThreadSafeReaderPair : IReaderPair {
@@ -14,11 +16,11 @@
 		public static ThreadSafeReaderPair FromPair(IReaderPair readerPair, object @lock)
 			=> new ThreadSafeReaderPair(readerPair, @lock);
 
-		private IReaderPair _readerPair;
+		internal IReaderPair _readerPair;
 		private object _lock;
 
 		/// <inheritdoc/>
-		public long DataPosition => this._readerPair.DataPosition;
+		public long DataPosition { get => this._readerPair.DataPosition; }
 
 		/// <inheritdoc/>
 		public long Position => this._readerPair.Position;
@@ -37,8 +39,17 @@
 		}
 
 		/// <inheritdoc/>
+		public T GetIndex<T>() {
+			lock (this._lock) return this._readerPair.GetIndex<T>();
+		}
+
+		/// <inheritdoc/>
 		public T GetIndexAs<T>() {
 			lock (this._lock) return this._readerPair.GetIndexAs<T>();
+		}
+		/// <inheritdoc/>
+		public Type GetIndexType() {
+			lock (this._lock) return this._readerPair.GetIndexType();
 		}
 
 		/// <inheritdoc/>
@@ -49,6 +60,11 @@
 		/// <inheritdoc/>
 		public T GetValueAs<T>() {
 			lock (this._lock) return this._readerPair.GetValueAs<T>();
+		}
+
+		/// <inheritdoc/>
+		public Type GetValueType() {
+			lock (this._lock) return this._readerPair.GetValueType();
 		}
 
 		/// <summary>A simple string form of the item.</summary>

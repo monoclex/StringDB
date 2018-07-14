@@ -12,7 +12,7 @@ namespace StringDB.Writer {
 
 		void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps);
 
-		void OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos);
+		long OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos);
 	}
 
 	internal class RawWriter : IRawWriter {
@@ -106,11 +106,12 @@ namespace StringDB.Writer {
 			this._lastStreamLength = judge + sizeof(byte) + sizeof(long); // set the new length of the file
 		}
 
-		public void OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos) {
+		public long OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos) {
 			var len = wt.GetLength(newValue);
 
 			if (len > oldLen) { //goto the end of the file and just slap it onto the end
 				this._s.Seek(this._lastStreamLength);
+				var newPos = this._lastStreamLength;
 
 				this._bw.Write(wt.Id);
 				TypeHandlerLengthManager.WriteLength(this._bw, len);
@@ -124,12 +125,16 @@ namespace StringDB.Writer {
 				// update stream length
 
 				this._lastStreamLength += TypeHandlerLengthManager.EstimateWriteLengthSize(len) + len + sizeof(byte);
+
+				return newPos;
 			} else { // goto the data overwrite it since it's shorter
 				this._s.Seek(dataPos);
 
 				this._bw.Write(wt.Id);
 				TypeHandlerLengthManager.WriteLength(this._bw, len);
 				wt.Write(this._bw, newValue);
+
+				return dataPos;
 			}
 
 			// nothin' to update

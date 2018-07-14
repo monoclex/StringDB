@@ -62,7 +62,7 @@ namespace StringDB.Writer {
 
 		/// <inheritdoc/>
 		public void OverwriteValue<T>(IReaderPair replacePair, T newValue)
-			=> this._rawWriter.OverwriteValue<T>(TypeManager.GetHandlerFor<T>(), newValue, replacePair.ValueLength, replacePair.DataPosition, replacePair.Position + sizeof(byte));
+			=> this.OverwriteValue<T>(TypeManager.GetHandlerFor<T>(), replacePair, newValue);
 
 		/// <inheritdoc/>
 		public void Insert<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, T1 index, T2 value)
@@ -77,8 +77,20 @@ namespace StringDB.Writer {
 			=> this._rawWriter.InsertRange<T1, T2>(typeHandlerT1, typeHandlerT2, items);
 
 		/// <inheritdoc/>
-		public void OverwriteValue<T>(TypeHandler<T> typeHandler, IReaderPair replacePair, T newValue)
-			=> this._rawWriter.OverwriteValue<T>(typeHandler, newValue, replacePair.ValueLength, replacePair.DataPosition, replacePair.Position + sizeof(byte));
+		public void OverwriteValue<T>(TypeHandler<T> typeHandler, IReaderPair replacePair, T newValue) {
+			var newPos = this._rawWriter.OverwriteValue<T>(typeHandler, newValue, replacePair.ValueLength, replacePair.DataPosition, replacePair.Position + sizeof(byte));
+
+			//TODO: update the readerpair?
+
+			/*
+			var repl = replacePair;
+			while (replacePair is ThreadSafeReaderPair newRepl)
+				repl = newRepl._readerPair;
+
+			if (repl is ReaderPair rp)
+				rp._dataPos = newPos;
+			*/
+		}
 
 		/// <inheritdoc/>
 		public void Flush()

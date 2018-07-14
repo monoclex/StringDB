@@ -27,10 +27,32 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
+			using (var db = Database.FromFile("stringdb.db")) {
+				db.Insert<string, string>("misclick", "This is a tyop!");
+
+				var misclick = db.Get<string>("misclick");
+				Console.WriteLine(misclick.GetValue<string>());
+
+				db.OverwriteValue<string>(misclick, "This is not a typo!");
+				Console.WriteLine(misclick.GetValue<string>());
+
+				// just to prove it changed within the file itself
+
+				misclick = db.Get<string>("misclick");
+				Console.WriteLine(misclick.GetValueAs<string>());
+			}
+
+			Console.ReadLine();
 
 			var lol = TypeManager.GetHandlerFor<int>();
 
 			using(var cooldb = Database.FromFile("lol.db")) {
+				cooldb.InsertRange<string, string>(new KeyValuePair<string, string>[] {
+					new KeyValuePair<string, string>("multidex", "Hello,"),
+					new KeyValuePair<string, string>("multidex", " "),
+					new KeyValuePair<string, string>("multidex", "World"),
+				});
+
 				cooldb.Insert(0, "Hello!");
 				cooldb.Insert(1, "World!");
 

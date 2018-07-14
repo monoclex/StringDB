@@ -83,6 +83,7 @@ namespace StringDB.Reader {
 			var type = ReadType(pos); // get the proper type handler
 
 			// throw an exception if we're reading the wrong type
+			//TODO: custom exception
 			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
 
 			// read it properly
