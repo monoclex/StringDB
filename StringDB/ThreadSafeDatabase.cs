@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace StringDB {
+	//TODO: IThreadSafe interface
 
 	/// <summary>Uses a lock before doing any action to add thread safety</summary>
 	public class ThreadSafeDatabase : IDatabase {

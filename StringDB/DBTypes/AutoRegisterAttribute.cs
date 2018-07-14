@@ -22,6 +22,8 @@ namespace StringDB {
 				// look through all the assemblies to find any [AutoRegister] attributes
 
 				// make sure we can use the cool assembly things
+
+				//TODO: verify AutoRegister works
 				
 				foreach (var assembly in GetDependentAssemblies(typeof(TypeManager).Assembly)) {
 					foreach (var type in assembly.GetTypes())

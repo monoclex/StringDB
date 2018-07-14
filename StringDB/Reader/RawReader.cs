@@ -11,15 +11,17 @@ namespace StringDB.Reader {
 
 		IPart ReadOn(IPart previous);
 
-		T ReadData<T>(long pos);
+		T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith);
 
-		T ReadDataAs<T>(long pos);
+		T ReadData<T>(long pos, long len, ITypeHandler typeHandlerReadWith);
 
-		T ReadDataAs<T>(long pos, long len);
+		T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith);
+
+		T ReadDataAs<T>(long pos, long len, ITypeHandler typeHandlerReadWith);
 
 		long ReadLength(long pos);
 
-		ITypeHandler ReadType(long pos);
+		ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null);
 
 		void DrainBuffer();
 	}
@@ -79,21 +81,49 @@ namespace StringDB.Reader {
 				this.ReadAt(previous.NextPart)
 				: null;
 
-		public T ReadData<T>(long pos) {
-			var type = ReadType(pos); // get the proper type handler
+		public T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith) {
+			if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
+
+			var type = ReadType(pos, null, (byte?)null); // get the proper type handler
 
 			// throw an exception if we're reading the wrong type
 			//TODO: custom exception
 			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
 
 			// read it properly
-			var typeHandler = (type as TypeHandler<T>);
-			return typeHandler.Read(this._br);
+			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br);
 		}
 
-		public T ReadDataAs<T>(long pos) => GetTypeHandlerAs<T>(pos).Read(this._br); // read the data
+		public T ReadData<T>(long pos, long len, ITypeHandler typeHandlerReadWith) {
+			if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
 
-		public T ReadDataAs<T>(long pos, long len) => GetTypeHandlerAs<T>(pos).Read(this._br, len); // read the data
+			var type = ReadType(pos, null, (byte?)null); // get the proper type handler
+
+			// throw an exception if we're reading the wrong type
+			//TODO: custom exception
+			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
+
+			// read it properly
+			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br, len);
+		}
+
+		public T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith) {
+			if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
+
+			this._stream.Seek(pos); // seek to the data and ignore the type identifier
+			this._stream.Read(this._oneByteBuffer, 0, 1);
+
+			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br);
+		}
+
+		public T ReadDataAs<T>(long pos, long len, ITypeHandler typeHandlerReadWith) {
+			if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
+
+			this._stream.Seek(pos); // seek to the data and ignore the type identifier
+			this._stream.Read(this._oneByteBuffer, 0, 1);
+
+			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br, len);
+		}
 
 		private TypeHandler<T> GetTypeHandlerAs<T>(long pos) {
 			this._stream.Seek(pos); // seek to the data and ignore the type identifier
@@ -109,9 +139,14 @@ namespace StringDB.Reader {
 			return TypeHandlerLengthManager.ReadLength(this._br); // read the length of the data
 		}
 
-		public ITypeHandler ReadType(long pos) {
-			this._stream.Seek(pos); // seek to the position
-			return TypeManager.GetHandlerFor(this._br.ReadByte()); // get the handler for the type of data
+		public ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType) {
+			if (specifyType == null) {
+				this._stream.Seek(pos); // seek to the position
+				byte b;
+				return (b = this._br.ReadByte()) == typeHandlerReadWith?.Id ?
+					typeHandlerReadWith
+					: TypeManager.GetHandlerFor(b); // get the handler for the type of data
+			} else return TypeManager.GetHandlerFor((byte)specifyType);
 		}
 
 		public void DrainBuffer() {

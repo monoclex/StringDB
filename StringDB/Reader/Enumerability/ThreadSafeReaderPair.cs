@@ -38,33 +38,17 @@ namespace StringDB.Reader {
 			}
 		}
 
-		/// <inheritdoc/>
-		public T GetIndex<T>() {
-			lock (this._lock) return this._readerPair.GetIndex<T>();
+		//TODO: inherit doc and thread safeness
+		public IRuntimeValue Index {
+			get {
+				lock (this._lock) return this._readerPair.Index;
+			}
 		}
 
-		/// <inheritdoc/>
-		public T GetIndexAs<T>() {
-			lock (this._lock) return this._readerPair.GetIndexAs<T>();
-		}
-		/// <inheritdoc/>
-		public Type GetIndexType() {
-			lock (this._lock) return this._readerPair.GetIndexType();
-		}
-
-		/// <inheritdoc/>
-		public T GetValue<T>() {
-			lock (this._lock) return this._readerPair.GetValue<T>();
-		}
-
-		/// <inheritdoc/>
-		public T GetValueAs<T>() {
-			lock (this._lock) return this._readerPair.GetValueAs<T>();
-		}
-
-		/// <inheritdoc/>
-		public Type GetValueType() {
-			lock (this._lock) return this._readerPair.GetValueType();
+		public IRuntimeValue Value {
+			get {
+				lock (this._lock) return this._readerPair.Value;
+			}
 		}
 
 		/// <summary>A simple string form of the item.</summary>

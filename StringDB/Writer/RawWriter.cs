@@ -15,6 +15,8 @@ namespace StringDB.Writer {
 		long OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos);
 	}
 
+	//TODO: remove IRawWriter
+
 	internal class RawWriter : IRawWriter {
 
 		public RawWriter(Stream s) {

@@ -12,6 +12,8 @@ using System.Reflection;
 
 namespace StringDB {
 
+	//TODO: mild cleanup with USE_ASSEMBLIES
+
 	/// <summary>Manages the types StringDB can read and write. Add your own if you need more types!</summary>
 	public static partial class TypeManager {
 

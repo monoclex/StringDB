@@ -27,19 +27,18 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
-			using (var db = Database.FromFile("stringdb.db")) {
-				db.Insert<string, string>("misclick", "This is a tyop!");
+			using(var testdb = Database.FromFile("wut.db")) {
+				testdb.Insert("Hello", "World");
+				testdb.Insert("i'm", "gay");
+				testdb.Insert("big", "little chicken");
 
-				var misclick = db.Get<string>("misclick");
-				Console.WriteLine(misclick.GetValue<string>());
+				foreach (var i in testdb)
+					Console.WriteLine(i.ToString());
 
-				db.OverwriteValue<string>(misclick, "This is not a typo!");
-				Console.WriteLine(misclick.GetValue<string>());
-
-				// just to prove it changed within the file itself
-
-				misclick = db.Get<string>("misclick");
-				Console.WriteLine(misclick.GetValueAs<string>());
+				foreach (var i in testdb) 
+					if(i is Reader.ReaderPair t) {
+						Console.WriteLine((t).ValueDDV.Type().ToString());
+					}
 			}
 
 			Console.ReadLine();
