@@ -109,23 +109,23 @@ namespace StringDB.Benchmarks {
 
 		public void IterateThroughEveryEntryAndReadValue() {
 			foreach (var i in this.stringdb) {
-				var t = i.GetValueAs<string>();
+				//var t = i.GetValueAs<string>();
 			}
 		}
 
 		[Benchmark]
 		public void GetValueOfFirst() {
-			var t = this.stringdb.Get(this._begin).GetValueAs<string>();
+			//var t = this.stringdb.Get(this._begin).GetValueAs<string>();
 		}
 
 		[Benchmark]
 		public void GetValueOfMiddle() {
-			var t = this.stringdb.Get(this._middle).GetValueAs<string>();
+			//var t = this.stringdb.Get(this._middle).GetValueAs<string>();
 		}
 
 		[Benchmark]
 		public void GetValueOfEnd() {
-			var t = this.stringdb.Get(this._end).GetValueAs<string>();
+			//var t = this.stringdb.Get(this._end).GetValueAs<string>();
 		}
 
 #endif

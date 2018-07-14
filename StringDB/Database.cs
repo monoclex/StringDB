@@ -18,9 +18,6 @@ namespace StringDB {
 		/// <summary>Cleans out the database specified, and copies all of the contents of the other database into this one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</summary>
 		/// <param name="dbCleanFrom">The database to clean up</param>
 		void CleanFrom(IDatabase dbCleanFrom);
-
-		/// <summary>Clears all buffers for this stream and causes any buffered data to be written to the underlying device.</summary>
-		void Flush();
 	}
 
 	/// <inheritdoc/>

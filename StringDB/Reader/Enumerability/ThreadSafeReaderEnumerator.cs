@@ -10,8 +10,8 @@ namespace StringDB.Reader {
 			this._lock = @lock;
 		}
 
-		private IEnumerator<IReaderPair> _readerEnumerator;
-		private object _lock;
+		private readonly IEnumerator<IReaderPair> _readerEnumerator;
+		private readonly object _lock;
 
 		public IReaderPair Current => ThreadSafeReaderPair.FromPair(this._readerEnumerator.Current, this._lock);
 

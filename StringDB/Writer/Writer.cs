@@ -43,7 +43,7 @@ namespace StringDB.Writer {
 		/// <param name="s">The stream</param>
 		public Writer(Stream s) => this._rawWriter = new RawWriter(s);
 
-		private readonly IRawWriter _rawWriter;
+		private readonly RawWriter _rawWriter;
 
 		// lol if this isn't a wall of text i don't know what is
 
@@ -77,7 +77,7 @@ namespace StringDB.Writer {
 
 		/// <inheritdoc/>
 		public void OverwriteValue<T>(TypeHandler<T> typeHandler, IReaderPair replacePair, T newValue) {
-			var newPos = this._rawWriter.OverwriteValue<T>(typeHandler, newValue, replacePair.ValueLength, replacePair.DataPosition, replacePair.Position + sizeof(byte));
+			var newPos = this._rawWriter.OverwriteValue<T>(typeHandler, newValue, replacePair.Value.Length(), replacePair.DataPosition, replacePair.Position + sizeof(byte));
 
 			//TODO: update the readerpair?
 

@@ -4,18 +4,7 @@ using System.IO;
 
 namespace StringDB.Writer {
 
-	internal interface IRawWriter {
-
-		void Flush();
-
-		void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps);
-
-		long OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos);
-	}
-
-	//TODO: remove IRawWriter
-
-	internal class RawWriter : IRawWriter {
+	internal class RawWriter {
 
 		public RawWriter(Stream s) {
 			this._s = s;

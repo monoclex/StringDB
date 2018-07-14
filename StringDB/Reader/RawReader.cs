@@ -2,32 +2,9 @@
 using System.IO;
 
 namespace StringDB.Reader {
-
-	internal interface IRawReader {
-
-		IPart ReadAt(long pos);
-
-		IPart ReadOn(IPart previous);
-
-		T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith);
-
-		T ReadData<T>(long pos, long len, ITypeHandler typeHandlerReadWith);
-
-		T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith);
-
-		T ReadDataAs<T>(long pos, long len, ITypeHandler typeHandlerReadWith);
-
-		long ReadLength(long pos);
-
-		ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null);
-
-		void DrainBuffer();
-	}
-
-	//TODO: remove IRawRewader
 	//TODO: cleanup code
 
-	internal class RawReader : IRawReader {
+	internal class RawReader {
 
 		internal RawReader(Stream s) {
 			this._stream = s;
@@ -42,9 +19,9 @@ namespace StringDB.Reader {
 
 		private long _bufferReadPos = MinusBufferSize; //the position we read the buffer at in the filestream
 		private int _bufferPos = MinusBufferSize; //the position within the buffer
-		private byte[] _bufferRead = new byte[BufferSize];
+		private readonly byte[] _bufferRead = new byte[BufferSize];
 
-		private byte[] _oneByteBuffer = new byte[1];
+		private readonly byte[] _oneByteBuffer = new byte[1];
 
 		public IPart ReadAt(long pos) {
 #if THREAD_SAFE
@@ -127,13 +104,6 @@ namespace StringDB.Reader {
 			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br, len);
 		}
 
-		private TypeHandler<T> GetTypeHandlerAs<T>(long pos) {
-			this._stream.Seek(pos); // seek to the data and ignore the type identifier
-			this._stream.Read(this._oneByteBuffer, 0, 1);
-
-			return (TypeManager.GetHandlerFor<T>() as TypeHandler<T>); // get the type handler for T
-		}
-
 		public long ReadLength(long pos) {
 			this._stream.Seek(pos); // seek to the data and ignore the type
 			this._stream.Read(this._oneByteBuffer, 0, 1);
@@ -141,7 +111,7 @@ namespace StringDB.Reader {
 			return TypeHandlerLengthManager.ReadLength(this._br); // read the length of the data
 		}
 
-		public ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType) {
+		public ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null) {
 			if (specifyType == null) {
 				this._stream.Seek(pos); // seek to the position
 				byte b;

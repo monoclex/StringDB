@@ -44,7 +44,7 @@ namespace StringDB.Reader {
 		}
 
 		private readonly Stream _stream;
-		private readonly IRawReader _rawReader;
+		private readonly RawReader _rawReader;
 
 		/// <inheritdoc/>
 		public IReaderPair First() {

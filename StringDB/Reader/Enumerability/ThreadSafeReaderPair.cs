@@ -15,7 +15,7 @@
 			=> new ThreadSafeReaderPair(readerPair, @lock);
 
 		internal IReaderPair _readerPair;
-		private object _lock;
+		private readonly object _lock;
 
 		/// <inheritdoc/>
 		public long DataPosition => this._readerPair.DataPosition;
@@ -30,22 +30,16 @@
 		public string StringIndex => this._readerPair.ByteArrayIndex.GetString();
 
 		/// <inheritdoc/>
-		public long ValueLength {
-			get {
-				lock (this._lock) return this._readerPair.ValueLength;
-			}
-		}
-
-		//TODO: inherit doc and thread safeness
 		public IRuntimeValue Index {
 			get {
-				lock (this._lock) return this._readerPair.Index;
+				lock (this._lock) return new ThreadSafeRuntimeValue(this._readerPair.Index, this._lock);
 			}
 		}
 
+		/// <inheritdoc/>
 		public IRuntimeValue Value {
 			get {
-				lock (this._lock) return this._readerPair.Value;
+				lock (this._lock) return new ThreadSafeRuntimeValue(this._readerPair.Value, this._lock);
 			}
 		}
 

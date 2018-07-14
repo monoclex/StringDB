@@ -27,13 +27,11 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
-			using(var testdb = Database.FromFile("wut.db")) {
-				testdb.Insert("Hello", "World");
-				testdb.Insert("i'm", "gay");
-				testdb.Insert("big", "little chicken");
+			
+			using (var testdb = Database.FromFile("wut.db")) {
 
 				foreach (var i in testdb)
-					Console.WriteLine(i.ToString());
+					Console.WriteLine($"{i.ToString()} {i.StringIndex}");
 
 				foreach (var t in testdb) 
 					Console.WriteLine((t).Value.Type().ToString());

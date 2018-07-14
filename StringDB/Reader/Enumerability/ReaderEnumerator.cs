@@ -6,12 +6,12 @@ namespace StringDB.Reader {
 	/// <summary>Used to enumerate over a StringDB.</summary>
 	internal class ReaderEnumerator : IEnumerator<IReaderPair> {
 
-		internal ReaderEnumerator(IRawReader rawReader) {
+		internal ReaderEnumerator(RawReader rawReader) {
 			this._rawReader = rawReader;
 			this._partOn = Part.Start;
 		}
 
-		private IRawReader _rawReader;
+		private RawReader _rawReader;
 		private IPart _partOn;
 
 		/// <summary>What the current element is on.</summary>

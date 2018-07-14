@@ -10,11 +10,9 @@ using System.Reflection;
 namespace StringDB {
 #if USE_ASSEMBLIES
 	public static partial class TypeManager {
+		/// <summary>Automatically registers the class when the TypeManager is initialized.</summary>
 		[AttributeUsage(AttributeTargets.Class)]
-		public class AutoRegister : Attribute {
-			public AutoRegister() {
-			}
-
+		public sealed class AutoRegister : Attribute {
 			internal static void RegisterTypes() {
 				// look through all the assemblies to find any [AutoRegister] attributes
 

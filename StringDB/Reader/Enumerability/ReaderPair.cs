@@ -15,19 +15,18 @@
 		/// <summary>Whatever the index is.</summary>
 		string StringIndex { get; }
 
-		//TODO: documentation
-
+		/// <summary>Provides Get, GetAs, and Type functions for the Index.</summary>
+		/// <remarks>It is highly advised that you use the ByteArrayIndex whenver possible.</remarks>
 		IRuntimeValue Index { get; }
-		IRuntimeValue Value { get; }
 
-		/// <summary>Get how long the value is without reading it into memory.</summary>
-		long ValueLength { get; }
+		/// <summary>Provides Get, GetAs, and Type functions for the Value.</summary>
+		IRuntimeValue Value { get; }
 	}
 
 	/// <summary>A pair of data - this correlates an index to it's corresponding value.</summary>
-	public struct ReaderPair : IReaderPair {
+	internal struct ReaderPair : IReaderPair {
 
-		internal ReaderPair(long dataPos, long pos, byte[] index, byte identifier, byte indexType, IRawReader rawReader) {
+		internal ReaderPair(long dataPos, long pos, byte[] index, byte identifier, byte indexType, RawReader rawReader) {
 			this._identifier = identifier;
 			this._rawReader = rawReader;
 			this._indexType = indexType;
@@ -36,7 +35,7 @@
 			this._pos = pos;
 		}
 
-		private IRawReader _rawReader { get; }
+		private RawReader _rawReader { get; }
 		internal long _dataPos;
 		internal long _pos { get; }
 		internal byte[] _index { get; }
@@ -64,12 +63,8 @@
 		/// <inheritdoc/>
 		public IRuntimeValue Value => new RuntimeValue(this._rawReader, this._dataPos, null);
 
-		/// <inheritdoc/>
-		public long ValueLength
-			=> this._rawReader.ReadLength(this._dataPos);
-
 		/// <summary>A simple string form of the item.</summary>
 		public override string ToString() =>
-			$"[Index: {Index.ToString()}, Value: {Value.ToString()}]";
+			$"[Index: {this.Index.ToString()}, Value: {this.Value.ToString()}]";
 	}
 }
