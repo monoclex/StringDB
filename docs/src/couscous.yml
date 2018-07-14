@@ -1,0 +1,42 @@
+template:
+    directory: website
+    url: https://github.com/CouscousPHP/Template-Light.git
+    index: README.md
+    
+baseUrl: http://SirJosh3917.github.io/StringDB
+
+title: StringDB
+subTitle: StringDB is a fast, powerful, lightweight archival-style DB that uses mainly (you guessed it!) strings.
+
+github:
+    user: SirJosh3917
+    repo: StringDB
+
+menu:
+    items:
+        home:
+            text: Home
+            relativeUrl:
+        gettingstarted:
+            text: Getting Started
+            relativeUrl: gettingstarted.html
+        docs:
+            text: Class Documentation
+            relativeUrl: reference/index.html
+        autoxml:
+            text: Auto-generated XML docs
+            relativeUrl: stringdbxml.html
+
+exclude:
+    - %gitignore%
+    - PostBuild
+    - StringDB.Benchmarks
+    - StringDB.Tester
+    - StringDB
+    - StringDB.sln
+    - README.md
+    - LICENSE
+    - .gitignore
+    - appveyor.yml
+
+title: Hello World!

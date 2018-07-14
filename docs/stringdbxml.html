@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>StringDB</title>
+
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/css/highlight.dark.css">
+        <link rel="stylesheet" href="/css/main.css">
+    </head>
+    <body>
+
+        <header class="navbar navbar-default navbar-fixed-top">
+
+            <a class="navbar-brand" href="/">
+                StringDB
+                <small class="hidden-xs hidden-sm">
+                    StringDB is a fast, powerful, lightweight archival-style DB that uses mainly (you guessed it!) strings.
+                </small>
+            </a>
+
+                            <a href="https://github.com/SirJosh3917/StringDB">
+                    <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+                </a>
+            
+        </header>
+
+        <main class="container-fluid">
+            <div class="row">
+
+                
+                    <nav id="sidebar" class="col-sm-3 col-lg-2" role="navigation">
+
+                        <ul class="nav nav-pills nav-stacked">
+                                                            <li class="">
+                                    <a href="/">
+                                        Home
+                                    </a>
+                                </li>
+                                                            <li class="">
+                                    <a href="/gettingstarted.html">
+                                        Getting Started
+                                    </a>
+                                </li>
+                                                            <li class="">
+                                    <a href="/reference/index.html">
+                                        Class Documentation
+                                    </a>
+                                </li>
+                                                            <li class="">
+                                    <a href="/stringdbxml.html">
+                                        Auto-generated XML docs
+                                    </a>
+                                </li>
+                                                    </ul>
+
+                    </nav>
+
+                
+                <section id="content" class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
+                    <ul>
+<li><a href="#classes">Classes</a>
+<ul>
+<li><a href="#stringdbconsts">StringDB.Consts</a></li>
+<li><a href="#stringdbdatabase">StringDB.Database</a></li>
+<li><a href="#stringdbidatabase">StringDB.IDatabase</a></li>
+<li><a href="#stringdbitypehandler">StringDB.ITypeHandler</a></li>
+<li><a href="#stringdbreaderipart">StringDB.Reader.IPart</a></li>
+<li><a href="#stringdbreaderireader">StringDB.Reader.IReader</a></li>
+<li><a href="#stringdbreaderireaderpair">StringDB.Reader.IReaderPair</a></li>
+<li><a href="#stringdbreaderreader">StringDB.Reader.Reader</a></li>
+<li><a href="#stringdbreaderreaderenumerator">StringDB.Reader.ReaderEnumerator</a></li>
+<li><a href="#stringdbreaderreaderpair">StringDB.Reader.ReaderPair</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpair">StringDB.Reader.ThreadSafeReaderPair</a></li>
+<li><a href="#stringdbthreadsafedatabase">StringDB.ThreadSafeDatabase</a></li>
+<li><a href="#stringdbtypehandlertclass1">StringDB.TypeHandler&lt;TClass1&gt;</a></li>
+<li><a href="#stringdbtypehandlerdoesntexist">StringDB.TypeHandlerDoesntExist</a></li>
+<li><a href="#stringdbtypehandlerexists">StringDB.TypeHandlerExists</a></li>
+<li><a href="#stringdbtypemanager">StringDB.TypeManager</a></li>
+<li><a href="#stringdbwriteriwriter">StringDB.Writer.IWriter</a></li>
+<li><a href="#stringdbwriterwriter">StringDB.Writer.Writer</a></li>
+</ul></li>
+</ul>
+<hr />
+<ul>
+<li><a href="#methods">Methods</a>
+<ul>
+<li><a href="#stringdbdatabasecleanfromstringdbidatabase-dbcleanfrom">StringDB.Database.CleanFrom(StringDB.IDatabase dbCleanFrom)</a></li>
+<li><a href="#stringdbdatabasecleantostringdbidatabase-dbcleanto">StringDB.Database.CleanTo(StringDB.IDatabase dbCleanTo)</a></li>
+<li><a href="#stringdbdatabasedispose">StringDB.Database.Dispose</a></li>
+<li><a href="#stringdbdatabasedrainbuffer">StringDB.Database.DrainBuffer</a></li>
+<li><a href="#stringdbdatabasefirst">StringDB.Database.First</a></li>
+<li><a href="#stringdbdatabaseflush">StringDB.Database.Flush</a></li>
+<li><a href="#stringdbdatabasefromfilesystemstring-name">StringDB.Database.FromFile(System.String name)</a></li>
+<li><a href="#stringdbdatabasefromstreamsystemiostream-s-systemboolean-disposestream">StringDB.Database.FromStream(System.IO.Stream s, System.Boolean disposeStream)</a></li>
+<li><a href="#stringdbdatabasegettparam1tparam1">StringDB.Database.Get&lt;TParam1&gt;(&lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbdatabasegettparam1stringdbtypehandlertparam1-tparam1">StringDB.Database.Get&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbdatabasegetalltparam1tparam1">StringDB.Database.GetAll&lt;TParam1&gt;(&lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbdatabasegetalltparam1stringdbtypehandlertparam1-tparam1">StringDB.Database.GetAll&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbdatabasegetenumerator">StringDB.Database.GetEnumerator</a></li>
+<li><a href="#stringdbdatabaseinserttparam1-tparam2tparam1-tparam2">StringDB.Database.Insert&lt;TParam1, TParam2&gt;(&lt;TParam1&gt;, &lt;TParam2&gt;)</a></li>
+<li><a href="#stringdbdatabaseinserttparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-tparam1-tparam2">StringDB.Database.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, &lt;TParam1&gt;, &lt;TParam2&gt;)</a></li>
+<li><a href="#stringdbdatabaseinserttparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-systemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Database.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</a></li>
+<li><a href="#stringdbdatabaseinserttparam1-tparam2systemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Database.Insert&lt;TParam1, TParam2&gt;(System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</a></li>
+<li><a href="#stringdbdatabaseinsertrangetparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Database.InsertRange&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</a></li>
+<li><a href="#stringdbdatabaseinsertrangetparam1-tparam2systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Database.InsertRange&lt;TParam1, TParam2&gt;(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</a></li>
+<li><a href="#stringdbdatabasemakethreadsafe">StringDB.Database.MakeThreadSafe</a></li>
+<li><a href="#stringdbdatabaseoverwritevaluetparam1stringdbreaderireaderpair-tparam1">StringDB.Database.OverwriteValue&lt;TParam1&gt;(StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbdatabaseoverwritevaluetparam1stringdbtypehandlertparam1-stringdbreaderireaderpair-tparam1">StringDB.Database.OverwriteValue&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbdatabasesystem#collections#ienumerable#getenumerator">StringDB.Database.System#Collections#IEnumerable#GetEnumerator</a></li>
+<li><a href="#stringdbdatabasetrygettparam1tparam1-stringdbreaderireaderpair@">StringDB.Database.TryGet&lt;TParam1&gt;(&lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</a></li>
+<li><a href="#stringdbdatabasetrygettparam1stringdbtypehandlertparam1-tparam1-stringdbreaderireaderpair@">StringDB.Database.TryGet&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</a></li>
+<li><a href="#stringdbidatabasecleanfromstringdbidatabase-dbcleanfrom">StringDB.IDatabase.CleanFrom(StringDB.IDatabase dbCleanFrom)</a></li>
+<li><a href="#stringdbidatabasecleantostringdbidatabase-dbcleanto">StringDB.IDatabase.CleanTo(StringDB.IDatabase dbCleanTo)</a></li>
+<li><a href="#stringdbidatabaseflush">StringDB.IDatabase.Flush</a></li>
+<li><a href="#stringdbreaderireaderdrainbuffer">StringDB.Reader.IReader.DrainBuffer</a></li>
+<li><a href="#stringdbreaderireaderfirst">StringDB.Reader.IReader.First</a></li>
+<li><a href="#stringdbreaderireadergettparam1tparam1">StringDB.Reader.IReader.Get&lt;TParam1&gt;(&lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbreaderireadergettparam1stringdbtypehandlertparam1-tparam1">StringDB.Reader.IReader.Get&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbreaderireadergetalltparam1tparam1">StringDB.Reader.IReader.GetAll&lt;TParam1&gt;(&lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbreaderireadergetalltparam1stringdbtypehandlertparam1-tparam1">StringDB.Reader.IReader.GetAll&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbreaderireadertrygettparam1tparam1-stringdbreaderireaderpair@">StringDB.Reader.IReader.TryGet&lt;TParam1&gt;(&lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</a></li>
+<li><a href="#stringdbreaderireadertrygettparam1stringdbtypehandlertparam1-tparam1-stringdbreaderireaderpair@">StringDB.Reader.IReader.TryGet&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</a></li>
+<li><a href="#stringdbreaderireaderpairgetindexastparam1">StringDB.Reader.IReaderPair.GetIndexAs&lt;TParam1&gt;</a></li>
+<li><a href="#stringdbreaderireaderpairgetvaluetparam1">StringDB.Reader.IReaderPair.GetValue&lt;TParam1&gt;</a></li>
+<li><a href="#stringdbreaderireaderpairgetvalueastparam1">StringDB.Reader.IReaderPair.GetValueAs&lt;TParam1&gt;</a></li>
+<li><a href="#stringdbreaderreaderdrainbuffer">StringDB.Reader.Reader.DrainBuffer</a></li>
+<li><a href="#stringdbreaderreaderfirst">StringDB.Reader.Reader.First</a></li>
+<li><a href="#stringdbreaderreadergettparam1tparam1">StringDB.Reader.Reader.Get&lt;TParam1&gt;(&lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbreaderreadergettparam1stringdbtypehandlertparam1-tparam1">StringDB.Reader.Reader.Get&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbreaderreadergetalltparam1tparam1">StringDB.Reader.Reader.GetAll&lt;TParam1&gt;(&lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbreaderreadergetalltparam1stringdbtypehandlertparam1-tparam1">StringDB.Reader.Reader.GetAll&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbreaderreadergetenumerator">StringDB.Reader.Reader.GetEnumerator</a></li>
+<li><a href="#stringdbreaderreadersystem#collections#ienumerable#getenumerator">StringDB.Reader.Reader.System#Collections#IEnumerable#GetEnumerator</a></li>
+<li><a href="#stringdbreaderreadertrygettparam1tparam1-stringdbreaderireaderpair@">StringDB.Reader.Reader.TryGet&lt;TParam1&gt;(&lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</a></li>
+<li><a href="#stringdbreaderreadertrygettparam1stringdbtypehandlertparam1-tparam1-stringdbreaderireaderpair@">StringDB.Reader.Reader.TryGet&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</a></li>
+<li><a href="#stringdbreaderreaderenumeratordispose">StringDB.Reader.ReaderEnumerator.Dispose</a></li>
+<li><a href="#stringdbreaderreaderenumeratormovenext">StringDB.Reader.ReaderEnumerator.MoveNext</a></li>
+<li><a href="#stringdbreaderreaderenumeratorreset">StringDB.Reader.ReaderEnumerator.Reset</a></li>
+<li><a href="#stringdbreaderreaderpairgetindexastparam1">StringDB.Reader.ReaderPair.GetIndexAs&lt;TParam1&gt;</a></li>
+<li><a href="#stringdbreaderreaderpairgetvaluetparam1">StringDB.Reader.ReaderPair.GetValue&lt;TParam1&gt;</a></li>
+<li><a href="#stringdbreaderreaderpairgetvalueastparam1">StringDB.Reader.ReaderPair.GetValueAs&lt;TParam1&gt;</a></li>
+<li><a href="#stringdbreaderreaderpairtostring">StringDB.Reader.ReaderPair.ToString</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpairfrompairstringdbreaderireaderpair-readerpair-systemobject-lock">StringDB.Reader.ThreadSafeReaderPair.FromPair(StringDB.Reader.IReaderPair readerPair, System.Object lock)</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpairgetindexastparam1">StringDB.Reader.ThreadSafeReaderPair.GetIndexAs&lt;TParam1&gt;</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpairgetvaluetparam1">StringDB.Reader.ThreadSafeReaderPair.GetValue&lt;TParam1&gt;</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpairgetvalueastparam1">StringDB.Reader.ThreadSafeReaderPair.GetValueAs&lt;TParam1&gt;</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpairtostring">StringDB.Reader.ThreadSafeReaderPair.ToString</a></li>
+<li><a href="#stringdbthreadsafedatabasecleanfromstringdbidatabase-dbcleanfrom">StringDB.ThreadSafeDatabase.CleanFrom(StringDB.IDatabase dbCleanFrom)</a></li>
+<li><a href="#stringdbthreadsafedatabasecleantostringdbidatabase-dbcleanto">StringDB.ThreadSafeDatabase.CleanTo(StringDB.IDatabase dbCleanTo)</a></li>
+<li><a href="#stringdbthreadsafedatabasedispose">StringDB.ThreadSafeDatabase.Dispose</a></li>
+<li><a href="#stringdbthreadsafedatabasedrainbuffer">StringDB.ThreadSafeDatabase.DrainBuffer</a></li>
+<li><a href="#stringdbthreadsafedatabasefirst">StringDB.ThreadSafeDatabase.First</a></li>
+<li><a href="#stringdbthreadsafedatabaseflush">StringDB.ThreadSafeDatabase.Flush</a></li>
+<li><a href="#stringdbthreadsafedatabasefromdatabasestringdbidatabase-db">StringDB.ThreadSafeDatabase.FromDatabase(StringDB.IDatabase db)</a></li>
+<li><a href="#stringdbthreadsafedatabasegettparam1tparam1">StringDB.ThreadSafeDatabase.Get&lt;TParam1&gt;(&lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbthreadsafedatabasegettparam1stringdbtypehandlertparam1-tparam1">StringDB.ThreadSafeDatabase.Get&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbthreadsafedatabasegetalltparam1tparam1">StringDB.ThreadSafeDatabase.GetAll&lt;TParam1&gt;(&lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbthreadsafedatabasegetalltparam1stringdbtypehandlertparam1-tparam1">StringDB.ThreadSafeDatabase.GetAll&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbthreadsafedatabasegetenumerator">StringDB.ThreadSafeDatabase.GetEnumerator</a></li>
+<li><a href="#stringdbthreadsafedatabaseinserttparam1-tparam2tparam1-tparam2">StringDB.ThreadSafeDatabase.Insert&lt;TParam1, TParam2&gt;(&lt;TParam1&gt;, &lt;TParam2&gt;)</a></li>
+<li><a href="#stringdbthreadsafedatabaseinserttparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-tparam1-tparam2">StringDB.ThreadSafeDatabase.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, &lt;TParam1&gt;, &lt;TParam2&gt;)</a></li>
+<li><a href="#stringdbthreadsafedatabaseinserttparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-systemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.ThreadSafeDatabase.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</a></li>
+<li><a href="#stringdbthreadsafedatabaseinserttparam1-tparam2systemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.ThreadSafeDatabase.Insert&lt;TParam1, TParam2&gt;(System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</a></li>
+<li><a href="#stringdbthreadsafedatabaseinsertrangetparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.ThreadSafeDatabase.InsertRange&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</a></li>
+<li><a href="#stringdbthreadsafedatabaseinsertrangetparam1-tparam2systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.ThreadSafeDatabase.InsertRange&lt;TParam1, TParam2&gt;(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</a></li>
+<li><a href="#stringdbthreadsafedatabaseoverwritevaluetparam1stringdbreaderireaderpair-tparam1">StringDB.ThreadSafeDatabase.OverwriteValue&lt;TParam1&gt;(StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbthreadsafedatabaseoverwritevaluetparam1stringdbtypehandlertparam1-stringdbreaderireaderpair-tparam1">StringDB.ThreadSafeDatabase.OverwriteValue&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbthreadsafedatabasesystem#collections#ienumerable#getenumerator">StringDB.ThreadSafeDatabase.System#Collections#IEnumerable#GetEnumerator</a></li>
+<li><a href="#stringdbthreadsafedatabasetrygettparam1tparam1-stringdbreaderireaderpair@">StringDB.ThreadSafeDatabase.TryGet&lt;TParam1&gt;(&lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</a></li>
+<li><a href="#stringdbthreadsafedatabasetrygettparam1stringdbtypehandlertparam1-tparam1-stringdbreaderireaderpair@">StringDB.ThreadSafeDatabase.TryGet&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</a></li>
+<li><a href="#stringdbtypehandlertclass1comparetclass1-item1-tclass1-item2">StringDB.TypeHandler&lt;TClass1&gt;.Compare(&lt;TClass1&gt; item1, &lt;TClass1&gt; item2)</a></li>
+<li><a href="#stringdbtypehandlertclass1getlengthtclass1-item">StringDB.TypeHandler&lt;TClass1&gt;.GetLength(&lt;TClass1&gt; item)</a></li>
+<li><a href="#stringdbtypehandlertclass1readsystemiobinaryreader-br-systemint64-len">StringDB.TypeHandler&lt;TClass1&gt;.Read(System.IO.BinaryReader br, System.Int64 len)</a></li>
+<li><a href="#stringdbtypehandlertclass1writesystemiobinarywriter-bw-tclass1-item">StringDB.TypeHandler&lt;TClass1&gt;.Write(System.IO.BinaryWriter bw, &lt;TClass1&gt; item)</a></li>
+<li><a href="#stringdbtypemanagergethandlerforsystembyte-id">StringDB.TypeManager.GetHandlerFor(System.Byte id)</a></li>
+<li><a href="#stringdbtypemanagergethandlerfortparam1">StringDB.TypeManager.GetHandlerFor&lt;TParam1&gt;</a></li>
+<li><a href="#stringdbtypemanageroverridingregistertypetparam1stringdbtypehandlertparam1-t">StringDB.TypeManager.OverridingRegisterType&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;} t)</a></li>
+<li><a href="#stringdbtypemanagerregistertypetparam1stringdbtypehandlertparam1-t">StringDB.TypeManager.RegisterType&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;} t)</a></li>
+<li><a href="#stringdbwriteriwriterflush">StringDB.Writer.IWriter.Flush</a></li>
+<li><a href="#stringdbwriteriwriterinserttparam1-tparam2tparam1-tparam2">StringDB.Writer.IWriter.Insert&lt;TParam1, TParam2&gt;(&lt;TParam1&gt;, &lt;TParam2&gt;)</a></li>
+<li><a href="#stringdbwriteriwriterinserttparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-tparam1-tparam2">StringDB.Writer.IWriter.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, &lt;TParam1&gt;, &lt;TParam2&gt;)</a></li>
+<li><a href="#stringdbwriteriwriterinserttparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-systemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Writer.IWriter.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</a></li>
+<li><a href="#stringdbwriteriwriterinserttparam1-tparam2systemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Writer.IWriter.Insert&lt;TParam1, TParam2&gt;(System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</a></li>
+<li><a href="#stringdbwriteriwriterinsertrangetparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Writer.IWriter.InsertRange&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</a></li>
+<li><a href="#stringdbwriteriwriterinsertrangetparam1-tparam2systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Writer.IWriter.InsertRange&lt;TParam1, TParam2&gt;(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</a></li>
+<li><a href="#stringdbwriteriwriteroverwritevaluetparam1stringdbreaderireaderpair-tparam1">StringDB.Writer.IWriter.OverwriteValue&lt;TParam1&gt;(StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbwriteriwriteroverwritevaluetparam1stringdbtypehandlertparam1-stringdbreaderireaderpair-tparam1">StringDB.Writer.IWriter.OverwriteValue&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbwriterwriter#ctorsystemiostream-s">StringDB.Writer.Writer.#ctor(System.IO.Stream s)</a></li>
+<li><a href="#stringdbwriterwriterflush">StringDB.Writer.Writer.Flush</a></li>
+<li><a href="#stringdbwriterwriterinserttparam1-tparam2tparam1-tparam2">StringDB.Writer.Writer.Insert&lt;TParam1, TParam2&gt;(&lt;TParam1&gt;, &lt;TParam2&gt;)</a></li>
+<li><a href="#stringdbwriterwriterinserttparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-tparam1-tparam2">StringDB.Writer.Writer.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, &lt;TParam1&gt;, &lt;TParam2&gt;)</a></li>
+<li><a href="#stringdbwriterwriterinserttparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-systemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Writer.Writer.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</a></li>
+<li><a href="#stringdbwriterwriterinserttparam1-tparam2systemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Writer.Writer.Insert&lt;TParam1, TParam2&gt;(System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</a></li>
+<li><a href="#stringdbwriterwriterinsertrangetparam1-tparam2stringdbtypehandlertparam1-stringdbtypehandlertparam2-systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Writer.Writer.InsertRange&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</a></li>
+<li><a href="#stringdbwriterwriterinsertrangetparam1-tparam2systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairtparam1-tparam2">StringDB.Writer.Writer.InsertRange&lt;TParam1, TParam2&gt;(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</a></li>
+<li><a href="#stringdbwriterwriteroverwritevaluetparam1stringdbreaderireaderpair-tparam1">StringDB.Writer.Writer.OverwriteValue&lt;TParam1&gt;(StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</a></li>
+<li><a href="#stringdbwriterwriteroverwritevaluetparam1stringdbtypehandlertparam1-stringdbreaderireaderpair-tparam1">StringDB.Writer.Writer.OverwriteValue&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</a></li>
+</ul></li>
+</ul>
+<hr />
+<ul>
+<li><a href="#properties">Properties</a>
+<ul>
+<li><a href="#stringdbitypehandlerid">StringDB.ITypeHandler.Id</a></li>
+<li><a href="#stringdbitypehandlertype">StringDB.ITypeHandler.Type</a></li>
+<li><a href="#stringdbreaderipartinitialbyte">StringDB.Reader.IPart.InitialByte</a></li>
+<li><a href="#stringdbreaderipartnextpart">StringDB.Reader.IPart.NextPart</a></li>
+<li><a href="#stringdbreaderipartposition">StringDB.Reader.IPart.Position</a></li>
+<li><a href="#stringdbreaderireaderpairbytearrayindex">StringDB.Reader.IReaderPair.ByteArrayIndex</a></li>
+<li><a href="#stringdbreaderireaderpairdataposition">StringDB.Reader.IReaderPair.DataPosition</a></li>
+<li><a href="#stringdbreaderireaderpairindex">StringDB.Reader.IReaderPair.Index</a></li>
+<li><a href="#stringdbreaderireaderpairposition">StringDB.Reader.IReaderPair.Position</a></li>
+<li><a href="#stringdbreaderireaderpairvaluelength">StringDB.Reader.IReaderPair.ValueLength</a></li>
+<li><a href="#stringdbreaderreaderenumeratorcurrent">StringDB.Reader.ReaderEnumerator.Current</a></li>
+<li><a href="#stringdbreaderreaderpairbytearrayindex">StringDB.Reader.ReaderPair.ByteArrayIndex</a></li>
+<li><a href="#stringdbreaderreaderpairdataposition">StringDB.Reader.ReaderPair.DataPosition</a></li>
+<li><a href="#stringdbreaderreaderpairindex">StringDB.Reader.ReaderPair.Index</a></li>
+<li><a href="#stringdbreaderreaderpairposition">StringDB.Reader.ReaderPair.Position</a></li>
+<li><a href="#stringdbreaderreaderpairvaluelength">StringDB.Reader.ReaderPair.ValueLength</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpairbytearrayindex">StringDB.Reader.ThreadSafeReaderPair.ByteArrayIndex</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpairdataposition">StringDB.Reader.ThreadSafeReaderPair.DataPosition</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpairindex">StringDB.Reader.ThreadSafeReaderPair.Index</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpairposition">StringDB.Reader.ThreadSafeReaderPair.Position</a></li>
+<li><a href="#stringdbreaderthreadsafereaderpairvaluelength">StringDB.Reader.ThreadSafeReaderPair.ValueLength</a></li>
+<li><a href="#stringdbtypehandlertclass1id">StringDB.TypeHandler&lt;TClass1&gt;.Id</a></li>
+<li><a href="#stringdbtypehandlertclass1type">StringDB.TypeHandler&lt;TClass1&gt;.Type</a></li>
+</ul></li>
+</ul>
+<hr />
+<ul>
+<li><a href="#fields">Fields</a>
+<ul>
+<li><a href="#stringdbconstsdeletedvalue">StringDB.Consts.DeletedValue</a></li>
+<li><a href="#stringdbconstsindexseperator">StringDB.Consts.IndexSeperator</a></li>
+<li><a href="#stringdbconstsisbytevalue">StringDB.Consts.IsByteValue</a></li>
+<li><a href="#stringdbconstsislongvalue">StringDB.Consts.IsLongValue</a></li>
+<li><a href="#stringdbconstsisuintvalue">StringDB.Consts.IsUIntValue</a></li>
+<li><a href="#stringdbconstsisushortvalue">StringDB.Consts.IsUShortValue</a></li>
+<li><a href="#stringdbconstsmaxlength">StringDB.Consts.MaxLength</a></li>
+<li><a href="#stringdbconstsnoindex">StringDB.Consts.NoIndex</a></li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="classes">Classes</h2>
+<h2 id="stringdbconsts">StringDB.Consts</h2>
+<h2 id="stringdbdatabase">StringDB.Database</h2>
+<h4 id="summary">Summary</h4>
+<p>Some kind of wwriter that writes stuff.</p>
+<h2 id="stringdbidatabase">StringDB.IDatabase</h2>
+<h4 id="summary-1">Summary</h4>
+<p>A StringDB database, used to encapsulate an IReader and an IWriter together for easy usage.</p>
+<h2 id="stringdbitypehandler">StringDB.ITypeHandler</h2>
+<h4 id="summary-2">Summary</h4>
+<p>A generic interface for a given TypeHandler</p>
+<h2 id="stringdbreaderipart">StringDB.Reader.IPart</h2>
+<h2 id="stringdbreaderireader">StringDB.Reader.IReader</h2>
+<h4 id="summary-3">Summary</h4>
+<p>Defines a reader. Use it to read out data</p>
+<h2 id="stringdbreaderireaderpair">StringDB.Reader.IReaderPair</h2>
+<h4 id="summary-4">Summary</h4>
+<p>A pair of data - this correlates an index to it's corresponding value.</p>
+<h2 id="stringdbreaderreader">StringDB.Reader.Reader</h2>
+<h4 id="summary-5">Summary</h4>
+<p>A Reader that reads out a StringDB database file.</p>
+<h2 id="stringdbreaderreaderenumerator">StringDB.Reader.ReaderEnumerator</h2>
+<h4 id="summary-6">Summary</h4>
+<p>Used to enumerate over a StringDB.</p>
+<h2 id="stringdbreaderreaderpair">StringDB.Reader.ReaderPair</h2>
+<h4 id="summary-7">Summary</h4>
+<p>A pair of data - this correlates an index to it's corresponding value.</p>
+<h2 id="stringdbreaderthreadsafereaderpair">StringDB.Reader.ThreadSafeReaderPair</h2>
+<h4 id="summary-8">Summary</h4>
+<p>Make a ReaderPair thread safe.</p>
+<h2 id="stringdbthreadsafedatabase">StringDB.ThreadSafeDatabase</h2>
+<h4 id="summary-9">Summary</h4>
+<p>Uses a lock before doing any action to add thread safety</p>
+<h2 id="stringdbtypehandlerlttclass1gt">StringDB.TypeHandler&lt;TClass1&gt;</h2>
+<h4 id="summary-10">Summary</h4>
+<p>Allows StringDB to handle a new type, without much effort.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbtypehandlerdoesntexist">StringDB.TypeHandlerDoesntExist</h2>
+<h4 id="summary-11">Summary</h4>
+<p>An exception that gets thrown when attempting to get a Type that doesn't exist.</p>
+<h2 id="stringdbtypehandlerexists">StringDB.TypeHandlerExists</h2>
+<h4 id="summary-12">Summary</h4>
+<p>An exception that gets thrown when attempting to register a Type if it already exists</p>
+<h2 id="stringdbtypemanager">StringDB.TypeManager</h2>
+<h4 id="summary-13">Summary</h4>
+<p>Manages the types StringDB can read and write. Add your own if you need more types!</p>
+<h2 id="stringdbwriteriwriter">StringDB.Writer.IWriter</h2>
+<h4 id="summary-14">Summary</h4>
+<p>Some kind of wwriter that writes stuff.</p>
+<h2 id="stringdbwriterwriter">StringDB.Writer.Writer</h2>
+<h4 id="summary-15">Summary</h4>
+<p>Some kind of wwriter that writes stuff.</p>
+<h2 id="methods">Methods</h2>
+<h2 id="stringdbdatabasecleanfromstringdbidatabase-dbcleanfrom">StringDB.Database.CleanFrom(StringDB.IDatabase dbCleanFrom)</h2>
+<h4 id="summary-16">Summary</h4>
+<p>Cleans out the database specified, and copies all of the contents of the other database into this one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dbCleanFrom</td>
+<td>The database to clean up</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbdatabasecleantostringdbidatabase-dbcleanto">StringDB.Database.CleanTo(StringDB.IDatabase dbCleanTo)</h2>
+<h4 id="summary-17">Summary</h4>
+<p>Cleans out the current database, and copies all of the contents of this database into the other one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dbCleanTo</td>
+<td>The database that will be used to insert the other database's values into</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbdatabasedispose">StringDB.Database.Dispose</h2>
+<h2 id="stringdbdatabasedrainbuffer">StringDB.Database.DrainBuffer</h2>
+<h4 id="summary-18">Summary</h4>
+<p>Clears out the buffer. Will cause performance issues if you do it too often.</p>
+<h2 id="stringdbdatabasefirst">StringDB.Database.First</h2>
+<h4 id="summary-19">Summary</h4>
+<p>Gets the very first element in the database</p>
+<h2 id="stringdbdatabaseflush">StringDB.Database.Flush</h2>
+<h4 id="summary-20">Summary</h4>
+<p>Flushes the prepending data to write to the stream</p>
+<h2 id="stringdbdatabasefromfilesystemstring-name">StringDB.Database.FromFile(System.String name)</h2>
+<h4 id="summary-21">Summary</h4>
+<p>Create a new Database from a string name to open a file</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>The name of the file</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbdatabasefromstreamsystemiostream-s-systemboolean-disposestream">StringDB.Database.FromStream(System.IO.Stream s, System.Boolean disposeStream)</h2>
+<h4 id="summary-22">Summary</h4>
+<p>Create a new Database from a stream</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>s</td>
+<td>The stream to be using</td>
+</tr>
+<tr>
+<td>disposeStream</td>
+<td>If the stream should be disposed after we're done using it</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbdatabasegetlttparam1gtlttparam1gt">StringDB.Database.Get&lt;TParam1&gt;(&lt;TParam1&gt;)</h2>
+<h4 id="summary-23">Summary</h4>
+<p>Gets the ReaderPair responsible for a given index</p>
+<h2 id="stringdbdatabasegetlttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt">StringDB.Database.Get&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</h2>
+<h4 id="summary-24">Summary</h4>
+<p>Gets the ReaderPair responsible for a given index</p>
+<h2 id="stringdbdatabasegetalllttparam1gtlttparam1gt">StringDB.Database.GetAll&lt;TParam1&gt;(&lt;TParam1&gt;)</h2>
+<h4 id="summary-25">Summary</h4>
+<p>Gets the multiple ReaderPairs responsible for a given index</p>
+<h2 id="stringdbdatabasegetalllttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt">StringDB.Database.GetAll&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</h2>
+<h4 id="summary-26">Summary</h4>
+<p>Gets the multiple ReaderPairs responsible for a given index</p>
+<h2 id="stringdbdatabasegetenumerator">StringDB.Database.GetEnumerator</h2>
+<h2 id="stringdbdatabaseinsertlttparam1-tparam2gtlttparam1gt-lttparam2gt">StringDB.Database.Insert&lt;TParam1, TParam2&gt;(&lt;TParam1&gt;, &lt;TParam2&gt;)</h2>
+<h4 id="summary-27">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbdatabaseinsertlttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-lttparam1gt-lttparam2gt">StringDB.Database.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, &lt;TParam1&gt;, &lt;TParam2&gt;)</h2>
+<h4 id="summary-28">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbdatabaseinsertlttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-systemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Database.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</h2>
+<h4 id="summary-29">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbdatabaseinsertlttparam1-tparam2gtsystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Database.Insert&lt;TParam1, TParam2&gt;(System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</h2>
+<h4 id="summary-30">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbdatabaseinsertrangelttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Database.InsertRange&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</h2>
+<h4 id="summary-31">Summary</h4>
+<p>Insert multiple items into the database.</p>
+<h2 id="stringdbdatabaseinsertrangelttparam1-tparam2gtsystemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Database.InsertRange&lt;TParam1, TParam2&gt;(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</h2>
+<h4 id="summary-32">Summary</h4>
+<p>Insert multiple items into the database.</p>
+<h2 id="stringdbdatabasemakethreadsafe">StringDB.Database.MakeThreadSafe</h2>
+<h4 id="summary-33">Summary</h4>
+<p>Wraps this database into thread safety using a ThreadSafeDatabase</p>
+<h2 id="stringdbdatabaseoverwritevaluelttparam1gtstringdbreaderireaderpair-lttparam1gt">StringDB.Database.OverwriteValue&lt;TParam1&gt;(StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</h2>
+<h4 id="summary-34">Summary</h4>
+<p>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</p>
+<h2 id="stringdbdatabaseoverwritevaluelttparam1gtstringdbtypehandlerlttparam1gt-stringdbreaderireaderpair-lttparam1gt">StringDB.Database.OverwriteValue&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</h2>
+<h4 id="summary-35">Summary</h4>
+<p>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</p>
+<h2 id="stringdbdatabasesystemcollectionsienumerablegetenumerator">StringDB.Database.System#Collections#IEnumerable#GetEnumerator</h2>
+<h2 id="stringdbdatabasetrygetlttparam1gtlttparam1gt-stringdbreaderireaderpair">StringDB.Database.TryGet&lt;TParam1&gt;(&lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</h2>
+<h4 id="summary-36">Summary</h4>
+<p>Attempts to get the ReaderPair</p>
+<h2 id="stringdbdatabasetrygetlttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt-stringdbreaderireaderpair">StringDB.Database.TryGet&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</h2>
+<h4 id="summary-37">Summary</h4>
+<p>Attempts to get the ReaderPair</p>
+<h2 id="stringdbidatabasecleanfromstringdbidatabase-dbcleanfrom">StringDB.IDatabase.CleanFrom(StringDB.IDatabase dbCleanFrom)</h2>
+<h4 id="summary-38">Summary</h4>
+<p>Cleans out the database specified, and copies all of the contents of the other database into this one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dbCleanFrom</td>
+<td>The database to clean up</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbidatabasecleantostringdbidatabase-dbcleanto">StringDB.IDatabase.CleanTo(StringDB.IDatabase dbCleanTo)</h2>
+<h4 id="summary-39">Summary</h4>
+<p>Cleans out the current database, and copies all of the contents of this database into the other one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dbCleanTo</td>
+<td>The database that will be used to insert the other database's values into</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbidatabaseflush">StringDB.IDatabase.Flush</h2>
+<h4 id="summary-40">Summary</h4>
+<p>Clears all buffers for this stream and causes any buffered data to be written to the underlying device.</p>
+<h2 id="stringdbreaderireaderdrainbuffer">StringDB.Reader.IReader.DrainBuffer</h2>
+<h4 id="summary-41">Summary</h4>
+<p>Clears out the buffer. Will cause performance issues if you do it too often.</p>
+<h2 id="stringdbreaderireaderfirst">StringDB.Reader.IReader.First</h2>
+<h4 id="summary-42">Summary</h4>
+<p>Gets the very first element in the database</p>
+<h2 id="stringdbreaderireadergetlttparam1gtlttparam1gt">StringDB.Reader.IReader.Get&lt;TParam1&gt;(&lt;TParam1&gt;)</h2>
+<h4 id="summary-43">Summary</h4>
+<p>Gets the ReaderPair responsible for a given index</p>
+<h2 id="stringdbreaderireadergetlttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt">StringDB.Reader.IReader.Get&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</h2>
+<h4 id="summary-44">Summary</h4>
+<p>Gets the ReaderPair responsible for a given index</p>
+<h2 id="stringdbreaderireadergetalllttparam1gtlttparam1gt">StringDB.Reader.IReader.GetAll&lt;TParam1&gt;(&lt;TParam1&gt;)</h2>
+<h4 id="summary-45">Summary</h4>
+<p>Gets the multiple ReaderPairs responsible for a given index</p>
+<h2 id="stringdbreaderireadergetalllttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt">StringDB.Reader.IReader.GetAll&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</h2>
+<h4 id="summary-46">Summary</h4>
+<p>Gets the multiple ReaderPairs responsible for a given index</p>
+<h2 id="stringdbreaderireadertrygetlttparam1gtlttparam1gt-stringdbreaderireaderpair">StringDB.Reader.IReader.TryGet&lt;TParam1&gt;(&lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</h2>
+<h4 id="summary-47">Summary</h4>
+<p>Attempts to get the ReaderPair</p>
+<h2 id="stringdbreaderireadertrygetlttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt-stringdbreaderireaderpair">StringDB.Reader.IReader.TryGet&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</h2>
+<h4 id="summary-48">Summary</h4>
+<p>Attempts to get the ReaderPair</p>
+<h2 id="stringdbreaderireaderpairgetindexaslttparam1gt">StringDB.Reader.IReaderPair.GetIndexAs&lt;TParam1&gt;</h2>
+<h4 id="summary-49">Summary</h4>
+<p>Get the index as any type the TypeHandler can handle.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type to read the index as.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbreaderireaderpairgetvaluelttparam1gt">StringDB.Reader.IReaderPair.GetValue&lt;TParam1&gt;</h2>
+<h4 id="summary-50">Summary</h4>
+<p>Read the data stored at the index as the type it was meant to be.</p>
+<h4 id="remarks">Remarks</h4>
+<p>See GetValueAs to try convert the value into the specified type.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type of the data that is stored.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbreaderireaderpairgetvalueaslttparam1gt">StringDB.Reader.IReaderPair.GetValueAs&lt;TParam1&gt;</h2>
+<h4 id="summary-51">Summary</h4>
+<p>Read the data stored at the index and ignore the type it should be, and try to convert it.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type you want it to be.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbreaderreaderdrainbuffer">StringDB.Reader.Reader.DrainBuffer</h2>
+<h4 id="summary-52">Summary</h4>
+<p>Clears out the buffer. Will cause performance issues if you do it too often.</p>
+<h2 id="stringdbreaderreaderfirst">StringDB.Reader.Reader.First</h2>
+<h4 id="summary-53">Summary</h4>
+<p>Gets the very first element in the database</p>
+<h2 id="stringdbreaderreadergetlttparam1gtlttparam1gt">StringDB.Reader.Reader.Get&lt;TParam1&gt;(&lt;TParam1&gt;)</h2>
+<h4 id="summary-54">Summary</h4>
+<p>Gets the ReaderPair responsible for a given index</p>
+<h2 id="stringdbreaderreadergetlttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt">StringDB.Reader.Reader.Get&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</h2>
+<h4 id="summary-55">Summary</h4>
+<p>Gets the ReaderPair responsible for a given index</p>
+<h2 id="stringdbreaderreadergetalllttparam1gtlttparam1gt">StringDB.Reader.Reader.GetAll&lt;TParam1&gt;(&lt;TParam1&gt;)</h2>
+<h4 id="summary-56">Summary</h4>
+<p>Gets the multiple ReaderPairs responsible for a given index</p>
+<h2 id="stringdbreaderreadergetalllttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt">StringDB.Reader.Reader.GetAll&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</h2>
+<h4 id="summary-57">Summary</h4>
+<p>Gets the multiple ReaderPairs responsible for a given index</p>
+<h2 id="stringdbreaderreadergetenumerator">StringDB.Reader.Reader.GetEnumerator</h2>
+<h2 id="stringdbreaderreadersystemcollectionsienumerablegetenumerator">StringDB.Reader.Reader.System#Collections#IEnumerable#GetEnumerator</h2>
+<h2 id="stringdbreaderreadertrygetlttparam1gtlttparam1gt-stringdbreaderireaderpair">StringDB.Reader.Reader.TryGet&lt;TParam1&gt;(&lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</h2>
+<h4 id="summary-58">Summary</h4>
+<p>Attempts to get the ReaderPair</p>
+<h2 id="stringdbreaderreadertrygetlttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt-stringdbreaderireaderpair">StringDB.Reader.Reader.TryGet&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</h2>
+<h4 id="summary-59">Summary</h4>
+<p>Attempts to get the ReaderPair</p>
+<h2 id="stringdbreaderreaderenumeratordispose">StringDB.Reader.ReaderEnumerator.Dispose</h2>
+<h4 id="summary-60">Summary</h4>
+<p>Removes references to the raw reader and the part we're on.</p>
+<h2 id="stringdbreaderreaderenumeratormovenext">StringDB.Reader.ReaderEnumerator.MoveNext</h2>
+<h4 id="summary-61">Summary</h4>
+<p>Retireves the next element in the sequence</p>
+<h2 id="stringdbreaderreaderenumeratorreset">StringDB.Reader.ReaderEnumerator.Reset</h2>
+<h4 id="summary-62">Summary</h4>
+<p>Resets it back to the start.</p>
+<h2 id="stringdbreaderreaderpairgetindexaslttparam1gt">StringDB.Reader.ReaderPair.GetIndexAs&lt;TParam1&gt;</h2>
+<h4 id="summary-63">Summary</h4>
+<p>Get the index as any type the TypeHandler can handle.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type to read the index as.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbreaderreaderpairgetvaluelttparam1gt">StringDB.Reader.ReaderPair.GetValue&lt;TParam1&gt;</h2>
+<h4 id="summary-64">Summary</h4>
+<p>Read the data stored at the index as the type it was meant to be.</p>
+<h4 id="remarks-1">Remarks</h4>
+<p>See GetValueAs to try convert the value into the specified type.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type of the data that is stored.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbreaderreaderpairgetvalueaslttparam1gt">StringDB.Reader.ReaderPair.GetValueAs&lt;TParam1&gt;</h2>
+<h4 id="summary-65">Summary</h4>
+<p>Read the data stored at the index and ignore the type it should be, and try to convert it.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type you want it to be.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbreaderreaderpairtostring">StringDB.Reader.ReaderPair.ToString</h2>
+<h4 id="summary-66">Summary</h4>
+<p>A simple string form of the item.</p>
+<h2 id="stringdbreaderthreadsafereaderpairfrompairstringdbreaderireaderpair-readerpair-systemobject-lock">StringDB.Reader.ThreadSafeReaderPair.FromPair(StringDB.Reader.IReaderPair readerPair, System.Object lock)</h2>
+<h4 id="summary-67">Summary</h4>
+<p>Turn a given ReaderPair into a ThreadSafeReaderPair</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>readerPair</td>
+<td>The ReaderPair</td>
+</tr>
+<tr>
+<td>lock</td>
+<td>The lock to lock onto</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbreaderthreadsafereaderpairgetindexaslttparam1gt">StringDB.Reader.ThreadSafeReaderPair.GetIndexAs&lt;TParam1&gt;</h2>
+<h4 id="summary-68">Summary</h4>
+<p>Get the index as any type the TypeHandler can handle.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type to read the index as.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbreaderthreadsafereaderpairgetvaluelttparam1gt">StringDB.Reader.ThreadSafeReaderPair.GetValue&lt;TParam1&gt;</h2>
+<h4 id="summary-69">Summary</h4>
+<p>Read the data stored at the index as the type it was meant to be.</p>
+<h4 id="remarks-2">Remarks</h4>
+<p>See GetValueAs to try convert the value into the specified type.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type of the data that is stored.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbreaderthreadsafereaderpairgetvalueaslttparam1gt">StringDB.Reader.ThreadSafeReaderPair.GetValueAs&lt;TParam1&gt;</h2>
+<h4 id="summary-70">Summary</h4>
+<p>Read the data stored at the index and ignore the type it should be, and try to convert it.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type you want it to be.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbreaderthreadsafereaderpairtostring">StringDB.Reader.ThreadSafeReaderPair.ToString</h2>
+<h4 id="summary-71">Summary</h4>
+<p>A simple string form of the item.</p>
+<h2 id="stringdbthreadsafedatabasecleanfromstringdbidatabase-dbcleanfrom">StringDB.ThreadSafeDatabase.CleanFrom(StringDB.IDatabase dbCleanFrom)</h2>
+<h4 id="summary-72">Summary</h4>
+<p>Cleans out the database specified, and copies all of the contents of the other database into this one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dbCleanFrom</td>
+<td>The database to clean up</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbthreadsafedatabasecleantostringdbidatabase-dbcleanto">StringDB.ThreadSafeDatabase.CleanTo(StringDB.IDatabase dbCleanTo)</h2>
+<h4 id="summary-73">Summary</h4>
+<p>Cleans out the current database, and copies all of the contents of this database into the other one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dbCleanTo</td>
+<td>The database that will be used to insert the other database's values into</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbthreadsafedatabasedispose">StringDB.ThreadSafeDatabase.Dispose</h2>
+<h2 id="stringdbthreadsafedatabasedrainbuffer">StringDB.ThreadSafeDatabase.DrainBuffer</h2>
+<h4 id="summary-74">Summary</h4>
+<p>Clears out the buffer. Will cause performance issues if you do it too often.</p>
+<h2 id="stringdbthreadsafedatabasefirst">StringDB.ThreadSafeDatabase.First</h2>
+<h4 id="summary-75">Summary</h4>
+<p>Gets the very first element in the database</p>
+<h2 id="stringdbthreadsafedatabaseflush">StringDB.ThreadSafeDatabase.Flush</h2>
+<h4 id="summary-76">Summary</h4>
+<p>Flushes the prepending data to write to the stream</p>
+<h2 id="stringdbthreadsafedatabasefromdatabasestringdbidatabase-db">StringDB.ThreadSafeDatabase.FromDatabase(StringDB.IDatabase db)</h2>
+<h4 id="summary-77">Summary</h4>
+<p>Create a database that is thread safe by locking onto an object before any action</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>db</td>
+<td>The database to make thread-safe</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbthreadsafedatabasegetlttparam1gtlttparam1gt">StringDB.ThreadSafeDatabase.Get&lt;TParam1&gt;(&lt;TParam1&gt;)</h2>
+<h4 id="summary-78">Summary</h4>
+<p>Gets the ReaderPair responsible for a given index</p>
+<h2 id="stringdbthreadsafedatabasegetlttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt">StringDB.ThreadSafeDatabase.Get&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</h2>
+<h4 id="summary-79">Summary</h4>
+<p>Gets the ReaderPair responsible for a given index</p>
+<h2 id="stringdbthreadsafedatabasegetalllttparam1gtlttparam1gt">StringDB.ThreadSafeDatabase.GetAll&lt;TParam1&gt;(&lt;TParam1&gt;)</h2>
+<h4 id="summary-80">Summary</h4>
+<p>Gets the multiple ReaderPairs responsible for a given index</p>
+<h2 id="stringdbthreadsafedatabasegetalllttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt">StringDB.ThreadSafeDatabase.GetAll&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;)</h2>
+<h4 id="summary-81">Summary</h4>
+<p>Gets the multiple ReaderPairs responsible for a given index</p>
+<h2 id="stringdbthreadsafedatabasegetenumerator">StringDB.ThreadSafeDatabase.GetEnumerator</h2>
+<h2 id="stringdbthreadsafedatabaseinsertlttparam1-tparam2gtlttparam1gt-lttparam2gt">StringDB.ThreadSafeDatabase.Insert&lt;TParam1, TParam2&gt;(&lt;TParam1&gt;, &lt;TParam2&gt;)</h2>
+<h4 id="summary-82">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbthreadsafedatabaseinsertlttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-lttparam1gt-lttparam2gt">StringDB.ThreadSafeDatabase.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, &lt;TParam1&gt;, &lt;TParam2&gt;)</h2>
+<h4 id="summary-83">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbthreadsafedatabaseinsertlttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-systemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.ThreadSafeDatabase.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</h2>
+<h4 id="summary-84">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbthreadsafedatabaseinsertlttparam1-tparam2gtsystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.ThreadSafeDatabase.Insert&lt;TParam1, TParam2&gt;(System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</h2>
+<h4 id="summary-85">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbthreadsafedatabaseinsertrangelttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.ThreadSafeDatabase.InsertRange&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</h2>
+<h4 id="summary-86">Summary</h4>
+<p>Insert multiple items into the database.</p>
+<h2 id="stringdbthreadsafedatabaseinsertrangelttparam1-tparam2gtsystemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.ThreadSafeDatabase.InsertRange&lt;TParam1, TParam2&gt;(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</h2>
+<h4 id="summary-87">Summary</h4>
+<p>Insert multiple items into the database.</p>
+<h2 id="stringdbthreadsafedatabaseoverwritevaluelttparam1gtstringdbreaderireaderpair-lttparam1gt">StringDB.ThreadSafeDatabase.OverwriteValue&lt;TParam1&gt;(StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</h2>
+<h4 id="summary-88">Summary</h4>
+<p>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</p>
+<h2 id="stringdbthreadsafedatabaseoverwritevaluelttparam1gtstringdbtypehandlerlttparam1gt-stringdbreaderireaderpair-lttparam1gt">StringDB.ThreadSafeDatabase.OverwriteValue&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</h2>
+<h4 id="summary-89">Summary</h4>
+<p>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</p>
+<h2 id="stringdbthreadsafedatabasesystemcollectionsienumerablegetenumerator">StringDB.ThreadSafeDatabase.System#Collections#IEnumerable#GetEnumerator</h2>
+<h2 id="stringdbthreadsafedatabasetrygetlttparam1gtlttparam1gt-stringdbreaderireaderpair">StringDB.ThreadSafeDatabase.TryGet&lt;TParam1&gt;(&lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</h2>
+<h4 id="summary-90">Summary</h4>
+<p>Attempts to get the ReaderPair</p>
+<h2 id="stringdbthreadsafedatabasetrygetlttparam1gtstringdbtypehandlerlttparam1gt-lttparam1gt-stringdbreaderireaderpair">StringDB.ThreadSafeDatabase.TryGet&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, &lt;TParam1&gt;, StringDB.Reader.IReaderPair@)</h2>
+<h4 id="summary-91">Summary</h4>
+<p>Attempts to get the ReaderPair</p>
+<h2 id="stringdbtypehandlerlttclass1gtcomparelttclass1gt-item1-lttclass1gt-item2">StringDB.TypeHandler&lt;TClass1&gt;.Compare(&lt;TClass1&gt; item1, &lt;TClass1&gt; item2)</h2>
+<h4 id="summary-92">Summary</h4>
+<p>Compare if two items are the same.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>item1</td>
+<td>The first item to compare</td>
+</tr>
+<tr>
+<td>item2</td>
+<td>The second item to compare</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbtypehandlerlttclass1gtgetlengthlttclass1gt-item">StringDB.TypeHandler&lt;TClass1&gt;.GetLength(&lt;TClass1&gt; item)</h2>
+<h4 id="summary-93">Summary</h4>
+<p>Gets the length of an item, or how long it would be when attempting to store it.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>item</td>
+<td>The item to calculate the length for.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbtypehandlerlttclass1gtreadsystemiobinaryreader-br-systemint64-len">StringDB.TypeHandler&lt;TClass1&gt;.Read(System.IO.BinaryReader br, System.Int64 len)</h2>
+<h4 id="summary-94">Summary</h4>
+<p>Read back the item from a stream, given the length of it. If you're not using the length of it, there's a good chance you're doing something wrong.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>br</td>
+<td>The BinaryReader.</td>
+</tr>
+<tr>
+<td>len</td>
+<td>The length of the data.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbtypehandlerlttclass1gtwritesystemiobinarywriter-bw-lttclass1gt-item">StringDB.TypeHandler&lt;TClass1&gt;.Write(System.IO.BinaryWriter bw, &lt;TClass1&gt; item)</h2>
+<h4 id="summary-95">Summary</h4>
+<p>Write an object to a BinaryWriter. The BinaryWriter should only be used to write the necessary data, and no seeking should be done. All you need to do is write the data, writing the length of the data will be taken care of for you assuming that the GetLength method is implemented properly.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bw</td>
+<td>The BinaryWriter to use.</td>
+</tr>
+<tr>
+<td>item</td>
+<td>The item to write.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbtypemanagergethandlerforsystembyte-id">StringDB.TypeManager.GetHandlerFor(System.Byte id)</h2>
+<h4 id="summary-96">Summary</h4>
+<p>Returns the TypeHandler given a unique byte identifier.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>The TypeHandler for the given byte Id</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbtypemanagergethandlerforlttparam1gt">StringDB.TypeManager.GetHandlerFor&lt;TParam1&gt;</h2>
+<h4 id="summary-97">Summary</h4>
+<p>Get the type handler for a type</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>The type of type handler</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbtypemanageroverridingregistertypelttparam1gtstringdbtypehandlerlttparam1gt-t">StringDB.TypeManager.OverridingRegisterType&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;} t)</h2>
+<h4 id="summary-98">Summary</h4>
+<p>Overrides an existing type register, or adds it if it doesn't exist.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t</td>
+<td>The type to override</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbtypemanagerregistertypelttparam1gtstringdbtypehandlerlttparam1gt-t">StringDB.TypeManager.RegisterType&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;} t)</h2>
+<h4 id="summary-99">Summary</h4>
+<p>Register a type</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t</td>
+<td>The type to register</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbwriteriwriterflush">StringDB.Writer.IWriter.Flush</h2>
+<h4 id="summary-100">Summary</h4>
+<p>Flushes the prepending data to write to the stream</p>
+<h2 id="stringdbwriteriwriterinsertlttparam1-tparam2gtlttparam1gt-lttparam2gt">StringDB.Writer.IWriter.Insert&lt;TParam1, TParam2&gt;(&lt;TParam1&gt;, &lt;TParam2&gt;)</h2>
+<h4 id="summary-101">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbwriteriwriterinsertlttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-lttparam1gt-lttparam2gt">StringDB.Writer.IWriter.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, &lt;TParam1&gt;, &lt;TParam2&gt;)</h2>
+<h4 id="summary-102">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbwriteriwriterinsertlttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-systemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Writer.IWriter.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</h2>
+<h4 id="summary-103">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbwriteriwriterinsertlttparam1-tparam2gtsystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Writer.IWriter.Insert&lt;TParam1, TParam2&gt;(System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</h2>
+<h4 id="summary-104">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbwriteriwriterinsertrangelttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Writer.IWriter.InsertRange&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</h2>
+<h4 id="summary-105">Summary</h4>
+<p>Insert multiple items into the database.</p>
+<h2 id="stringdbwriteriwriterinsertrangelttparam1-tparam2gtsystemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Writer.IWriter.InsertRange&lt;TParam1, TParam2&gt;(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</h2>
+<h4 id="summary-106">Summary</h4>
+<p>Insert multiple items into the database.</p>
+<h2 id="stringdbwriteriwriteroverwritevaluelttparam1gtstringdbreaderireaderpair-lttparam1gt">StringDB.Writer.IWriter.OverwriteValue&lt;TParam1&gt;(StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</h2>
+<h4 id="summary-107">Summary</h4>
+<p>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</p>
+<h2 id="stringdbwriteriwriteroverwritevaluelttparam1gtstringdbtypehandlerlttparam1gt-stringdbreaderireaderpair-lttparam1gt">StringDB.Writer.IWriter.OverwriteValue&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</h2>
+<h4 id="summary-108">Summary</h4>
+<p>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</p>
+<h2 id="stringdbwriterwriterctorsystemiostream-s">StringDB.Writer.Writer.#ctor(System.IO.Stream s)</h2>
+<h4 id="summary-109">Summary</h4>
+<p>Create a new Writer.</p>
+<table>
+<thead>
+<tr>
+<th>Param Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>s</td>
+<td>The stream</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stringdbwriterwriterflush">StringDB.Writer.Writer.Flush</h2>
+<h4 id="summary-110">Summary</h4>
+<p>Flushes the prepending data to write to the stream</p>
+<h2 id="stringdbwriterwriterinsertlttparam1-tparam2gtlttparam1gt-lttparam2gt">StringDB.Writer.Writer.Insert&lt;TParam1, TParam2&gt;(&lt;TParam1&gt;, &lt;TParam2&gt;)</h2>
+<h4 id="summary-111">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbwriterwriterinsertlttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-lttparam1gt-lttparam2gt">StringDB.Writer.Writer.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, &lt;TParam1&gt;, &lt;TParam2&gt;)</h2>
+<h4 id="summary-112">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbwriterwriterinsertlttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-systemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Writer.Writer.Insert&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</h2>
+<h4 id="summary-113">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbwriterwriterinsertlttparam1-tparam2gtsystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Writer.Writer.Insert&lt;TParam1, TParam2&gt;(System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;})</h2>
+<h4 id="summary-114">Summary</h4>
+<p>Insert an item into the database</p>
+<h2 id="stringdbwriterwriterinsertrangelttparam1-tparam2gtstringdbtypehandlerlttparam1gt-stringdbtypehandlerlttparam2gt-systemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Writer.Writer.InsertRange&lt;TParam1, TParam2&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.TypeHandler{&lt;TParam2&gt;}, System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</h2>
+<h4 id="summary-115">Summary</h4>
+<p>Insert multiple items into the database.</p>
+<h2 id="stringdbwriterwriterinsertrangelttparam1-tparam2gtsystemcollectionsgenericienumerablesystemcollectionsgenerickeyvaluepairlttparam1gt-lttparam2gt">StringDB.Writer.Writer.InsertRange&lt;TParam1, TParam2&gt;(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{&lt;TParam1&gt;, &lt;TParam2&gt;}})</h2>
+<h4 id="summary-116">Summary</h4>
+<p>Insert multiple items into the database.</p>
+<h2 id="stringdbwriterwriteroverwritevaluelttparam1gtstringdbreaderireaderpair-lttparam1gt">StringDB.Writer.Writer.OverwriteValue&lt;TParam1&gt;(StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</h2>
+<h4 id="summary-117">Summary</h4>
+<p>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</p>
+<h2 id="stringdbwriterwriteroverwritevaluelttparam1gtstringdbtypehandlerlttparam1gt-stringdbreaderireaderpair-lttparam1gt">StringDB.Writer.Writer.OverwriteValue&lt;TParam1&gt;(StringDB.TypeHandler{&lt;TParam1&gt;}, StringDB.Reader.IReaderPair, &lt;TParam1&gt;)</h2>
+<h4 id="summary-118">Summary</h4>
+<p>Overwrite a value. Note: You should call the database cleaning functions if you do this too frequently.</p>
+<h2 id="properties">Properties</h2>
+<h2 id="stringdbitypehandlerid">StringDB.ITypeHandler.Id</h2>
+<h4 id="summary-119">Summary</h4>
+<p>Unique byte identifier. Set it above 0x2F to avoid colliding with the predefined types.</p>
+<h2 id="stringdbitypehandlertype">StringDB.ITypeHandler.Type</h2>
+<h4 id="summary-120">Summary</h4>
+<p>Returns whatever type it is, typeof(T)</p>
+<h2 id="stringdbreaderipartinitialbyte">StringDB.Reader.IPart.InitialByte</h2>
+<h4 id="summary-121">Summary</h4>
+<p>The initial byte detected</p>
+<h2 id="stringdbreaderipartnextpart">StringDB.Reader.IPart.NextPart</h2>
+<h4 id="summary-122">Summary</h4>
+<p>Where the next position will be</p>
+<h2 id="stringdbreaderipartposition">StringDB.Reader.IPart.Position</h2>
+<h4 id="summary-123">Summary</h4>
+<p>position of this part</p>
+<h2 id="stringdbreaderireaderpairbytearrayindex">StringDB.Reader.IReaderPair.ByteArrayIndex</h2>
+<h4 id="summary-124">Summary</h4>
+<p>Get the index as a byte array instead.</p>
+<h2 id="stringdbreaderireaderpairdataposition">StringDB.Reader.IReaderPair.DataPosition</h2>
+<h4 id="summary-125">Summary</h4>
+<p>The position of where the data is stored for this ReaderPair</p>
+<h2 id="stringdbreaderireaderpairindex">StringDB.Reader.IReaderPair.Index</h2>
+<h4 id="summary-126">Summary</h4>
+<p>Whatever the index is.</p>
+<h2 id="stringdbreaderireaderpairposition">StringDB.Reader.IReaderPair.Position</h2>
+<h4 id="summary-127">Summary</h4>
+<p>The position in the file that this ReaderPair is located at</p>
+<h2 id="stringdbreaderireaderpairvaluelength">StringDB.Reader.IReaderPair.ValueLength</h2>
+<h4 id="summary-128">Summary</h4>
+<p>Get how long the value is without reading it into memory.</p>
+<h2 id="stringdbreaderreaderenumeratorcurrent">StringDB.Reader.ReaderEnumerator.Current</h2>
+<h4 id="summary-129">Summary</h4>
+<p>What the current element is on.</p>
+<h2 id="stringdbreaderreaderpairbytearrayindex">StringDB.Reader.ReaderPair.ByteArrayIndex</h2>
+<h4 id="summary-130">Summary</h4>
+<p>Get the index as a byte array instead.</p>
+<h2 id="stringdbreaderreaderpairdataposition">StringDB.Reader.ReaderPair.DataPosition</h2>
+<h4 id="summary-131">Summary</h4>
+<p>The position of where the data is stored for this ReaderPair</p>
+<h2 id="stringdbreaderreaderpairindex">StringDB.Reader.ReaderPair.Index</h2>
+<h4 id="summary-132">Summary</h4>
+<p>Whatever the index is.</p>
+<h2 id="stringdbreaderreaderpairposition">StringDB.Reader.ReaderPair.Position</h2>
+<h4 id="summary-133">Summary</h4>
+<p>The position in the file that this ReaderPair is located at</p>
+<h2 id="stringdbreaderreaderpairvaluelength">StringDB.Reader.ReaderPair.ValueLength</h2>
+<h4 id="summary-134">Summary</h4>
+<p>Get how long the value is without reading it into memory.</p>
+<h2 id="stringdbreaderthreadsafereaderpairbytearrayindex">StringDB.Reader.ThreadSafeReaderPair.ByteArrayIndex</h2>
+<h4 id="summary-135">Summary</h4>
+<p>Get the index as a byte array instead.</p>
+<h2 id="stringdbreaderthreadsafereaderpairdataposition">StringDB.Reader.ThreadSafeReaderPair.DataPosition</h2>
+<h4 id="summary-136">Summary</h4>
+<p>The position of where the data is stored for this ReaderPair</p>
+<h2 id="stringdbreaderthreadsafereaderpairindex">StringDB.Reader.ThreadSafeReaderPair.Index</h2>
+<h4 id="summary-137">Summary</h4>
+<p>Whatever the index is.</p>
+<h2 id="stringdbreaderthreadsafereaderpairposition">StringDB.Reader.ThreadSafeReaderPair.Position</h2>
+<h4 id="summary-138">Summary</h4>
+<p>The position in the file that this ReaderPair is located at</p>
+<h2 id="stringdbreaderthreadsafereaderpairvaluelength">StringDB.Reader.ThreadSafeReaderPair.ValueLength</h2>
+<h4 id="summary-139">Summary</h4>
+<p>Get how long the value is without reading it into memory.</p>
+<h2 id="stringdbtypehandlerlttclass1gtid">StringDB.TypeHandler&lt;TClass1&gt;.Id</h2>
+<h4 id="summary-140">Summary</h4>
+<p>Unique byte identifier. Set it above 0x2F to avoid colliding with the predefined types.</p>
+<h2 id="stringdbtypehandlerlttclass1gttype">StringDB.TypeHandler&lt;TClass1&gt;.Type</h2>
+<h4 id="summary-141">Summary</h4>
+<p>Returns whatever type it is, typeof(T)</p>
+<h2 id="fields">Fields</h2>
+<h2 id="stringdbconstsdeletedvalue">StringDB.Consts.DeletedValue</h2>
+<h4 id="summary-142">Summary</h4>
+<p>Used to tell that this value is deleted.</p>
+<h2 id="stringdbconstsindexseperator">StringDB.Consts.IndexSeperator</h2>
+<h4 id="summary-143">Summary</h4>
+<p>Used for seperating indexes from data. This is why you can't have indexes with lengths more then 253.</p>
+<h2 id="stringdbconstsisbytevalue">StringDB.Consts.IsByteValue</h2>
+<h4 id="summary-144">Summary</h4>
+<p>Used to tell if the next value is a byte</p>
+<h2 id="stringdbconstsislongvalue">StringDB.Consts.IsLongValue</h2>
+<h4 id="summary-145">Summary</h4>
+<p>Used to tell if the next value is a ulong</p>
+<h2 id="stringdbconstsisuintvalue">StringDB.Consts.IsUIntValue</h2>
+<h4 id="summary-146">Summary</h4>
+<p>Used to tell if the next value is a uint</p>
+<h2 id="stringdbconstsisushortvalue">StringDB.Consts.IsUShortValue</h2>
+<h4 id="summary-147">Summary</h4>
+<p>Used to tell if the next value is a ushort</p>
+<h2 id="stringdbconstsmaxlength">StringDB.Consts.MaxLength</h2>
+<h4 id="summary-148">Summary</h4>
+<p>The maximum value for an index. After this point, bytes are </p>
+<h2 id="stringdbconstsnoindex">StringDB.Consts.NoIndex</h2>
+<h4 id="summary-149">Summary</h4>
+<p>An index with zero length tells it that there's nothing after this.</p>
+                </section>
+
+            </div>
+        </main>
+
+        <footer>
+            <div class="container-fluid">
+                <p class="text-muted">
+                    website generated with <a href="http://couscous.io" title="Markdown website generator">Couscous</a>
+                </p>
+            </div>
+        </footer>
+
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="//yastatic.net/highlightjs/8.2/highlight.min.js"></script>
+
+        <script>
+            $(function() {
+                $("section>h1").wrap('<div class="page-header" />');
+                // Syntax highlighting
+                hljs.initHighlightingOnLoad();
+            });
+        </script>
+        <!-- Livereload -->
+        <script>
+            document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +
+                    ':35729/livereload.js?snipver=1"></' + 'script>')
+        </script>
+        <!-- End Livereload -->
+    </body>
+</html>
