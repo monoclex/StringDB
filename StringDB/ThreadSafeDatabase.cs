@@ -24,6 +24,11 @@ namespace StringDB {
 		private IDatabase _other;
 
 		/// <inheritdoc/>
+		public void Flush() {
+			lock (this._lock) this._other.Flush();
+		}
+
+		/// <inheritdoc/>
 		public IReaderPair Get<T>(T index) {
 			lock (this._lock) return this._other.Get<T>(index);
 		}
