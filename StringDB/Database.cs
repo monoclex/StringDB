@@ -148,7 +148,7 @@ namespace StringDB {
 
 		private static IEnumerable<KeyValuePair<byte[], Stream>> FromDatabase(IDatabase other) {
 			foreach (var i in other)
-				yield return new KeyValuePair<byte[], Stream>(i.ByteArrayIndex, i.GetValueAs<Stream>());
+				yield return new KeyValuePair<byte[], Stream>(i.ByteArrayIndex, i.Value.GetAs<Stream>());
 		}
 	}
 }

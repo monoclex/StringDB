@@ -20,9 +20,7 @@ namespace StringDB.Reader {
 	public struct RuntimeValue : IRuntimeValue {
 		internal const int NOSPECIFYLEN = -1;
 
-		//TODO: remove specifyType
-
-		internal RuntimeValue(IRawReader rawReader, long readPos, byte? specifyType, long specifyLen = NOSPECIFYLEN) {
+		internal RuntimeValue(IRawReader rawReader, long readPos, byte? specifyType = null, long specifyLen = NOSPECIFYLEN) {
 			this._specifyType = specifyType;
 			this._specifyLen = specifyLen;
 			this._rawReader = rawReader;
@@ -52,9 +50,9 @@ namespace StringDB.Reader {
 					this._rawReader.ReadDataAs<T>(this._readPos, typeHandler)
 					: this._rawReader.ReadDataAs<T>(this._readPos, this._specifyLen, typeHandler);
 
-		public new Type Type()
-			=> this._specifyType != null ?
-					throw new Exception($"Cannot fetch type of an index")
-					: this._rawReader.ReadType(this._readPos, null).Type;
+		public Type Type()
+			=> this._specifyType == null ?
+					this._rawReader.ReadType(this._readPos, null).Type
+					: TypeManager.GetHandlerFor((byte)this._specifyType).Type;
 	}
 }

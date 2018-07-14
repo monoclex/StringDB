@@ -27,7 +27,7 @@
 		public byte[] ByteArrayIndex => this._readerPair.ByteArrayIndex;
 
 		/// <inheritdoc/>
-		public string Index => this._readerPair.ByteArrayIndex.GetString();
+		public string StringIndex => this._readerPair.ByteArrayIndex.GetString();
 
 		/// <inheritdoc/>
 		public long ValueLength {

@@ -135,7 +135,7 @@ namespace StringDB {
 		private static IEnumerable<KeyValuePair<byte[], Stream>> Wrap(IEnumerable<IReaderPair> readerPairs, object @lock) {
 			foreach (var i in readerPairs) {
 				var t = ThreadSafeReaderPair.FromPair(i, @lock);
-				yield return new KeyValuePair<byte[], Stream>(t.ByteArrayIndex, t.GetValueAs<Stream>());
+				yield return new KeyValuePair<byte[], Stream>(t.ByteArrayIndex, t.Value.GetAs<Stream>());
 			}
 		}
 	}

@@ -35,10 +35,8 @@ namespace StringDB.Tester {
 				foreach (var i in testdb)
 					Console.WriteLine(i.ToString());
 
-				foreach (var i in testdb) 
-					if(i is Reader.ReaderPair t) {
-						Console.WriteLine((t).ValueDDV.Type().ToString());
-					}
+				foreach (var t in testdb) 
+					Console.WriteLine((t).Value.Type().ToString());
 			}
 
 			Console.ReadLine();
@@ -56,7 +54,7 @@ namespace StringDB.Tester {
 				cooldb.Insert(1, "World!");
 
 				for (int i = 0; i < 2; i++)
-					Console.WriteLine(cooldb.Get(i).GetValueAs<string>());
+					Console.WriteLine(cooldb.Get(i).Index.GetAs<string>());
 			}
 			return;
 			Console.ReadLine();

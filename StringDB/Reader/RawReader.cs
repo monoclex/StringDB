@@ -52,7 +52,7 @@ namespace StringDB.Reader {
 #endif
 			BufferSeek(pos);
 
-			var p = this.ReadBytes(9); // read the length, and the data pos
+			var p = this.ReadBytes(10); // read the length, and the data pos
 			var importantByte = this._bufferRead[p]; // store the index type incase the buffer updates
 			var intVal = BitConverter.ToInt64(this._bufferRead, p + 1); // use BitConverter to get it as a long
 
@@ -64,13 +64,14 @@ namespace StringDB.Reader {
 			} else {
 				if (importantByte == Consts.NoIndex) return null; // if the index length is 0, we know we've probably hit the end of the DB as well.
 
+				var byteType = this._bufferRead[p + 9];
 				var val_pos = this.ReadBytes(importantByte); // read the length of the index
 				var val = new byte[importantByte];
 
 				for (var i = 0; i < val.Length; i++) // loop through the buffer and read bytes ( safe because buffer is larger then Consts.MaxLength )
 					val[i] = this._bufferRead[val_pos + i];
 
-				return new PartDataPair(importantByte, pos, intVal, val);
+				return new PartDataPair(importantByte, pos, intVal, val, byteType);
 			}
 #if THREAD_SAFE
 			}

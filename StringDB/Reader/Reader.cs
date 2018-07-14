@@ -107,7 +107,7 @@ namespace StringDB.Reader {
 				yield break;
 
 			foreach (var i in this) // for every ReaderPair we got
-				if (typeHandler.Compare(index, i.GetIndexAs<T>())) // compare thats one's index with this one's index
+				if (typeHandler.Compare(index, i.Index.GetAs<T>())) // compare thats one's index with this one's index
 					yield return i;
 		}
 

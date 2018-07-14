@@ -62,7 +62,7 @@ namespace StringDB.Writer {
 			var judge = pos + sizeof(byte) + sizeof(long); // the position and the index chain linker lengths
 
 			foreach (var i in kvps) // get the approximate length of every index so we know where the position of the data will be
-				judge += wt1.GetLength(i.Key) + sizeof(byte) + sizeof(long);
+				judge += wt1.GetLength(i.Key) + sizeof(byte) + sizeof(long) + sizeof(byte);
 
 			// indexes
 
@@ -72,10 +72,11 @@ namespace StringDB.Writer {
 
 				this._bw.Write((byte)len);
 				this._bw.Write(judge);
+				this._bw.Write(wt1.Id);
 				wt1.Write(this._bw, i.Key);
 
 				var wlen = wt2.GetLength(i.Value); // judge the next value pos
-				judge += TypeHandlerLengthManager.EstimateWriteLengthSize(wlen) + wlen;
+				judge += TypeHandlerLengthManager.EstimateWriteLengthSize(wlen) + wlen + sizeof(byte);
 			}
 
 			// index chain
