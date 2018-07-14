@@ -54,5 +54,13 @@ namespace StringDB.Reader {
 			=> this._specifyType == null ?
 					this._rawReader.ReadType(this._readPos, null).Type
 					: TypeManager.GetHandlerFor((byte)this._specifyType).Type;
+
+		public long Length()
+			=> this._specifyLen != NOSPECIFYLEN ?
+					this._specifyLen
+					: this._rawReader.ReadLength(this._readPos);
+
+		public override string ToString()
+			=> $"({this.Length()} bytes, {this.Type()})";
 	}
 }

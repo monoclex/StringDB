@@ -70,6 +70,6 @@
 
 		/// <summary>A simple string form of the item.</summary>
 		public override string ToString() =>
-			$"tmp"; //$"[\"{this.Index}\", Identifier 0x{this.Value.Type().Id.ToString("x2")}, \"{this.ValueLength} bytes\"]";
+			$"[Index: {Index.ToString()}, Value: {Value.ToString()}]";
 	}
 }
