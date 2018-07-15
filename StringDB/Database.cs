@@ -152,8 +152,10 @@ namespace StringDB {
 		}
 
 		private static IEnumerable<KeyValuePair<byte[], Stream>> FromDatabase(IDatabase other) {
-			foreach (var i in other)
+			foreach (var i in other) {
+				//TODO: preserve the type of data when cleaning
 				yield return new KeyValuePair<byte[], Stream>(i.ByteArrayIndex, i.Value.GetAs<Stream>());
+			}
 		}
 	}
 }

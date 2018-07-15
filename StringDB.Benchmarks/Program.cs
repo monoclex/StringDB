@@ -20,8 +20,79 @@ namespace StringDB.Benchmarks {
 	internal class Program {
 
 		private static void Main() {
-			var summary = BenchmarkRunner.Run<StringDBBenchmark>();
+			var summary = BenchmarkRunner.Run<OthrBench>();
 			Console.ReadLine();
+		}
+	}
+
+	public class OthrBench {
+		private IDatabase db;
+		private IDatabase threadsafedb;
+
+		[GlobalSetup]
+		public void Setup() {
+			db = Database.FromFile(Guid.NewGuid().ToString().Substring(0, 5) + "STRDB.db");
+			threadsafedb = Database.FromFile(Guid.NewGuid().ToString().Substring(0, 5) + "STRDB.db");
+
+			var byteHandler = TypeManager.GetHandlerFor<byte[]>();
+			db.InsertRange(byteHandler, byteHandler, GenInsertData());
+			threadsafedb.InsertRange(byteHandler, byteHandler, GenInsertData());
+
+			threadsafedb.MakeThreadSafe();
+		}
+		
+		private KeyValuePair<byte[], byte[]> _dat = new KeyValuePair<byte[], byte[]>(new byte[10], new byte[100]);
+		private IEnumerable<KeyValuePair<byte[], byte[]>> GenInsertData() {
+			for (var i = 0; i < 100_000; i++)
+				yield return _dat;
+		}
+
+		[Benchmark]
+		public void ParallelForEach() {
+			Parallel.ForEach(db, (i) => { });
+		}
+
+		[Benchmark]
+		public void ForEach() {
+			foreach (var i in db) { }
+		}
+
+		[GlobalCleanup]
+		public void Clean() {
+			db.Dispose();
+			threadsafedb.Dispose();
+		}
+	}
+
+	public class NewBench {
+		private TypeHandler<byte[]> _byteHandler = TypeManager.GetHandlerFor<byte[]>();
+		private byte[] _data = new byte[100];
+		private IEnumerable<KeyValuePair<byte[], byte[]>> _insertRange;
+		private IDatabase db;
+
+		[GlobalSetup]
+		public void AllSetup() {
+			_insertRange = new KeyValuePair<byte[], byte[]>[] { new KeyValuePair<byte[], byte[]>(_data, _data) };
+		}
+
+		[IterationSetup]
+		public void Setup() {
+			db = Database.FromStream(new MemoryStream(), true);
+		}
+
+		[Benchmark]
+		public void WithOptimizations() {
+			db.InsertRange(_byteHandler, _byteHandler, _insertRange);
+		}
+
+		[Benchmark]
+		public void WithoutOptimizations() {
+			db.Insert(_data, _data);
+		}
+
+		[IterationCleanup]
+		public void Cleanup() {
+			db.Dispose();
 		}
 	}
 

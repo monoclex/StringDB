@@ -73,11 +73,8 @@ namespace StringDB.Reader {
 		public IReaderPair Get<T>(TypeHandler<T> typeHandler, T index) {
 			// prevent the re-use of code
 
-			using (var enumer = this.GetAll(typeHandler, index).GetEnumerator()) { // loop through the multiple found
-				if (enumer.MoveNext()) {
-					return enumer.Current; // return the first one of the ones we found
-				}
-			}
+			foreach (var i in this.GetAll(typeHandler, index)) // loop through the multiple found
+				return i; // return the first one of the ones we found
 
 			throw new InvalidOperationException($"Unable to find the given index {index}");
 		}

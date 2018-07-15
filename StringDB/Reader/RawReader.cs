@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using StringDB.Exceptions;
 
 namespace StringDB.Reader {
 	internal interface IRawReader {
@@ -18,6 +19,8 @@ namespace StringDB.Reader {
 		T ReadDataAs<T>(long pos, long len, ITypeHandler typeHandlerReadWith);
 
 		long ReadLength(long pos);
+
+		byte ReadByte(long pos);
 
 		void DrainBuffer();
 	}
@@ -61,6 +64,10 @@ namespace StringDB.Reader {
 
 		public long ReadLength(long pos) {
 			lock (this._lock) return this._parent.ReadLength(pos);
+		}
+
+		public byte ReadByte(long pos) {
+			lock (this._lock) return this._parent.ReadByte(pos);
 		}
 
 		public void DrainBuffer() {
@@ -119,33 +126,36 @@ namespace StringDB.Reader {
 				: null;
 
 		public T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith) {
-			if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
+			// will never happen anyways
+			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
 
 			var type = ReadType(pos, null, (byte?)null); // get the proper type handler
 
 			// throw an exception if we're reading the wrong type
 			//TODO: custom exception
-			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
+			if (type.Type != typeof(T)) throw new TypesDontMatch(typeof(T), type.Type);
 
 			// read it properly
 			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br);
 		}
 
 		public T ReadData<T>(long pos, long len, ITypeHandler typeHandlerReadWith) {
-			if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
+			// will never happen anyways
+			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
 
 			var type = ReadType(pos, null, (byte?)null); // get the proper type handler
 
 			// throw an exception if we're reading the wrong type
 			//TODO: custom exception
-			if (type.Type != typeof(T)) throw new Exception($"The data you are trying to read is not of type {typeof(T)}, it is of type {type.Type}");
+			if (type.Type != typeof(T)) throw new TypesDontMatch(typeof(T), type.Type);
 
 			// read it properly
 			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br, len);
 		}
 
 		public T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith) {
-			if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
+			// will never happen anyways
+			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
 
 			this._stream.Seek(pos); // seek to the data and ignore the type identifier
 			this._stream.Read(this._oneByteBuffer, 0, 1);
@@ -154,7 +164,7 @@ namespace StringDB.Reader {
 		}
 
 		public T ReadDataAs<T>(long pos, long len, ITypeHandler typeHandlerReadWith) {
-			if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
+			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
 
 			this._stream.Seek(pos); // seek to the data and ignore the type identifier
 			this._stream.Read(this._oneByteBuffer, 0, 1);
@@ -167,6 +177,12 @@ namespace StringDB.Reader {
 			this._stream.Read(this._oneByteBuffer, 0, 1);
 
 			return TypeHandlerLengthManager.ReadLength(this._br); // read the length of the data
+		}
+
+		public byte ReadByte(long pos) {
+			this._stream.Seek(pos);
+			this._stream.Read(this._oneByteBuffer, 0, 1);
+			return this._oneByteBuffer[0];
 		}
 
 		public ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null) {
@@ -188,11 +204,23 @@ namespace StringDB.Reader {
 		//heavily optimized method of reading bytes with an internal byte[] cache
 		private int ReadBytes(int amt) {
 			if (this._bufferPos + amt >= BufferSize) { //if we've went out of scope of the buffer
+
+				// apparently this code *never* gets triggered by the debugger?
+				// dunno why it exists but ok
+
 				this._bufferReadPos += this._bufferPos; //re-read the buffer
 				this._bufferPos = 0;
 
 				this._stream.Seek(this._bufferReadPos, SeekOrigin.Begin);
-				this._stream.Read(this._bufferRead, 0, BufferSize);
+				var len = this._stream.Read(this._bufferRead, 0, BufferSize);
+
+				//TODO: explore possibility of exploit due to not tracking the size of the buffer
+				// for now, we'll just clear out the rest of the bytes in the buffer starting from the length.
+				// It'll work well *enough* as a fix.
+
+				if (len != BufferSize)
+					for (int i = len; i < BufferSize; i++)
+						this._bufferRead[i] = 0x00;
 			}
 
 			//return the position of bytes from the buffer
@@ -207,7 +235,15 @@ namespace StringDB.Reader {
 				this._bufferPos = 0; //move the buffer pos
 
 				this._stream.Seek(pos, SeekOrigin.Begin);
-				this._stream.Read(this._bufferRead, 0, BufferSize);
+				var len = this._stream.Read(this._bufferRead, 0, BufferSize);
+
+				//TODO: explore possibility of exploit due to not tracking the size of the buffer
+				// for now, we'll just clear out the rest of the bytes in the buffer starting from the length.
+				// It'll work well *enough* as a fix.
+
+				if (len != BufferSize)
+					for (int i = len; i < BufferSize; i++)
+						this._bufferRead[i] = 0x00;
 			} else this._bufferPos = (int)(pos - this._bufferReadPos);
 		}
 	}

@@ -75,7 +75,7 @@ namespace StringDB.Writer {
 
 		/// <inheritdoc/>
 		public void OverwriteValue<T>(TypeHandler<T> typeHandler, IReaderPair replacePair, T newValue) {
-			var newPos = this._rawWriter.OverwriteValue<T>(typeHandler, newValue, replacePair.Value.Length(), replacePair.DataPosition, replacePair.Position + sizeof(byte));
+			var newPos = this._rawWriter.OverwriteValue<T>(typeHandler, newValue, replacePair.Value.GetLength(), replacePair.DataPosition, replacePair.Position + sizeof(byte));
 
 			//TODO: update the readerpair?
 

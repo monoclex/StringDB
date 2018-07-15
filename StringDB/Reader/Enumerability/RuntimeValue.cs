@@ -18,10 +18,13 @@ namespace StringDB.Reader {
 		T GetAs<T>(TypeHandler<T> typeHandler);
 
 		/// <summary>Uses the TypeManager to try find the TypeHandler associated with the data and return it's type.</summary>
-		Type Type();
+		Type GetTypeOf();
 
 		/// <summary>Returns how long the data is.</summary>
-		long Length();
+		long GetLength();
+
+		/// <summary>Get the identifier byte</summary>
+		byte GetIdentifierByte();
 	}
 
 	internal struct RuntimeValue : IRuntimeValue {
@@ -60,19 +63,25 @@ namespace StringDB.Reader {
 					: this._rawReader.ReadDataAs<T>(this._readPos, this._specifyLen, typeHandler);
 
 		/// <inheritdoc/>
-		public Type Type()
+		public Type GetTypeOf()
 			=> this._specifyType == null ?
 					this._rawReader.ReadType(this._readPos, null).Type
 					: TypeManager.GetHandlerFor((byte)this._specifyType).Type;
 
 		/// <inheritdoc/>
-		public long Length()
+		public long GetLength()
 			=> this._specifyLen != NOSPECIFYLEN ?
 					this._specifyLen
 					: this._rawReader.ReadLength(this._readPos);
 
 		/// <inheritdoc/>
+		public byte GetIdentifierByte()
+			=> this._specifyType == null ?
+					this._rawReader.ReadByte(this._readPos)
+					: (byte)this._specifyType;
+
+		/// <inheritdoc/>
 		public override string ToString()
-			=> $"({this.Length()} bytes, {this.Type()})";
+			=> $"(0x{this.GetIdentifierByte().ToString("x2")}, {this.GetLength()} bytes, {this.GetTypeOf()})";
 	}
 }

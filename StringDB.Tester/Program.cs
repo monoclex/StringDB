@@ -27,6 +27,42 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
+			int c = 0;
+			using (var d2b = Database.FromFile("test.db")) {
+				foreach (var i in d2b) {
+
+				}// Console.WriteLine(i.ToString());
+			}
+
+				Console.ReadLine();
+
+			IDatabase db = Database.FromStream(new MemoryStream(), true);
+			Time(20_000, () => {
+				db = Database.FromStream(new MemoryStream(), true);
+			}, () => {
+				db.Insert("HELLO", "WORLD");
+			}, () => {
+				db.Dispose();
+				db = Database.FromStream(new MemoryStream(), true);
+			});
+
+			Console.ReadKey(true);
+
+			var strMgr = TypeManager.GetHandlerFor<string>();
+
+			Time(20_000, () => {
+				db = Database.FromStream(new MemoryStream(), true);
+			}, () => {
+				db.Insert(strMgr, strMgr, "HELLO", "WORLD");
+			}, () => {
+				db.Dispose();
+				db = Database.FromStream(new MemoryStream(), true);
+			});
+
+			Console.ReadLine();
+
+			return;
+			/*
 			using (var db = Database.FromStream(new MemoryStream(), true)) {
 				db.MakeThreadSafe();
 				Parallel.For(0, 1_000_000, (i) => {
@@ -49,7 +85,7 @@ namespace StringDB.Tester {
 					db.InsertRange(byteHandler, byteHandler, insertRange);
 
 			return;
-			*/
+			*//*
 			var ms = new MemoryStream();
 
 			using (var fs = File.Open("test.db", FileMode.OpenOrCreate))
@@ -57,7 +93,7 @@ namespace StringDB.Tester {
 
 			using (var db = Database.FromStream(ms, true))
 				for (var i = 0; i < 100_000_000; i++)
-					foreach (var j in db) { }
+					foreach (var j in db) { }*/
 		}
 
 		private static void Time(int estTime, Action before, Action method, Action after) {
