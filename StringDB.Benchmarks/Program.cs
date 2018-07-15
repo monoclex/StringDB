@@ -28,7 +28,7 @@ namespace StringDB.Benchmarks {
 	[HtmlExporter]
 	public class StringDBBenchmark {
 #if SETUP
-		public Database stringdb;
+		public IDatabase stringdb;
 		private IEnumerable<KeyValuePair<byte[], byte[]>> itemsToInsert;
 		private IEnumerable<KeyValuePair<byte[], byte[]>> newInserts;
 
@@ -165,7 +165,7 @@ namespace StringDB.Benchmarks {
 		private static Random _random;
 		public static Random Rng => _random ?? (_random = new Random());
 
-		public static Database NewStringDB() => Database.FromStream(new MemoryStream(), true);
+		public static IDatabase NewStringDB() => Database.FromStream(new MemoryStream(), true);
 
 		public static readonly string[] RandomNames = {
 			"Jimbo",

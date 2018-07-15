@@ -59,7 +59,7 @@
 		public long Position { get; }
 		public long NextPart { get; }
 
-		public IReaderPair ToReaderPair(RawReader rawReader)
+		public IReaderPair ToReaderPair(IRawReader rawReader)
 			=> new ReaderPair(this.DataPosition, this.Position, this.Index, this.InitialByte, this.Type, rawReader);
 	}
 }

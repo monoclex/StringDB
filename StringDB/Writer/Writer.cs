@@ -38,12 +38,10 @@ namespace StringDB.Writer {
 
 	/// <inheritdoc/>
 	public class Writer : IWriter {
+		
+		internal Writer(IRawWriter rawWriter) => this._rawWriter = rawWriter;
 
-		/// <summary>Create a new Writer.</summary>
-		/// <param name="s">The stream</param>
-		public Writer(Stream s) => this._rawWriter = new RawWriter(s);
-
-		private readonly RawWriter _rawWriter;
+		private readonly IRawWriter _rawWriter;
 
 		// lol if this isn't a wall of text i don't know what is
 

@@ -27,65 +27,37 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
-			
-			using (var testdb = Database.FromFile("wut.db")) {
-
-				foreach (var i in testdb)
-					Console.WriteLine($"{i.ToString()} {i.StringIndex}");
-
-				foreach (var t in testdb) 
-					Console.WriteLine((t).Value.Type().ToString());
+			using (var db = Database.FromStream(new MemoryStream(), true)) {
+				db.MakeThreadSafe();
+				Parallel.For(0, 1_000_000, (i) => {
+					db.Insert(i, i);
+				});
 			}
 
 			Console.ReadLine();
 
-			var lol = TypeManager.GetHandlerFor<int>();
+			/*
+			var ind = System.Text.Encoding.UTF8.GetBytes("TEST INDEX");
+			var val = System.Text.Encoding.UTF8.GetBytes("TEST VALUE USED FOR PROFILING");
 
-			using(var cooldb = Database.FromFile("lol.db")) {
-				cooldb.InsertRange<string, string>(new KeyValuePair<string, string>[] {
-					new KeyValuePair<string, string>("multidex", "Hello,"),
-					new KeyValuePair<string, string>("multidex", " "),
-					new KeyValuePair<string, string>("multidex", "World"),
-				});
+			IEnumerable<KeyValuePair<byte[], byte[]>> insertRange = new KeyValuePair<byte[], byte[]>[] { new KeyValuePair<byte[], byte[]>(ind, val) };
 
-				cooldb.Insert(0, "Hello!");
-				cooldb.Insert(1, "World!");
+			var byteHandler = TypeManager.GetHandlerFor<byte[]>();
 
-				for (int i = 0; i < 2; i++)
-					Console.WriteLine(cooldb.Get(i).Index.GetAs<string>());
-			}
+			using (var db = Database.FromFile("test.db"))
+				for (int i = 0; i < 10_000_000; i++)
+					db.InsertRange(byteHandler, byteHandler, insertRange);
+
 			return;
-			Console.ReadLine();
+			*/
+			var ms = new MemoryStream();
 
-			Console.WriteLine("begin");
-			using (var db = Database.FromFile("stringdb5.0.0.db")) {
-				for (int i = 0; i < 1_000_000; i++)
-					db.Insert("HELLO", "WORLD!");
-			}
-			Console.WriteLine("end");
+			using (var fs = File.Open("test.db", FileMode.OpenOrCreate))
+				fs.CopyTo(ms);
 
-			using (var db = Database.FromFile("testdb.db").MakeThreadSafe()) {
-
-				Parallel.For(0, 100_000, (i) => {
-					db.Insert("EEE", "AAA");
-				});
-
-				Console.WriteLine("for loop done");
-
-				Parallel.ForEach(db, (i) => {
-					//Console.WriteLine(i.ToString());
-				});
-				
-				using(var other = Database.FromFile("eee.db").MakeThreadSafe()) {
-					Parallel.For(0, 1_000_000, (i) => {
-						other.CleanFrom(db);
-					});
-				}
-			}
-
-			Console.WriteLine("ayy");
-
-			Console.ReadLine();
+			using (var db = Database.FromStream(ms, true))
+				for (var i = 0; i < 100_000_000; i++)
+					foreach (var j in db) { }
 		}
 
 		private static void Time(int estTime, Action before, Action method, Action after) {

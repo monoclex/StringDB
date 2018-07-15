@@ -14,17 +14,17 @@ namespace StringDB.Reader {
 		/// <summary>Gets the ReaderPair responsible for a given index</summary>
 		IReaderPair Get<T>(T index);
 
-		/// <summary>Attempts to get the ReaderPair</summary>
-		bool TryGet<T>(T index, out IReaderPair value);
-
-		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
-		IEnumerable<IReaderPair> GetAll<T>(T index);
-
 		/// <summary>Gets the ReaderPair responsible for a given index</summary>
 		IReaderPair Get<T>(TypeHandler<T> typeHandler, T index);
 
 		/// <summary>Attempts to get the ReaderPair</summary>
+		bool TryGet<T>(T index, out IReaderPair value);
+
+		/// <summary>Attempts to get the ReaderPair</summary>
 		bool TryGet<T>(TypeHandler<T> typeHandler, T index, out IReaderPair value);
+
+		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
+		IEnumerable<IReaderPair> GetAll<T>(T index);
 
 		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
 		IEnumerable<IReaderPair> GetAll<T>(TypeHandler<T> typeHandler, T index);
@@ -33,18 +33,16 @@ namespace StringDB.Reader {
 		void DrainBuffer();
 	}
 
-	//TODO: protected reader/writer to prevent from inheriting
-
 	/// <summary>A Reader that reads out a StringDB database file.</summary>
-	public class Reader : IReader {
+	public sealed class Reader : IReader {
 
-		internal Reader(Stream stream) {
+		internal Reader(Stream stream, IRawReader rawReader) {
 			this._stream = stream ?? throw new ArgumentNullException(nameof(stream));
-			this._rawReader = new RawReader(this._stream);
+			this._rawReader = rawReader;
 		}
 
 		private readonly Stream _stream;
-		private readonly RawReader _rawReader;
+		private readonly IRawReader _rawReader;
 
 		/// <inheritdoc/>
 		public IReaderPair First() {
@@ -97,7 +95,7 @@ namespace StringDB.Reader {
 
 			// couldn't find anything
 
-			value = default(ReaderPair);
+			value = null;
 			return false;
 		}
 

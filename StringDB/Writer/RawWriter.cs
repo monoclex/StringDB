@@ -3,8 +3,38 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace StringDB.Writer {
+	internal interface IRawWriter {
+		void Flush();
 
-	internal class RawWriter {
+		void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps);
+
+		long OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos);
+	}
+
+	internal class ThreadSafeRawWriter : IRawWriter {
+
+		public ThreadSafeRawWriter(IRawWriter parent, object @lock) {
+			this._parent = parent;
+			this._lock = @lock;
+		}
+
+		private readonly IRawWriter _parent;
+		private readonly object _lock;
+
+		public void Flush() {
+			lock (this._lock) this._parent.Flush();
+		}
+
+		public void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps) {
+			lock (this._lock) this._parent.InsertRange(wt1, wt2, kvps);
+		}
+
+		public long OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos) {
+			lock (this._lock) return this._parent.OverwriteValue(wt, newValue, oldLen, dataPos, posOfDataPos);
+		}
+	}
+
+	internal class RawWriter : IRawWriter {
 
 		public RawWriter(Stream s) {
 			this._s = s;

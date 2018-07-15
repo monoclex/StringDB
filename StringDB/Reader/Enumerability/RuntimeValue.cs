@@ -27,14 +27,14 @@ namespace StringDB.Reader {
 	internal struct RuntimeValue : IRuntimeValue {
 		internal const int NOSPECIFYLEN = -1;
 
-		internal RuntimeValue(RawReader rawReader, long readPos, byte? specifyType = null, long specifyLen = NOSPECIFYLEN) {
+		internal RuntimeValue(IRawReader rawReader, long readPos, byte? specifyType = null, long specifyLen = NOSPECIFYLEN) {
 			this._specifyType = specifyType;
 			this._specifyLen = specifyLen;
 			this._rawReader = rawReader;
 			this._readPos = readPos;
 		}
 
-		private readonly RawReader _rawReader;
+		private readonly IRawReader _rawReader;
 		private readonly long _specifyLen;
 		private readonly byte? _specifyType;
 		internal long _readPos;

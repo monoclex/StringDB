@@ -18,6 +18,9 @@ namespace StringDB {
 		/// <summary>Cleans out the database specified, and copies all of the contents of the other database into this one. You may be able to experience a smaller DB file if you've used StringDB to not to perfectionist values.</summary>
 		/// <param name="dbCleanFrom">The database to clean up</param>
 		void CleanFrom(IDatabase dbCleanFrom);
+
+		/// <summary>Replaces the current reader and writer with a thread safe reader and writer.</summary>
+		void MakeThreadSafe();
 	}
 
 	/// <inheritdoc/>
@@ -27,23 +30,28 @@ namespace StringDB {
 			this._disposeStream = disposeStream;
 
 			this._stream = s;
-			this._reader = new Reader.Reader(s);
-			this._writer = new Writer.Writer(s);
+			this._reader = new Reader.Reader(s, new RawReader(s));
+			this._writer = new Writer.Writer(new RawWriter(s));
 		}
 
 		/// <summary>Create a new Database from a stream</summary><param name="s">The stream to be using</param><param name="disposeStream">If the stream should be disposed after we're done using it</param>
-		public static Database FromStream(Stream s, bool disposeStream = false) => new Database(s, disposeStream);
+		public static IDatabase FromStream(Stream s, bool disposeStream = false) => new Database(s, disposeStream);
 
 		/// <summary>Create a new Database from a string name to open a file</summary><param name="name">The name of the file</param>
-		public static Database FromFile(string name) => new Database(File.Open(name, FileMode.OpenOrCreate), true);
+		public static IDatabase FromFile(string name) => new Database(File.Open(name, FileMode.OpenOrCreate), true);
 
 		private readonly bool _disposeStream;
 		private readonly Stream _stream;
 		private IReader _reader;
 		private IWriter _writer;
 
-		/// <summary>Wraps this database into thread safety using a ThreadSafeDatabase</summary>
-		public IDatabase MakeThreadSafe() => new ThreadSafeDatabase(this);
+		/// <inheritdoc/>
+		public void MakeThreadSafe() {
+			var @lock = new object();
+
+			this._reader = new Reader.Reader(this._stream, new ThreadSafeRawReader(new RawReader(this._stream), @lock));
+			this._writer = new Writer.Writer(new ThreadSafeRawWriter(new RawWriter(this._stream), @lock));
+		}
 
 		/// <inheritdoc/>
 		public void Flush() => this._writer.Flush();

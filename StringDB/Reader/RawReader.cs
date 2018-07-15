@@ -2,9 +2,73 @@
 using System.IO;
 
 namespace StringDB.Reader {
-	//TODO: cleanup code
+	internal interface IRawReader {
+		IPart ReadAt(long pos);
 
-	internal class RawReader {
+		IPart ReadOn(IPart previous);
+
+		ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null);
+
+		T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith);
+
+		T ReadData<T>(long pos, long len, ITypeHandler typeHandlerReadWith);
+
+		T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith);
+
+		T ReadDataAs<T>(long pos, long len, ITypeHandler typeHandlerReadWith);
+
+		long ReadLength(long pos);
+
+		void DrainBuffer();
+	}
+
+	internal class ThreadSafeRawReader : IRawReader {
+		public ThreadSafeRawReader(IRawReader parent, object @lock) {
+			this._parent = parent;
+			this._lock = @lock;
+		}
+
+		private readonly IRawReader _parent;
+		private readonly object _lock;
+
+		public IPart ReadAt(long pos) {
+			lock (this._lock) return this._parent.ReadAt(pos);
+		}
+
+		public IPart ReadOn(IPart previous) {
+			lock (this._lock) return this._parent.ReadOn(previous);
+		}
+
+		public ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null) {
+			lock (this._lock) return this._parent.ReadType(pos, typeHandlerReadWith, specifyType);
+		}
+
+		public T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith) {
+			lock (this._lock) return this._parent.ReadData<T>(pos, typeHandlerReadWith);
+		}
+
+		public T ReadData<T>(long pos, long len, ITypeHandler typeHandlerReadWith) {
+			lock (this._lock) return this._parent.ReadData<T>(pos, len, typeHandlerReadWith);
+		}
+
+		public T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith) {
+			lock (this._lock) return this._parent.ReadDataAs<T>(pos, typeHandlerReadWith);
+		}
+
+		public T ReadDataAs<T>(long pos, long len, ITypeHandler typeHandlerReadWith) {
+			lock (this._lock) return this._parent.ReadDataAs<T>(pos, len, typeHandlerReadWith);
+		}
+
+		public long ReadLength(long pos) {
+			lock (this._lock) return this._parent.ReadLength(pos);
+		}
+
+		public void DrainBuffer() {
+			lock (this._lock) this._parent.DrainBuffer();
+		}
+	}
+
+	internal class RawReader : IRawReader {
 
 		internal RawReader(Stream s) {
 			this._stream = s;
@@ -14,7 +78,7 @@ namespace StringDB.Reader {
 		private readonly Stream _stream;
 		private readonly BinaryReader _br;
 
-		private const int BufferSize = 0x1000; //1MiB
+		private const int BufferSize = 0x1000; // 4096KB buffer
 		private const int MinusBufferSize = -1 - BufferSize;
 
 		private long _bufferReadPos = MinusBufferSize; //the position we read the buffer at in the filestream
@@ -24,9 +88,6 @@ namespace StringDB.Reader {
 		private readonly byte[] _oneByteBuffer = new byte[1];
 
 		public IPart ReadAt(long pos) {
-#if THREAD_SAFE
-			lock (_lock) {
-#endif
 			BufferSeek(pos);
 
 			var p = this.ReadBytes(10); // read the length, and the data pos
@@ -50,9 +111,6 @@ namespace StringDB.Reader {
 
 				return new PartDataPair(importantByte, pos, intVal, val, byteType);
 			}
-#if THREAD_SAFE
-			}
-#endif
 		}
 
 		public IPart ReadOn(IPart previous) => // only read on if the next part can be found

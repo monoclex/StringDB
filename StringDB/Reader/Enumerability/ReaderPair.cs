@@ -26,7 +26,7 @@
 	/// <summary>A pair of data - this correlates an index to it's corresponding value.</summary>
 	internal struct ReaderPair : IReaderPair {
 
-		internal ReaderPair(long dataPos, long pos, byte[] index, byte identifier, byte indexType, RawReader rawReader) {
+		internal ReaderPair(long dataPos, long pos, byte[] index, byte identifier, byte indexType, IRawReader rawReader) {
 			this._identifier = identifier;
 			this._rawReader = rawReader;
 			this._indexType = indexType;
@@ -35,7 +35,7 @@
 			this._pos = pos;
 		}
 
-		private RawReader _rawReader { get; }
+		private IRawReader _rawReader { get; }
 		internal long _dataPos;
 		internal long _pos { get; }
 		internal byte[] _index { get; }
