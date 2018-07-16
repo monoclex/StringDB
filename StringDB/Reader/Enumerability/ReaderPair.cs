@@ -9,8 +9,8 @@
 		/// <summary>The position of where the data is stored for this ReaderPair</summary>
 		long DataPosition { get; }
 
-		/// <summary>Get the index as a byte array instead.</summary>
-		byte[] ByteArrayIndex { get; }
+		/// <summary>Gets the raw value stored in the index.</summary>
+		byte[] RawIndex { get; }
 
 		/// <summary>Whatever the index is.</summary>
 		string StringIndex { get; }
@@ -52,10 +52,7 @@
 		public long Position => this._pos;
 
 		/// <inheritdoc/>
-		public byte[] ByteArrayIndex => this._index;
-
-		/// <inheritdoc/>
-		public string StringIndex => this._index.GetString();
+		public byte[] RawIndex => this._index;
 
 		/// <inheritdoc/>
 		public IRuntimeValue Index => new RuntimeValue(this._rawReader, this._pos + sizeof(long) + sizeof(byte), this._indexType, this._identifier);

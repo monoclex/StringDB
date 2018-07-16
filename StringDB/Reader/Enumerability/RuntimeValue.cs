@@ -28,9 +28,7 @@ namespace StringDB.Reader {
 	}
 
 	internal struct RuntimeValue : IRuntimeValue {
-		internal const int NOSPECIFYLEN = -1;
-
-		internal RuntimeValue(IRawReader rawReader, long readPos, byte? specifyType = null, long specifyLen = NOSPECIFYLEN) {
+		internal RuntimeValue(IRawReader rawReader, long readPos, byte? specifyType = null, long specifyLen = Consts.NOSPECIFYLEN) {
 			this._specifyType = specifyType;
 			this._specifyLen = specifyLen;
 			this._rawReader = rawReader;
@@ -52,15 +50,11 @@ namespace StringDB.Reader {
 
 		/// <inheritdoc/>
 		public T Get<T>(TypeHandler<T> typeHandler)
-			=> this._specifyLen == NOSPECIFYLEN ?
-					this._rawReader.ReadData<T>(this._readPos, typeHandler)
-					: this._rawReader.ReadData<T>(this._readPos, this._specifyLen, typeHandler);
+			=> this._rawReader.ReadData<T>(this._readPos, typeHandler, this._specifyLen);
 
 		/// <inheritdoc/>
 		public T GetAs<T>(TypeHandler<T> typeHandler)
-			=> this._specifyLen == NOSPECIFYLEN ?
-					this._rawReader.ReadDataAs<T>(this._readPos, typeHandler)
-					: this._rawReader.ReadDataAs<T>(this._readPos, this._specifyLen, typeHandler);
+			=> this._rawReader.ReadDataAs<T>(this._readPos, typeHandler, this._specifyLen);
 
 		/// <inheritdoc/>
 		public Type GetTypeOf()
@@ -70,7 +64,7 @@ namespace StringDB.Reader {
 
 		/// <inheritdoc/>
 		public long GetLength()
-			=> this._specifyLen != NOSPECIFYLEN ?
+			=> this._specifyLen != Consts.NOSPECIFYLEN ?
 					this._specifyLen
 					: this._rawReader.ReadLength(this._readPos);
 

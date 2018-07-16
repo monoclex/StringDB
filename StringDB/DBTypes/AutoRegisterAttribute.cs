@@ -8,6 +8,14 @@ using System.Linq;
 using System.Reflection;
 
 namespace StringDB {
+	internal static class AutoRegisterStatic {
+		public static void RegisterTypes() {
+#if USE_ASSEMBLIES
+			AutoRegister.RegisterTypes();
+#endif
+		}
+	}
+
 #if USE_ASSEMBLIES
 	public static partial class TypeManager {
 		/// <summary>Automatically registers the class when the TypeManager is initialized.</summary>

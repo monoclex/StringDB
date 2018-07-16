@@ -26,5 +26,7 @@
 
 		/// <summary>An index with zero length tells it that there's nothing after this.</summary>
 		public const byte NoIndex = 0x00;
+
+		public const int NOSPECIFYLEN = -1;
 	}
 }

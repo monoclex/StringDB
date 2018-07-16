@@ -1,14 +1,9 @@
 ﻿namespace StringDB.Reader {
 
 	internal interface IPart {
-
-		/// <summary>The initial byte detected</summary>
+		
 		byte InitialByte { get; }
-
-		/// <summary>position of this part</summary>
 		long Position { get; }
-
-		/// <summary>Where the next position will be</summary>
 		long NextPart { get; }
 	}
 

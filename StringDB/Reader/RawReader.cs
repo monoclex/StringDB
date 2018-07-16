@@ -10,13 +10,9 @@ namespace StringDB.Reader {
 
 		ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null);
 
-		T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith);
+		T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith, long len = -1);
 
-		T ReadData<T>(long pos, long len, ITypeHandler typeHandlerReadWith);
-
-		T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith);
-
-		T ReadDataAs<T>(long pos, long len, ITypeHandler typeHandlerReadWith);
+		T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith, long len = -1);
 
 		long ReadLength(long pos);
 
@@ -46,20 +42,12 @@ namespace StringDB.Reader {
 			lock (this._lock) return this._parent.ReadType(pos, typeHandlerReadWith, specifyType);
 		}
 
-		public T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith) {
-			lock (this._lock) return this._parent.ReadData<T>(pos, typeHandlerReadWith);
+		public T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith, long len = Consts.NOSPECIFYLEN) {
+			lock (this._lock) return this._parent.ReadData<T>(pos, typeHandlerReadWith, len);
 		}
 
-		public T ReadData<T>(long pos, long len, ITypeHandler typeHandlerReadWith) {
-			lock (this._lock) return this._parent.ReadData<T>(pos, len, typeHandlerReadWith);
-		}
-
-		public T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith) {
-			lock (this._lock) return this._parent.ReadDataAs<T>(pos, typeHandlerReadWith);
-		}
-
-		public T ReadDataAs<T>(long pos, long len, ITypeHandler typeHandlerReadWith) {
-			lock (this._lock) return this._parent.ReadDataAs<T>(pos, len, typeHandlerReadWith);
+		public T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith, long len = Consts.NOSPECIFYLEN) {
+			lock (this._lock) return this._parent.ReadDataAs<T>(pos, typeHandlerReadWith, len);
 		}
 
 		public long ReadLength(long pos) {
@@ -74,6 +62,8 @@ namespace StringDB.Reader {
 			lock (this._lock) this._parent.DrainBuffer();
 		}
 	}
+
+	//TODO: cleanup this mESS
 
 	internal class RawReader : IRawReader {
 
@@ -125,45 +115,25 @@ namespace StringDB.Reader {
 				this.ReadAt(previous.NextPart)
 				: null;
 
-		public T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith) {
+		public T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith, long len = -1) {
 			// will never happen anyways
 			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
 
 			var type = ReadType(pos, null, (byte?)null); // get the proper type handler
 
 			// throw an exception if we're reading the wrong type
-			//TODO: custom exception
 			if (type.Type != typeof(T)) throw new TypesDontMatch(typeof(T), type.Type);
 
-			// read it properly
-			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br);
-		}
-
-		public T ReadData<T>(long pos, long len, ITypeHandler typeHandlerReadWith) {
-			// will never happen anyways
-			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
-
-			var type = ReadType(pos, null, (byte?)null); // get the proper type handler
-
-			// throw an exception if we're reading the wrong type
-			//TODO: custom exception
-			if (type.Type != typeof(T)) throw new TypesDontMatch(typeof(T), type.Type);
+			var typ = (typeHandlerReadWith as TypeHandler<T>);
 
 			// read it properly
-			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br, len);
+
+			if (len == -1)
+				return typ.Read(this._br);
+			else return typ.Read(this._br, len);
 		}
 
-		public T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith) {
-			// will never happen anyways
-			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
-
-			this._stream.Seek(pos); // seek to the data and ignore the type identifier
-			this._stream.Read(this._oneByteBuffer, 0, 1);
-
-			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br);
-		}
-
-		public T ReadDataAs<T>(long pos, long len, ITypeHandler typeHandlerReadWith) {
+		public T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith, long len = Consts.NOSPECIFYLEN) {
 			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
 
 			this._stream.Seek(pos); // seek to the data and ignore the type identifier

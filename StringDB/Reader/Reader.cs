@@ -62,14 +62,6 @@ namespace StringDB.Reader {
 			=> Get<T>(TypeManager.GetHandlerFor<T>(), index);
 
 		/// <inheritdoc/>
-		public bool TryGet<T>(T index, out IReaderPair value)
-			=> TryGet<T>(TypeManager.GetHandlerFor<T>(), index, out value);
-
-		/// <inheritdoc/>
-		public IEnumerable<IReaderPair> GetAll<T>(T index)
-			=> GetAll<T>(TypeManager.GetHandlerFor<T>(), index);
-
-		/// <inheritdoc/>
 		public IReaderPair Get<T>(TypeHandler<T> typeHandler, T index) {
 			// prevent the re-use of code
 
@@ -78,6 +70,10 @@ namespace StringDB.Reader {
 
 			throw new InvalidOperationException($"Unable to find the given index {index}");
 		}
+		
+		/// <inheritdoc/>
+		public bool TryGet<T>(T index, out IReaderPair value)
+			=> TryGet<T>(TypeManager.GetHandlerFor<T>(), index, out value);
 
 		/// <inheritdoc/>
 		public bool TryGet<T>(TypeHandler<T> typeHandler, T index, out IReaderPair value) {
@@ -97,6 +93,10 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
+		public IEnumerable<IReaderPair> GetAll<T>(T index)
+			=> GetAll<T>(TypeManager.GetHandlerFor<T>(), index);
+
+		/// <inheritdoc/>
 		public IEnumerable<IReaderPair> GetAll<T>(TypeHandler<T> typeHandler, T index) {
 			if (this._stream.Length <= 8) // newly created DBs
 				yield break;
@@ -107,10 +107,10 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
-		public IEnumerator<IReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader);
+		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
 		/// <inheritdoc/>
-		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+		public IEnumerator<IReaderPair> GetEnumerator() => new ReaderEnumerator(this._rawReader);
 
 		/// <inheritdoc/>
 		public void DrainBuffer() =>

@@ -20,9 +20,6 @@ namespace StringDB {
 		public static void Seek(this Stream s, long p)
 			=> s.Seek(p, SeekOrigin.Begin);
 
-		public static T Read<T>(this TypeHandler<T> typeHandler, BinaryReader br)
-			=> typeHandler.Read(br, TypeHandlerLengthManager.ReadLength(br));
-
 		//  ___
 		// /. .\
 

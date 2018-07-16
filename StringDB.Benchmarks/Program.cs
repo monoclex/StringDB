@@ -20,7 +20,7 @@ namespace StringDB.Benchmarks {
 	internal class Program {
 
 		private static void Main() {
-			var summary = BenchmarkRunner.Run<OthrBench>();
+			var summary = BenchmarkRunner.Run<NewBench>();
 			Console.ReadLine();
 		}
 	}
@@ -81,13 +81,13 @@ namespace StringDB.Benchmarks {
 		}
 
 		[Benchmark]
-		public void WithOptimizations() {
-			db.InsertRange(_byteHandler, _byteHandler, _insertRange);
+		public void ForLoop() {
+			for (int i = 0; i < 1_000_000; i++) db.Insert("Hello,", " World!");
 		}
 
 		[Benchmark]
-		public void WithoutOptimizations() {
-			db.Insert(_data, _data);
+		public void Fill() {
+			db.Fill("Hello,", " World!", 1_000_000);
 		}
 
 		[IterationCleanup]

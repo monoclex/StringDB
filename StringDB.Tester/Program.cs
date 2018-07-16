@@ -27,20 +27,12 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
-			int c = 0;
-			using (var d2b = Database.FromFile("test.db")) {
-				foreach (var i in d2b) {
-
-				}// Console.WriteLine(i.ToString());
-			}
-
-				Console.ReadLine();
-
 			IDatabase db = Database.FromStream(new MemoryStream(), true);
 			Time(20_000, () => {
 				db = Database.FromStream(new MemoryStream(), true);
+				for (int i = 0; i < 1_000_000; i++) db.Insert("HELLO_,", "WORLD_,");
 			}, () => {
-				db.Insert("HELLO", "WORLD");
+
 			}, () => {
 				db.Dispose();
 				db = Database.FromStream(new MemoryStream(), true);
