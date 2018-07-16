@@ -26,7 +26,7 @@ namespace StringDB {
 
 		public static void RegisterTypes() {
 #if USE_ASSEMBLIES
-			AutoRegister.RegisterTypes();
+			TypeManager.AutoRegister.RegisterTypes();
 #endif
 		}
 	}

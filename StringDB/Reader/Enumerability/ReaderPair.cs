@@ -12,9 +12,6 @@
 		/// <summary>Gets the raw value stored in the index.</summary>
 		byte[] RawIndex { get; }
 
-		/// <summary>Whatever the index is.</summary>
-		string StringIndex { get; }
-
 		/// <summary>Provides Get, GetAs, and Type functions for the Index.</summary>
 		/// <remarks>It is highly advised that you use the ByteArrayIndex whenver possible.</remarks>
 		IRuntimeValue Index { get; }
