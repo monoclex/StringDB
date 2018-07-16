@@ -59,9 +59,10 @@ namespace StringDB {
 
 			this._reader = new Reader.Reader(this._stream, new ThreadSafeRawReader(new RawReader(this._stream), @lock));
 			this._writer = new Writer.Writer(new ThreadSafeRawWriter(new RawWriter(this._stream), @lock));
-		} 
+		}
 
 		#region reader
+
 		/// <inheritdoc/>
 		public IReaderPair First() =>
 			this._reader.First();
@@ -101,9 +102,11 @@ namespace StringDB {
 		/// <inheritdoc/>
 		public void DrainBuffer() =>
 			this._reader.DrainBuffer();
-		#endregion
+
+		#endregion reader
 
 		#region writer
+
 		/// <inheritdoc/>
 		public void Flush() {
 			this._writer.Flush();
@@ -153,7 +156,8 @@ namespace StringDB {
 			this._writer.OverwriteValue(typeHandler, replacePair, newValue);
 			this._reader.DrainBuffer();
 		}
-		#endregion
+
+		#endregion writer
 
 		/// <inheritdoc/>
 		public void Dispose() {

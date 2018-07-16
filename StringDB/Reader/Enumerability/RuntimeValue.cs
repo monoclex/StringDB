@@ -28,6 +28,7 @@ namespace StringDB.Reader {
 	}
 
 	internal struct RuntimeValue : IRuntimeValue {
+
 		internal RuntimeValue(IRawReader rawReader, long readPos, byte? specifyType = null, long specifyLen = Consts.NOSPECIFYLEN) {
 			this._specifyType = specifyType;
 			this._specifyLen = specifyLen;

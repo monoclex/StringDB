@@ -1,7 +1,6 @@
 ﻿using StringDB.Reader;
 
 using System.Collections.Generic;
-using System.IO;
 
 namespace StringDB.Writer {
 
@@ -49,7 +48,7 @@ namespace StringDB.Writer {
 
 	/// <inheritdoc/>
 	public class Writer : IWriter {
-		
+
 		internal Writer(IRawWriter rawWriter) => this._rawWriter = rawWriter;
 
 		private readonly IRawWriter _rawWriter;

@@ -1,7 +1,6 @@
 ﻿namespace StringDB.Reader {
 
 	internal interface IPart {
-		
 		byte InitialByte { get; }
 		long Position { get; }
 		long NextPart { get; }

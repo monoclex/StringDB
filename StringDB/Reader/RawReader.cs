@@ -1,9 +1,12 @@
-﻿using System;
+﻿using StringDB.Exceptions;
+
+using System;
 using System.IO;
-using StringDB.Exceptions;
 
 namespace StringDB.Reader {
+
 	internal interface IRawReader {
+
 		IPart ReadAt(long pos);
 
 		IPart ReadOn(IPart previous);
@@ -22,6 +25,7 @@ namespace StringDB.Reader {
 	}
 
 	internal class ThreadSafeRawReader : IRawReader {
+
 		public ThreadSafeRawReader(IRawReader parent, object @lock) {
 			this._parent = parent;
 			this._lock = @lock;
@@ -142,6 +146,16 @@ namespace StringDB.Reader {
 			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br, len);
 		}
 
+		public ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null) {
+			if (specifyType == null) {
+				this._stream.Seek(pos); // seek to the position
+				byte b;
+				return (b = this._br.ReadByte()) == typeHandlerReadWith?.Id ?
+					typeHandlerReadWith
+					: TypeManager.GetHandlerFor(b); // get the handler for the type of data
+			} else return TypeManager.GetHandlerFor((byte)specifyType);
+		}
+
 		public long ReadLength(long pos) {
 			this._stream.Seek(pos); // seek to the data and ignore the type
 			this._stream.Read(this._oneByteBuffer, 0, 1);
@@ -155,16 +169,6 @@ namespace StringDB.Reader {
 			return this._oneByteBuffer[0];
 		}
 
-		public ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null) {
-			if (specifyType == null) {
-				this._stream.Seek(pos); // seek to the position
-				byte b;
-				return (b = this._br.ReadByte()) == typeHandlerReadWith?.Id ?
-					typeHandlerReadWith
-					: TypeManager.GetHandlerFor(b); // get the handler for the type of data
-			} else return TypeManager.GetHandlerFor((byte)specifyType);
-		}
-
 		public void DrainBuffer() {
 			this._bufferPos = MinusBufferSize;
 			this._bufferReadPos = MinusBufferSize;
@@ -174,7 +178,6 @@ namespace StringDB.Reader {
 		//heavily optimized method of reading bytes with an internal byte[] cache
 		private int ReadBytes(int amt) {
 			if (this._bufferPos + amt >= BufferSize) { //if we've went out of scope of the buffer
-
 				// apparently this code *never* gets triggered by the debugger?
 				// dunno why it exists but ok
 

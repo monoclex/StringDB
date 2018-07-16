@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace StringDB.Writer {
+
 	internal interface IRawWriter {
+
 		void Flush();
 
 		void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps);

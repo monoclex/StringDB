@@ -1,12 +1,10 @@
-﻿
-using StringDB.DBTypes.Predefined;
+﻿using StringDB.DBTypes.Predefined;
 using StringDB.Exceptions;
 
 using System;
 using System.Collections.Concurrent;
 
 namespace StringDB {
-	//TODO: mild cleanup with USE_ASSEMBLIES
 
 	/// <summary>Manages the types StringDB can read and write. Add your own if you need more types!</summary>
 	public static partial class TypeManager {
@@ -20,8 +18,8 @@ namespace StringDB {
 					RegisterType(new ByteArrayType());
 					RegisterType(new StringType());
 					RegisterType(new StreamType());
-					
-					AutoRegisterStatic.RegisterTypes();
+
+					AutoRegisterHelper.RegisterTypes();
 				}
 		}
 

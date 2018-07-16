@@ -2,13 +2,28 @@
 #define USE_ASSEMBLIES
 #endif
 
+//only versions that support reflection ( & longlength )
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace StringDB {
-	internal static class AutoRegisterStatic {
+
+	internal static partial class Consts {
+
+		public const bool UseAssemblies =
+#if USE_ASSEMBLIES
+			true;
+#else
+			false;
+
+#endif
+	}
+
+	internal static class AutoRegisterHelper {
+
 		public static void RegisterTypes() {
 #if USE_ASSEMBLIES
 			AutoRegister.RegisterTypes();
@@ -25,7 +40,7 @@ namespace StringDB {
 				// look through all the assemblies to find any [AutoRegister] attributes
 
 				// make sure we can use the cool assembly things
-				
+
 				foreach (var assembly in GetDependentAssemblies(typeof(TypeManager).Assembly)) {
 					foreach (var type in assembly.GetTypes())
 						// if it has the attribute

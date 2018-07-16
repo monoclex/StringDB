@@ -70,7 +70,7 @@ namespace StringDB.Reader {
 
 			throw new InvalidOperationException($"Unable to find the given index {index}");
 		}
-		
+
 		/// <inheritdoc/>
 		public bool TryGet<T>(T index, out IReaderPair value)
 			=> TryGet<T>(TypeManager.GetHandlerFor<T>(), index, out value);
