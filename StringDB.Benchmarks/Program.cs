@@ -4,7 +4,9 @@
 #define CLEAN_TESTS
 
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Columns;
 using BenchmarkDotNet.Attributes.Exporters;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
 using Newtonsoft.Json;
@@ -20,213 +22,216 @@ namespace StringDB.Benchmarks {
 	internal class Program {
 
 		private static void Main() {
-			var summary = BenchmarkRunner.Run<NewBench>();
+			using (var test = new StringDBBenchmark()) {
+				test.DatabaseType = GenerateDBType.FilledThreadUnsafe;
+				test.ItemPosition = ItemPosition.Middle;
+
+				test.SetupDB();
+
+				test.Fill();
+				test.Insert();
+				test.InsertRange();
+				test.OverwriteValue();
+				test.Get();
+				test.TryGet();
+				test.GetAll();
+				test.CleanTo();
+				test.CleanFrom();
+				test.Flush();
+
+				//test.DisposeDB();
+			}
+
+			var summary = BenchmarkRunner.Run<StringDBBenchmark>();
 			Console.ReadLine();
 		}
 	}
 
-	public class OthrBench {
-		private IDatabase db;
-		private IDatabase threadsafedb;
+	[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+	[CategoriesColumn]
+	[MarkdownExporter]
+	public class StringDBBenchmark : IDisposable {
+		public void Dispose() {
+			this._db.Dispose();
+			this._tmp.Dispose();
+			this._db = null;
+			this._tmp = null;
+			GC.SuppressFinalize(this);
+		}
 
-		[GlobalSetup]
-		public void Setup() {
-			db = Database.FromFile(Guid.NewGuid().ToString().Substring(0, 5) + "STRDB.db");
-			threadsafedb = Database.FromFile(Guid.NewGuid().ToString().Substring(0, 5) + "STRDB.db");
+		[Params(GenerateDBType.BlankThreadUnsafe, GenerateDBType.BlankThreadSafe, GenerateDBType.FilledThreadUnsafe, GenerateDBType.FilledThreadSafe)]
+		public GenerateDBType DatabaseType;
 
-			var byteHandler = TypeManager.GetHandlerFor<byte[]>();
-			db.InsertRange(byteHandler, byteHandler, GenInsertData());
-			threadsafedb.InsertRange(byteHandler, byteHandler, GenInsertData());
+		[Params(ItemPosition.First, ItemPosition.Middle, ItemPosition.End)]
+		public ItemPosition ItemPosition;
 
-			threadsafedb.MakeThreadSafe();
+		public IDatabase _db;
+
+		private KeyValuePair<byte[], byte[]> _singleItem;
+		private KeyValuePair<byte[], byte[]>[] _itms;
+
+		private Reader.IReaderPair _replRP;
+		private byte[] _replIndex;
+
+		public IDatabase _tmp;
+
+		private bool _filled;
+
+		[IterationSetup]
+		public void SetupDB() {
+			this._itms = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.AmountOfItems)).ToArray();
+			this._db = GenerateItems.GetDatabase(DatabaseType);
+
+			this._filled = this.DatabaseType == GenerateDBType.FilledThreadSafe || this.DatabaseType == GenerateDBType.FilledThreadUnsafe;
+
+			if (this._filled) {
+				this._singleItem = GenerateItems.GetItemAsKVP(GenerateItems.GetItems(1).FirstOrDefault());
+			
+				switch (this.ItemPosition) {
+					case ItemPosition.First: {
+						this._replRP = this._db.First();
+					}
+					break;
+
+					case ItemPosition.Middle: {
+						int c = 0;
+						foreach (var i in this._db)
+							if (c++ == GenerateItems.AmountOfItems / 2) {
+								this._replRP = i;
+								break;
+							}
+					}
+					break;
+
+					case ItemPosition.End: {
+						foreach (var i in this._db)
+							this._replRP = i;
+					}
+					break;
+
+					default: throw new Exception("unknown");
+				}
+
+				this._replIndex = this._replRP.Index.GetAs<byte[]>();
+			}
+
+			this._tmp = Database.FromStream(new MemoryStream(), true);
 		}
 		
-		private KeyValuePair<byte[], byte[]> _dat = new KeyValuePair<byte[], byte[]>(new byte[10], new byte[100]);
-		private IEnumerable<KeyValuePair<byte[], byte[]>> GenInsertData() {
-			for (var i = 0; i < 100_000; i++)
-				yield return _dat;
-		}
-
 		[Benchmark]
-		public void ParallelForEach() {
-			Parallel.ForEach(db, (i) => { });
-		}
-
-		[Benchmark]
-		public void ForEach() {
-			foreach (var i in db) { }
-		}
-
-		[GlobalCleanup]
-		public void Clean() {
-			db.Dispose();
-			threadsafedb.Dispose();
-		}
-	}
-
-	public class NewBench {
-		private TypeHandler<byte[]> _byteHandler = TypeManager.GetHandlerFor<byte[]>();
-		private byte[] _data = new byte[100];
-		private IEnumerable<KeyValuePair<byte[], byte[]>> _insertRange;
-		private IDatabase db;
-
-		[GlobalSetup]
-		public void AllSetup() {
-			_insertRange = new KeyValuePair<byte[], byte[]>[] { new KeyValuePair<byte[], byte[]>(_data, _data) };
-		}
-
-		[IterationSetup]
-		public void Setup() {
-			db = Database.FromStream(new MemoryStream(), true);
-		}
-
-		[Benchmark]
-		public void ForLoop() {
-			for (int i = 0; i < 1_000_000; i++) db.Insert("Hello,", " World!");
-		}
-
-		[Benchmark]
+		[BenchmarkCategory("Writer")]
 		public void Fill() {
-			db.Fill("Hello,", " World!", 1_000_000);
+			if(this._singleItem.Key == null ||
+				this._singleItem.Value == null) throw new Exception("Not intended to be benchmarked");
+			this._db.Fill(_singleItem.Key, _singleItem.Value, GenerateItems.AmountOfItems);
+		}
+
+		[Benchmark]
+		[BenchmarkCategory("Writer")]
+		public void Insert() {
+			if (this._singleItem.Key == null ||
+				this._singleItem.Value == null) throw new Exception("Not intended to be benchmarked");
+			this._db.Insert(this._singleItem);
+		}
+
+		[Benchmark]
+		[BenchmarkCategory("Writer")]
+		public void InsertRange() {
+			if (this._itms == null) throw new Exception("Not intended to be benchmarked");
+			this._db.InsertRange(this._itms);
+		}
+
+		[Benchmark]
+		[BenchmarkCategory("Writer")]
+		public void OverwriteValue() {
+			if (!this._filled) throw new Exception("Not filled.");
+
+			if(this._replRP == null ||
+				this._replIndex == null) throw new Exception("Not intended to be benchmarked");
+
+			this._db.OverwriteValue(this._replRP, this._replIndex);
+		}
+
+		[Benchmark]
+		[BenchmarkCategory("Reader")]
+		public void Get() {
+			if (!this._filled) throw new Exception("Not filled.");
+
+			if(this._replIndex == null) throw new Exception("Not intended to be benchmarked");
+			this._db.Get(this._replIndex);
+		}
+
+		[Benchmark]
+		[BenchmarkCategory("Reader")]
+		public void TryGet() {
+			if (!this._filled) throw new Exception("Not filled.");
+			if (this._replIndex == null) throw new Exception("Not intended to be benchmarked");
+
+			this._db.TryGet(this._replIndex, out var _);
+		}
+
+		[Benchmark]
+		[BenchmarkCategory("Reader")]
+		public void GetAll() {
+			if (!this._filled) throw new Exception("Not filled.");
+			if (this._replIndex == null) throw new Exception("Not intended to be benchmarked");
+
+			this._db.GetAll(this._replIndex);
+		}
+
+		[Benchmark]
+		[BenchmarkCategory("Database")]
+		public void CleanTo() {
+			this._db.CleanTo(this._tmp);
+		}
+
+		[Benchmark]
+		[BenchmarkCategory("Database")]
+		public void CleanFrom() {
+			this._tmp.CleanFrom(this._db);
+		}
+
+		[Benchmark]
+		[BenchmarkCategory("Database")]
+		public void Flush() {
+			this._db.Flush();
 		}
 
 		[IterationCleanup]
-		public void Cleanup() {
-			db.Dispose();
+		public void DisposeDB() {
+			this._db.Dispose();
 		}
 	}
 
-	[HtmlExporter]
-	public class StringDBBenchmark {
-#if SETUP
-		public IDatabase stringdb;
-		private IEnumerable<KeyValuePair<byte[], byte[]>> itemsToInsert;
-		private IEnumerable<KeyValuePair<byte[], byte[]>> newInserts;
+	public enum GenerateDBType {
+		BlankThreadUnsafe,
+		BlankThreadSafe,
+		FilledThreadUnsafe,
+		FilledThreadSafe
+	}
 
-		private byte[] _begin { get; set; }
-		private byte[] _middle { get; set; }
-		private byte[] _end { get; set; }
-
-		private int lastdb;
-
-		[GlobalSetup]
-		public void SetupMethod() {
-			this.itemsToInsert = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.ItemsToInsert)).ToList();
-			this.newInserts = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.ItemsToInsert)).ToList();
-
-			var count = 0;
-			foreach (var i in this.itemsToInsert) {
-				this._end = i.Key;
-				if (count == 0)
-					this._begin = i.Key;
-
-				count++;
-			}
-
-			var c = 0;
-			foreach (var i in this.itemsToInsert) {
-				if (count / 2 == c)
-					this._middle = i.Key;
-				c++;
-			}
-		}
-
-		[IterationSetup]
-		public void IterationSetup() {
-			this.stringdb = GenerateItems.NewStringDB();
-			this.stringdb.InsertRange(this.itemsToInsert);
-		}
-
-		[IterationCleanup]
-		public void IterationCleanup() {
-			try {
-				if (this.stringdb != null)
-					this.stringdb.Dispose();
-			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
-			}
-		}
-
-#if WRITER_TESTS
-
-		[Benchmark]
-		public void InsertRangeItems() => this.stringdb.InsertRange(this.itemsToInsert);
-
-		[Benchmark]
-		public void SingleInsertItems() {
-			foreach (var i in this.itemsToInsert)
-				this.stringdb.Insert(i.Key, i.Value);
-		}
-
-		[Benchmark]
-		public void OverwriteValues() {
-			var enum_1 = this.stringdb.GetEnumerator();
-			var enum_2 = this.newInserts.GetEnumerator();
-
-			while (enum_1.MoveNext() && enum_2.MoveNext())
-				this.stringdb.OverwriteValue(enum_1.Current, enum_2.Current.Value);
-		}
-
-#endif
-
-#if READER_TESTS
-
-		[Benchmark]
-		public void IterateThroughEveryEntry() {
-			foreach (var i in this.stringdb) { }
-		}
-
-		[Benchmark]
-
-		public void IterateThroughEveryEntryAndReadValue() {
-			foreach (var i in this.stringdb) {
-				//var t = i.GetValueAs<string>();
-			}
-		}
-
-		[Benchmark]
-		public void GetValueOfFirst() {
-			//var t = this.stringdb.Get(this._begin).GetValueAs<string>();
-		}
-
-		[Benchmark]
-		public void GetValueOfMiddle() {
-			//var t = this.stringdb.Get(this._middle).GetValueAs<string>();
-		}
-
-		[Benchmark]
-		public void GetValueOfEnd() {
-			//var t = this.stringdb.Get(this._end).GetValueAs<string>();
-		}
-
-#endif
-
-#if CLEAN_TESTS
-
-		[Benchmark]
-		public void CleanFromDatabase() {
-			//TODO: remove new StringDb and generate database name from the benchmark
-
-			using (var db = GenerateItems.NewStringDB()) {
-				db.CleanFrom(this.stringdb);
-			}
-		}
-
-		[Benchmark]
-		public void CleanToDatabase() {
-			//TODO: remove new StringDb and generate database name from the benchmark
-
-			using (var db = GenerateItems.NewStringDB()) {
-				this.stringdb.CleanTo(db);
-			}
-		}
-
-#endif
-#endif
+	public enum ItemPosition {
+		First,
+		Middle,
+		End
 	}
 
 	public static class GenerateItems {
-		public const int ItemsToInsert = 100_000;
+		public static IDatabase GetDatabase(GenerateDBType type) {
+			var db = Database.FromStream(new MemoryStream(), true);
+
+			switch(type) {
+				case GenerateDBType.BlankThreadUnsafe: break;
+				case GenerateDBType.BlankThreadSafe: db.MakeThreadSafe(); break;
+				case GenerateDBType.FilledThreadUnsafe: db.InsertRange(GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.AmountOfItems)).ToArray()); break;
+				case GenerateDBType.FilledThreadSafe: db.Dispose(); db = GetDatabase(GenerateDBType.FilledThreadUnsafe); db.MakeThreadSafe(); break;
+				default: throw new Exception("unknwon");
+			}
+
+			return db;
+		}
+
+		public const int AmountOfItems = 100_000;
 
 		public const int MinIncome = 1_000;
 		public const int MaxIncome = 10_000;
@@ -235,8 +240,6 @@ namespace StringDB.Benchmarks {
 
 		private static Random _random;
 		public static Random Rng => _random ?? (_random = new Random());
-
-		public static IDatabase NewStringDB() => Database.FromStream(new MemoryStream(), true);
 
 		public static readonly string[] RandomNames = {
 			"Jimbo",
@@ -271,8 +274,11 @@ namespace StringDB.Benchmarks {
 
 		public static IEnumerable<KeyValuePair<byte[], byte[]>> GetItemsAsKVP(IEnumerable<Item> items) {
 			foreach (var i in items)
-				yield return new KeyValuePair<byte[], byte[]>(System.Text.Encoding.UTF8.GetBytes(i.Identifier), System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(i)));
+				yield return GetItemAsKVP(i);
 		}
+
+		public static KeyValuePair<byte[], byte[]> GetItemAsKVP(Item item)
+			=> new KeyValuePair<byte[], byte[]>(System.Text.Encoding.UTF8.GetBytes(item.Identifier), System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item)));
 
 		public static IEnumerable<string> GenerateFriends(int amount) {
 			for (var i = 0; i < amount; i++)

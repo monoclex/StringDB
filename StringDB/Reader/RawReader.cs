@@ -119,7 +119,7 @@ namespace StringDB.Reader {
 				this.ReadAt(previous.NextPart)
 				: null;
 
-		public T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith, long len = -1) {
+		public T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith, long len = Consts.NOSPECIFYLEN) {
 			// will never happen anyways
 			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
 
@@ -132,7 +132,7 @@ namespace StringDB.Reader {
 
 			// read it properly
 
-			if (len == -1)
+			if (len == Consts.NOSPECIFYLEN)
 				return typ.Read(this._br);
 			else return typ.Read(this._br, len);
 		}
@@ -143,7 +143,11 @@ namespace StringDB.Reader {
 			this._stream.Seek(pos); // seek to the data and ignore the type identifier
 			this._stream.Read(this._oneByteBuffer, 0, 1);
 
-			return (typeHandlerReadWith as TypeHandler<T>).Read(this._br, len);
+			var typ = (typeHandlerReadWith as TypeHandler<T>);
+
+			if (len == Consts.NOSPECIFYLEN)
+				return typ.Read(this._br);
+			else return typ.Read(this._br, len);
 		}
 
 		public ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null) {
@@ -159,6 +163,13 @@ namespace StringDB.Reader {
 		public long ReadLength(long pos) {
 			this._stream.Seek(pos); // seek to the data and ignore the type
 			this._stream.Read(this._oneByteBuffer, 0, 1);
+			var b = this._br.ReadByte();
+
+			if(b == 0) {
+				b = 0;
+			}
+
+			this._br.BaseStream.Seek(-1, SeekOrigin.Current);
 
 			return TypeHandlerLengthManager.ReadLength(this._br); // read the length of the data
 		}

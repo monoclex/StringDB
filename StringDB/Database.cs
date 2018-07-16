@@ -41,7 +41,7 @@ namespace StringDB {
 		public static IDatabase FromFile(string name) => new Database(File.Open(name, FileMode.OpenOrCreate), true);
 
 		private readonly bool _disposeStream;
-		private readonly Stream _stream;
+		private Stream _stream;
 		private IReader _reader;
 		private IWriter _writer;
 
@@ -161,13 +161,15 @@ namespace StringDB {
 
 		/// <inheritdoc/>
 		public void Dispose() {
+			this.Flush();
+
 			this._writer = null;
 			this._reader = null;
 
-			this.Flush();
-
 			if (this._disposeStream)
 				this._stream.Dispose();
+
+			this._stream = null;
 		}
 
 		private static IEnumerable<KeyValuePair<byte[], Stream>> FromDatabase(IDatabase other) {

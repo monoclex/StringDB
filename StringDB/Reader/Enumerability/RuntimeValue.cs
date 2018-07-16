@@ -3,7 +3,7 @@
 namespace StringDB.Reader {
 
 	/// <summary>A value that reads from the Stream for retrieving struff like the type, length, or data value.</summary>
-	public interface IRuntimeValue {
+	public interface IRuntimeValue : IDisposable {
 
 		/// <summary>Gets the value if type T matches the type the data is stored as.</summary>
 		T Get<T>();
@@ -36,7 +36,7 @@ namespace StringDB.Reader {
 			this._readPos = readPos;
 		}
 
-		private readonly IRawReader _rawReader;
+		private IRawReader _rawReader;
 		private readonly long _specifyLen;
 		private readonly byte? _specifyType;
 		internal long _readPos;
@@ -78,5 +78,11 @@ namespace StringDB.Reader {
 		/// <inheritdoc/>
 		public override string ToString()
 			=> $"(0x{this.GetIdentifierByte().ToString("x2")}, {this.GetLength()} bytes, {this.GetTypeOf()})";
+
+		public void Dispose() {
+			this._rawReader = null;
+
+			GC.SuppressFinalize(this);
+		}
 	}
 }

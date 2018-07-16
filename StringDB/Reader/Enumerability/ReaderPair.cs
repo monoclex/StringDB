@@ -1,7 +1,9 @@
-﻿namespace StringDB.Reader {
+﻿using System;
+
+namespace StringDB.Reader {
 
 	/// <summary>A pair of data - this correlates an index to it's corresponding value.</summary>
-	public interface IReaderPair {
+	public interface IReaderPair : IDisposable {
 
 		/// <summary>The position in the file that this ReaderPair is located at</summary>
 		long Position { get; }
@@ -24,6 +26,9 @@
 	internal struct ReaderPair : IReaderPair {
 
 		internal ReaderPair(long dataPos, long pos, byte[] index, byte identifier, byte indexType, IRawReader rawReader) {
+			this._indexCache = null;
+			this._valueCache = null;
+
 			this._identifier = identifier;
 			this._rawReader = rawReader;
 			this._indexType = indexType;
@@ -32,12 +37,15 @@
 			this._pos = pos;
 		}
 
-		private IRawReader _rawReader { get; }
+		private IRawReader _rawReader;
 		internal long _dataPos;
 		internal long _pos { get; }
 		internal byte[] _index { get; }
 		internal byte _identifier { get; }
 		internal byte _indexType { get; }
+
+		private IRuntimeValue _indexCache;
+		private IRuntimeValue _valueCache;
 
 		/// <inheritdoc/>
 		public long DataPosition {
@@ -52,13 +60,22 @@
 		public byte[] RawIndex => this._index;
 
 		/// <inheritdoc/>
-		public IRuntimeValue Index => new RuntimeValue(this._rawReader, this._pos + sizeof(long) + sizeof(byte), this._indexType, this._identifier);
+		public IRuntimeValue Index => (this._indexCache ?? (_indexCache = new RuntimeValue(this._rawReader, this._pos + sizeof(long) + sizeof(byte), this._indexType, this._identifier)));
 
 		/// <inheritdoc/>
-		public IRuntimeValue Value => new RuntimeValue(this._rawReader, this._dataPos, null);
+		public IRuntimeValue Value => (this._valueCache ?? (_valueCache = new RuntimeValue(this._rawReader, this._dataPos, null)));
 
 		/// <summary>A simple string form of the item.</summary>
 		public override string ToString() =>
 			$"[Index: {this.Index.ToString()}, Value: {this.Value.ToString()}]";
+
+		public void Dispose() {
+			this._indexCache?.Dispose();
+			this._valueCache?.Dispose();
+
+			this._rawReader = null;
+
+			GC.SuppressFinalize(this);
+		}
 	}
 }

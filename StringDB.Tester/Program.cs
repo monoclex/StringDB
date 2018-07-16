@@ -27,6 +27,13 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
+			var db = Database.FromFile("TEST.db");
+
+			db.Fill("MEMES", "i like, MEMES", 100);
+
+			db.Dispose();
+
+			/*
 			IDatabase db = Database.FromStream(new MemoryStream(), true);
 			Time(20_000, () => {
 				db = Database.FromStream(new MemoryStream(), true);
@@ -62,7 +69,7 @@ namespace StringDB.Tester {
 				});
 			}
 
-			Console.ReadLine();
+			Console.ReadLine();/8/8*/
 
 			/*
 			var ind = System.Text.Encoding.UTF8.GetBytes("TEST INDEX");

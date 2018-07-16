@@ -78,7 +78,7 @@ namespace StringDB.Writer {
 				this._s.Seek(0);
 				this._bw.Write(0L);
 				pos = sizeof(long);
-			} else this._s.Seek(this._lastStreamLength);
+			} else this._s.Seek(this._lastStreamLength, SeekOrigin.Begin);
 
 			var judge = pos + sizeof(byte) + sizeof(long); // the position and the index chain linker lengths
 
@@ -90,14 +90,14 @@ namespace StringDB.Writer {
 			foreach (var i in kvps) { // write the index
 				var len = wt1.GetLength(i.Key);
 				if (len >= Consts.MaxLength) throw new ArgumentException($"An index is longer then allowed ({Consts.MaxLength}). Length: {len}");
-
+				
 				this._bw.Write((byte)len);
 				this._bw.Write(judge);
 				this._bw.Write(wt1.Id);
 				wt1.Write(this._bw, i.Key);
 
 				var wlen = wt2.GetLength(i.Value); // judge the next value pos
-				judge += TypeHandlerLengthManager.EstimateWriteLengthSize(wlen) + wlen + sizeof(byte);
+				judge += TypeHandlerLengthManager.EstimateWriteLengthSize(wlen) + wlen;
 			}
 
 			// index chain

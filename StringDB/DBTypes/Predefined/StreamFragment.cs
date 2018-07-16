@@ -6,11 +6,18 @@ namespace StringDB.DBTypes.Predefined {
 	internal class StreamFragment : Stream {
 
 		public StreamFragment(Stream main, long pos, long lenAfterPos) {
+			if(lenAfterPos < 1) {
+				Console.WriteLine(">");
+			}
+
 			this.Length = lenAfterPos;
 			this._originalPos = pos;
 			this._pos = pos;
 			this._s = main;
+			this._originalPosToSeek = main.Position; // we'll seek right back to here after any reading or writing so we don't screw with the real stream
 		}
+
+		private long _originalPosToSeek;
 
 		private readonly Stream _s;
 
@@ -47,7 +54,9 @@ namespace StringDB.DBTypes.Predefined {
 
 			this._s.Seek(this._pos, SeekOrigin.Begin);
 			this._pos += c;
-			return this._s.Read(buffer, offset, c);
+			int res = this._s.Read(buffer, offset, c);
+			this._s.Seek(this._originalPosToSeek, SeekOrigin.Begin);
+			return res;
 		}
 
 		public override long Seek(long offset, SeekOrigin origin) {

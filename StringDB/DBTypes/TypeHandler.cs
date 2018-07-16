@@ -66,21 +66,33 @@ namespace StringDB {
 		}
 
 		public static long ReadLength(BinaryReader br) { // read the length depending on the identifier
-			switch (br.ReadByte()) {
+			long p;
+			byte b;
+			switch ((b = br.ReadByte())) {
 				case Consts.IsByteValue:
-				return br.ReadByte();
+				p = br.ReadByte();
+				break;
 
 				case Consts.IsUShortValue:
-				return br.ReadUInt16();
+				p = br.ReadUInt16();
+				break;
 
 				case Consts.IsUIntValue:
-				return br.ReadUInt32();
+				p = br.ReadUInt32();
+				break;
 
 				case Consts.IsLongValue:
-				return br.ReadInt64();
+				p = br.ReadInt64();
+				break;
 
 				default: return 0;
 			}
+
+			if(p < 1) {
+				p = -1;
+			}
+
+			return p;
 		}
 
 		internal static long EstimateWriteLengthSize(long len) { // estimate how big in bytes a WriteLength would be with a given length
