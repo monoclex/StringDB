@@ -15,33 +15,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace StringDB.Benchmarks {
 
 	internal class Program {
 
 		private static void Main() {
-			using (var test = new StringDBBenchmark()) {
-				test.DatabaseType = GenerateDBType.FilledThreadUnsafe;
-				test.ItemPosition = ItemPosition.Middle;
-
-				test.SetupDB();
-
-				test.Fill();
-				test.Insert();
-				test.InsertRange();
-				test.OverwriteValue();
-				test.Get();
-				test.TryGet();
-				test.GetAll();
-				test.CleanTo();
-				test.CleanFrom();
-				test.Flush();
-
-				//test.DisposeDB();
-			}
-
 			var summary = BenchmarkRunner.Run<StringDBBenchmark>();
 			Console.ReadLine();
 		}
@@ -51,6 +30,7 @@ namespace StringDB.Benchmarks {
 	[CategoriesColumn]
 	[MarkdownExporter]
 	public class StringDBBenchmark : IDisposable {
+
 		public void Dispose() {
 			this._db.Dispose();
 			this._tmp.Dispose();
@@ -80,13 +60,13 @@ namespace StringDB.Benchmarks {
 		[IterationSetup]
 		public void SetupDB() {
 			this._itms = GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.AmountOfItems)).ToArray();
-			this._db = GenerateItems.GetDatabase(DatabaseType);
+			this._db = GenerateItems.GetDatabase(this.DatabaseType);
 
 			this._filled = this.DatabaseType == GenerateDBType.FilledThreadSafe || this.DatabaseType == GenerateDBType.FilledThreadUnsafe;
 
 			if (this._filled) {
 				this._singleItem = GenerateItems.GetItemAsKVP(GenerateItems.GetItems(1).FirstOrDefault());
-			
+
 				switch (this.ItemPosition) {
 					case ItemPosition.First: {
 						this._replRP = this._db.First();
@@ -94,7 +74,7 @@ namespace StringDB.Benchmarks {
 					break;
 
 					case ItemPosition.Middle: {
-						int c = 0;
+						var c = 0;
 						foreach (var i in this._db)
 							if (c++ == GenerateItems.AmountOfItems / 2) {
 								this._replRP = i;
@@ -117,13 +97,13 @@ namespace StringDB.Benchmarks {
 
 			this._tmp = Database.FromStream(new MemoryStream(), true);
 		}
-		
+
 		[Benchmark]
 		[BenchmarkCategory("Writer")]
 		public void Fill() {
-			if(this._singleItem.Key == null ||
+			if (this._singleItem.Key == null ||
 				this._singleItem.Value == null) throw new Exception("Not intended to be benchmarked");
-			this._db.Fill(_singleItem.Key, _singleItem.Value, GenerateItems.AmountOfItems);
+			this._db.Fill(this._singleItem.Key, this._singleItem.Value, GenerateItems.AmountOfItems);
 		}
 
 		[Benchmark]
@@ -146,7 +126,7 @@ namespace StringDB.Benchmarks {
 		public void OverwriteValue() {
 			if (!this._filled) throw new Exception("Not filled.");
 
-			if(this._replRP == null ||
+			if (this._replRP == null ||
 				this._replIndex == null) throw new Exception("Not intended to be benchmarked");
 
 			this._db.OverwriteValue(this._replRP, this._replIndex);
@@ -157,7 +137,7 @@ namespace StringDB.Benchmarks {
 		public void Get() {
 			if (!this._filled) throw new Exception("Not filled.");
 
-			if(this._replIndex == null) throw new Exception("Not intended to be benchmarked");
+			if (this._replIndex == null) throw new Exception("Not intended to be benchmarked");
 			this._db.Get(this._replIndex);
 		}
 
@@ -217,10 +197,11 @@ namespace StringDB.Benchmarks {
 	}
 
 	public static class GenerateItems {
+
 		public static IDatabase GetDatabase(GenerateDBType type) {
 			var db = Database.FromStream(new MemoryStream(), true);
 
-			switch(type) {
+			switch (type) {
 				case GenerateDBType.BlankThreadUnsafe: break;
 				case GenerateDBType.BlankThreadSafe: db.MakeThreadSafe(); break;
 				case GenerateDBType.FilledThreadUnsafe: db.InsertRange(GenerateItems.GetItemsAsKVP(GenerateItems.GetItems(GenerateItems.AmountOfItems)).ToArray()); break;

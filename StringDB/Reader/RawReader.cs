@@ -120,9 +120,6 @@ namespace StringDB.Reader {
 				: null;
 
 		public T ReadData<T>(long pos, ITypeHandler typeHandlerReadWith, long len = Consts.NOSPECIFYLEN) {
-			// will never happen anyways
-			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
-
 			var type = ReadType(pos, null, (byte?)null); // get the proper type handler
 
 			// throw an exception if we're reading the wrong type
@@ -132,22 +129,20 @@ namespace StringDB.Reader {
 
 			// read it properly
 
-			if (len == Consts.NOSPECIFYLEN)
-				return typ.Read(this._br);
-			else return typ.Read(this._br, len);
+			return len == Consts.NOSPECIFYLEN ?
+				typ.Read(this._br)
+				: typ.Read(this._br, len);
 		}
 
 		public T ReadDataAs<T>(long pos, ITypeHandler typeHandlerReadWith, long len = Consts.NOSPECIFYLEN) {
-			// if (typeof(T) != typeHandlerReadWith.Type) throw new Exception($"<T> and the TypeHandlerType do not match.");
-
 			this._stream.Seek(pos); // seek to the data and ignore the type identifier
 			this._stream.Read(this._oneByteBuffer, 0, 1);
 
 			var typ = (typeHandlerReadWith as TypeHandler<T>);
 
-			if (len == Consts.NOSPECIFYLEN)
-				return typ.Read(this._br);
-			else return typ.Read(this._br, len);
+			return len == Consts.NOSPECIFYLEN ?
+				typ.Read(this._br)
+				: typ.Read(this._br, len);
 		}
 
 		public ITypeHandler ReadType(long pos, ITypeHandler typeHandlerReadWith, byte? specifyType = null) {
@@ -165,7 +160,7 @@ namespace StringDB.Reader {
 			this._stream.Read(this._oneByteBuffer, 0, 1);
 			var b = this._br.ReadByte();
 
-			if(b == 0) {
+			if (b == 0) {
 				b = 0;
 			}
 
@@ -189,8 +184,8 @@ namespace StringDB.Reader {
 		//heavily optimized method of reading bytes with an internal byte[] cache
 		private int ReadBytes(int amt) {
 			if (this._bufferPos + amt >= BufferSize) { //if we've went out of scope of the buffer
-				// apparently this code *never* gets triggered by the debugger?
-				// dunno why it exists but ok
+													   // apparently this code *never* gets triggered by the debugger?
+													   // dunno why it exists but ok
 
 				this._bufferReadPos += this._bufferPos; //re-read the buffer
 				this._bufferPos = 0;
@@ -203,7 +198,7 @@ namespace StringDB.Reader {
 				// It'll work well *enough* as a fix.
 
 				if (len != BufferSize)
-					for (int i = len; i < BufferSize; i++)
+					for (var i = len; i < BufferSize; i++)
 						this._bufferRead[i] = 0x00;
 			}
 
@@ -226,7 +221,7 @@ namespace StringDB.Reader {
 				// It'll work well *enough* as a fix.
 
 				if (len != BufferSize)
-					for (int i = len; i < BufferSize; i++)
+					for (var i = len; i < BufferSize; i++)
 						this._bufferRead[i] = 0x00;
 			} else this._bufferPos = (int)(pos - this._bufferReadPos);
 		}

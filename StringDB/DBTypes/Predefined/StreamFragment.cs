@@ -6,7 +6,7 @@ namespace StringDB.DBTypes.Predefined {
 	internal class StreamFragment : Stream {
 
 		public StreamFragment(Stream main, long pos, long lenAfterPos) {
-			if(lenAfterPos < 1) {
+			if (lenAfterPos < 1) {
 				Console.WriteLine(">");
 			}
 
@@ -17,7 +17,7 @@ namespace StringDB.DBTypes.Predefined {
 			this._originalPosToSeek = main.Position; // we'll seek right back to here after any reading or writing so we don't screw with the real stream
 		}
 
-		private long _originalPosToSeek;
+		private readonly long _originalPosToSeek;
 
 		private readonly Stream _s;
 
@@ -54,7 +54,7 @@ namespace StringDB.DBTypes.Predefined {
 
 			this._s.Seek(this._pos, SeekOrigin.Begin);
 			this._pos += c;
-			int res = this._s.Read(buffer, offset, c);
+			var res = this._s.Read(buffer, offset, c);
 			this._s.Seek(this._originalPosToSeek, SeekOrigin.Begin);
 			return res;
 		}

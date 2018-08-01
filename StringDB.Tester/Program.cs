@@ -1,10 +1,7 @@
-﻿using Newtonsoft.Json;
-using StringDB.Reader;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace StringDB.Tester {
 
@@ -13,13 +10,16 @@ namespace StringDB.Tester {
 		public override byte Id => 0x2F;
 
 		public override bool Compare(int item1, int item2) => item1 == item2;
+
 		public override long GetLength(int item) => sizeof(int);
+
 		public override int Read(BinaryReader br, long len) => len == 4 ? br.ReadInt32() : throw new Exception("that's not a freaking int");
+
 		public override void Write(BinaryWriter bw, int item) => bw.Write(item);
 	}
 
 	internal class Program {
-		private static KeyValuePair<byte[], byte[]> CacheKVP = new KeyValuePair<byte[], byte[]>(new byte[100], new byte[1000]);
+		private static readonly KeyValuePair<byte[], byte[]> CacheKVP = new KeyValuePair<byte[], byte[]>(new byte[100], new byte[1000]);
 
 		public static IEnumerable<KeyValuePair<byte[], byte[]>> GetSampleData() {
 			for (var i = 0; i < 1_000_000; i++)
@@ -27,11 +27,42 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
-			var db = Database.FromFile("TEST.db");
+			using(IDatabase db = Database.FromFile("mystring.db")) {
+				db.Insert("hello", "Hello, World!");
 
-			db.Fill("MEMES", "i like, MEMES", 100);
+				System.Threading.Tasks.Parallel.For(0, 1_000_000, (i) => db.Insert(i.ToString(), "_"));
 
-			db.Dispose();
+				foreach (var i in db)
+					Console.WriteLine(i);
+
+				var pair = db.Get("hello");
+				db.OverwriteValue(pair, "Goodbye, World!");
+
+				foreach (var i in db)
+					Console.WriteLine(i);
+
+				db.InsertRange(new KeyValuePair<string, string>[] {
+					new KeyValuePair<string, string>("test1", "Value for 1!"),
+					new KeyValuePair<string, string>("test2", "Value for 2!"),
+					new KeyValuePair<string, string>("test3", "Value for 3!"),
+				});
+
+				foreach(var i in db) {
+					Console.WriteLine(i);
+					Console.WriteLine($"Index's Type: {i.Index.GetTypeOf()}");
+					Console.WriteLine($"Value's Type: {i.Index.GetTypeOf()}");
+					Console.WriteLine($"Index as a byte array: {i.Index.GetAs<byte[]>()}");
+					Console.WriteLine($"Value as a byte array: {i.Value.GetAs<byte[]>()}");
+				}
+			}
+
+			Console.ReadLine();
+
+			//var db = Database.FromFile("TEST.db");
+
+			//db.Fill("MEMES", "i like, MEMES", 100);
+
+			//db.Dispose();
 
 			/*
 			IDatabase db = Database.FromStream(new MemoryStream(), true);
@@ -39,7 +70,6 @@ namespace StringDB.Tester {
 				db = Database.FromStream(new MemoryStream(), true);
 				for (int i = 0; i < 1_000_000; i++) db.Insert("HELLO_,", "WORLD_,");
 			}, () => {
-
 			}, () => {
 				db.Dispose();
 				db = Database.FromStream(new MemoryStream(), true);
@@ -96,7 +126,6 @@ namespace StringDB.Tester {
 		}
 
 		private static void Time(int estTime, Action before, Action method, Action after) {
-
 			var est = GetStopwatch(1, before, method, after);
 			var amt = 5_000 / (double)est.ElapsedMilliseconds;
 
@@ -149,6 +178,7 @@ namespace StringDB.Tester {
 	}
 
 	public static class Helper {
+
 		public static IEnumerable<T> AsEnumerable<T>(this T item) {
 			yield return item;
 		}

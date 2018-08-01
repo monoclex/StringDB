@@ -112,7 +112,7 @@ namespace StringDB.Writer {
 		private static IEnumerable<KeyValuePair<T1, T2>> FillIEnumerable<T1, T2>(T1 index, T2 value, int times) {
 			var kvp = new KeyValuePair<T1, T2>(index, value);
 
-			for (int i = 0; i < times; i++)
+			for (var i = 0; i < times; i++)
 				yield return kvp;
 		}
 	}

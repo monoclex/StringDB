@@ -7,10 +7,9 @@ namespace StoneVault {
 
 	/// <summary>Vault - Store your data in a stone, unchangeable format for transferring to and from new StringDB versions.</summary>
 	public static class Vault {
-
 		private const byte DATA_GOOD = 0x00;
 		private const byte DATA_END = 0xFF;
-		
+
 		/// <param name="encoding">Default ( null ) is UTF8</param>
 		public static void Store(IEnumerable<KeyValuePair<byte[], byte[]>> vaultItems, Stream writeTo, Encoding encoding = null) {
 			using (var bw = new BinaryWriter(writeTo, encoding ?? Encoding.UTF8, true)) {
@@ -26,10 +25,10 @@ namespace StoneVault {
 
 		/// <param name="encoding">Default ( null ) is UTF8</param>
 		public static IEnumerable<KeyValuePair<byte[], byte[]>> Read(Stream readFrom, Encoding encoding = null) {
-			bool toggle = false;
-			byte[] last = new byte[0];
-			foreach(var i in ReadOut(readFrom, encoding)) {
-				if(toggle)
+			var toggle = false;
+			var last = new byte[0];
+			foreach (var i in ReadOut(readFrom, encoding)) {
+				if (toggle)
 					yield return new KeyValuePair<byte[], byte[]>(last, i);
 				else last = i;
 

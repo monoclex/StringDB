@@ -88,7 +88,7 @@ namespace StringDB {
 				default: return 0;
 			}
 
-			if(p < 1) {
+			if (p < 1) {
 				p = -1;
 			}
 

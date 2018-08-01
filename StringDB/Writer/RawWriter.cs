@@ -90,7 +90,7 @@ namespace StringDB.Writer {
 			foreach (var i in kvps) { // write the index
 				var len = wt1.GetLength(i.Key);
 				if (len >= Consts.MaxLength) throw new ArgumentException($"An index is longer then allowed ({Consts.MaxLength}). Length: {len}");
-				
+
 				this._bw.Write((byte)len);
 				this._bw.Write(judge);
 				this._bw.Write(wt1.Id);

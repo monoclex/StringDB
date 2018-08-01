@@ -1,15 +1,15 @@
 ﻿using StringDB;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace StoneVault.Tester
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
+namespace StoneVault.Tester {
+
+	internal class Program {
+
+		private static void Main() {
 			using (var vault = new MemoryStream())
 			using (var db = Database.FromStream(new MemoryStream(), true)) {
 				db.Fill("EXAMPLE KEY", " ~ v a l u e ~ ", 25);
@@ -18,9 +18,9 @@ namespace StoneVault.Tester
 
 				vault.Seek(0, SeekOrigin.Begin);
 
-				int items = 0;
+				var items = 0;
 
-				foreach(var i in Vault.Read(vault)) {
+				foreach (var i in Vault.Read(vault)) {
 					Console.WriteLine($"[{Encoding.UTF8.GetString(i.Key)}, {Encoding.UTF8.GetString(i.Value)}]");
 					items++;
 				}
@@ -29,11 +29,11 @@ namespace StoneVault.Tester
 			}
 
 			Console.ReadLine();
-        }
+		}
 
-		static IEnumerable<KeyValuePair<byte[], byte[]>> ReadOut(IDatabase db) {
+		private static IEnumerable<KeyValuePair<byte[], byte[]>> ReadOut(IDatabase db) {
 			foreach (var i in db)
 				yield return new KeyValuePair<byte[], byte[]>(i.Index.GetAs<byte[]>(), i.Value.GetAs<byte[]>());
 		}
-    }
+	}
 }

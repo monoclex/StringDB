@@ -60,10 +60,10 @@ namespace StringDB.Reader {
 		public byte[] RawIndex => this._index;
 
 		/// <inheritdoc/>
-		public IRuntimeValue Index => (this._indexCache ?? (_indexCache = new RuntimeValue(this._rawReader, this._pos + sizeof(long) + sizeof(byte), this._indexType, this._identifier)));
+		public IRuntimeValue Index => (this._indexCache ?? (this._indexCache = new RuntimeValue(this._rawReader, this._pos + sizeof(long) + sizeof(byte), this._indexType, this._identifier)));
 
 		/// <inheritdoc/>
-		public IRuntimeValue Value => (this._valueCache ?? (_valueCache = new RuntimeValue(this._rawReader, this._dataPos, null)));
+		public IRuntimeValue Value => (this._valueCache ?? (this._valueCache = new RuntimeValue(this._rawReader, this._dataPos, null)));
 
 		/// <summary>A simple string form of the item.</summary>
 		public override string ToString() =>
