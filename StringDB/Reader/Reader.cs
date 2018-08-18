@@ -8,6 +8,9 @@ namespace StringDB.Reader {
 	/// <summary>Defines a reader. Use it to read out data</summary>
 	public interface IReader : IEnumerable<IReaderPair> {
 
+		/// <summary>Useful if you want to store a cache of IReaderPairs, but don't want to expend lots of memory to do so. Use the IReaderPair's 'Position' property when using this.</summary>
+		IReaderPair ReadFromPosition(long position);
+
 		/// <summary>Gets the very first element in the database</summary>
 		IReaderPair First();
 
@@ -34,6 +37,10 @@ namespace StringDB.Reader {
 
 		private readonly StreamIO _sio;
 		private readonly IRawReader _rawReader;
+
+		/// <inheritdoc/>
+		public IReaderPair ReadFromPosition(long position)
+			=> ((PartDataPair)this._sio.ReadAt(position)).ToReaderPair(this._rawReader);
 
 		/// <inheritdoc/>
 		public IReaderPair First() {

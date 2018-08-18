@@ -65,6 +65,10 @@ namespace StringDB {
 		#region reader
 
 		/// <inheritdoc/>
+		public IReaderPair ReadFromPosition(long position)
+			=> this._reader.ReadFromPosition(position);
+
+		/// <inheritdoc/>
 		public IReaderPair First() =>
 			this._reader.First();
 

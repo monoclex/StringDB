@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace StringDB.Tester {
 
@@ -26,9 +27,33 @@ namespace StringDB.Tester {
 				yield return CacheKVP;
 		}
 
+		private static long LongRandom(long min, long max, Random rand) {
+			byte[] buf = new byte[8];
+			rand.NextBytes(buf);
+			long longRand = BitConverter.ToInt64(buf, 0);
+
+			return (Math.Abs(longRand % (max - min)) + min);
+		}
+
 		private static void Main() {
+			Console.ReadLine();
+
+			Console.WriteLine("S");
+			var data = new long[880000 * 2];
+
+			var rng = new Random();
+
+			for (int i = 0; i < data.Length; i++)
+				data[i] = LongRandom(long.MinValue, long.MaxValue, rng);
+
+			Console.WriteLine(Marshal.SizeOf(data));
+
+			Console.ReadLine();
+
+			/*
 			var ms = new MemoryStream();
 			using (IDatabase db = Database.FromFile("aa.db")){//.FromStream(ms, true)) {
+
 				db.Insert("hello", "Hello, World!");
 
 				var pair = db.Get("hello");
@@ -53,6 +78,34 @@ namespace StringDB.Tester {
 
 				foreach (var i in db)
 					Console.WriteLine($"{i.Index.GetAs<string>()}, {i.Value.GetAs<string>()}");
+
+				int max = 10_000;
+				var stp = Stopwatch.StartNew();
+
+				for(int i = 0; i < max; i++)
+					foreach(var ix in db) {
+						for (int k = 0; k < 10; k++)
+							ix.Value.GetAs<Stream>();
+					}
+
+				stp.Stop();
+
+				Console.WriteLine(stp.ElapsedMilliseconds);
+
+				var pairs = new List<Reader.IReaderPair>();
+				foreach (var i in db) pairs.Add(i);
+
+				stp.Restart();
+
+				for(int i = 0; i < max; i++)
+					foreach(var ix in pairs) {
+						for (int k = 0; k < 10; k++)
+							ix.Value.GetAs<Stream>();
+					}
+
+				stp.Stop();
+
+				Console.WriteLine(stp.ElapsedMilliseconds);
 			}
 
 			Console.ReadLine();
