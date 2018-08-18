@@ -27,17 +27,17 @@ namespace StringDB.Reader {
 	/// <summary>A Reader that reads out a StringDB database file.</summary>
 	public sealed class Reader : IReader {
 
-		internal Reader(Stream stream, IRawReader rawReader) {
-			this._stream = stream ?? throw new ArgumentNullException(nameof(stream));
+		internal Reader(StreamIO sio, IRawReader rawReader) {
+			this._sio = sio ?? throw new ArgumentNullException(nameof(sio));
 			this._rawReader = rawReader;
 		}
 
-		private readonly Stream _stream;
+		private readonly StreamIO _sio;
 		private readonly IRawReader _rawReader;
 
 		/// <inheritdoc/>
 		public IReaderPair First() {
-			if (this._stream.Length <= 8)
+			if (this._sio.Length <= 8)
 				return default(ReaderPair); // newly created DBs have nothing
 
 			var p = this._rawReader.ReadOn(Part.Start); // read on from the start
@@ -77,7 +77,7 @@ namespace StringDB.Reader {
 
 		/// <inheritdoc/>
 		public IEnumerable<IReaderPair> GetAll<T>(TypeHandler<T> typeHandler, T index) {
-			if (this._stream.Length <= 8) // newly created DBs
+			if (this._sio.Length <= 8) // newly created DBs
 				yield break;
 
 			foreach (var i in this) // for every ReaderPair we got

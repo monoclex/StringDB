@@ -38,20 +38,17 @@ namespace StringDB.Writer {
 
 	internal class RawWriter : IRawWriter {
 
-		public RawWriter(Stream s) {
-			this._s = s;
-			this._bw = new BinaryWriter(s);
+		public RawWriter(StreamIO s) {
+			this._sio = s;
 
-			this._lastStreamLength += this._s.Length;
-
-			if (this._lastStreamLength > 8) {
-				this._s.Seek(0);
+			if (this._sio.Length > 8) {
+				this._sio.Seek(0);
 
 				// instead of using a BinaryReader, we'll just do whatever the BinaryReader does
 
 				var m_buffer = new byte[8];
 
-				this._s.Read(m_buffer, 0, 8);
+				//this._s.Stream.StreamRead(m_buffer, 0, 8);
 
 				// https://referencesource.microsoft.com/#mscorlib/system/io/binaryreader.cs,197
 
@@ -63,27 +60,26 @@ namespace StringDB.Writer {
 			}
 		}
 
-		private readonly Stream _s;
-		private readonly BinaryWriter _bw;
+		private readonly StreamIO _sio;
 
-		private long _lastStreamLength;
 		private long _indexChainReplace;
+		private long _lastStreamLength;
 
-		public void Flush() => this._bw.Flush();
+		public void Flush() => this._sio.Flush();
 
 		public void InsertRange<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, IEnumerable<KeyValuePair<T1, T2>> kvps) {
-			var pos = this._lastStreamLength; // get the length of the stream
+			var pos = this._sio.Length; // get the length of the stream
 
-			if (this._lastStreamLength < 8) { // handle a newly created database
-				this._s.Seek(0);
-				this._bw.Write(0L);
+			if (this._sio.Length < 8) { // handle a newly created database
+				this._sio.Seek(0);
+				this._sio.BinaryWriter.Write(0L);
 				pos = sizeof(long);
-			} else this._s.Seek(this._lastStreamLength, SeekOrigin.Begin);
+			} else this._sio.Seek(this._sio.Length);
 
 			var judge = pos + sizeof(byte) + sizeof(long); // the position and the index chain linker lengths
 
 			foreach (var i in kvps) // get the approximate length of every index so we know where the position of the data will be
-				judge += wt1.GetLength(i.Key) + sizeof(byte) + sizeof(long) + sizeof(byte);
+				judge += this._sio.WriteIndexSize(wt1.GetLength(i.Key));
 
 			// indexes
 
@@ -91,70 +87,55 @@ namespace StringDB.Writer {
 				var len = wt1.GetLength(i.Key);
 				if (len >= Consts.MaxLength) throw new ArgumentException($"An index is longer then allowed ({Consts.MaxLength}). Length: {len}");
 
-				this._bw.Write((byte)len);
-				this._bw.Write(judge);
-				this._bw.Write(wt1.Id);
-				wt1.Write(this._bw, i.Key);
-
-				var wlen = wt2.GetLength(i.Value); // judge the next value pos
-				judge += TypeHandlerLengthManager.EstimateWriteLengthSize(wlen) + wlen;
+				this._sio.WriteIndex(wt1, len, i.Key, judge);
+				
+				judge += this._sio.WriteValueSize(wt2.GetLength(i.Value));
 			}
 
 			// index chain
 
 			var repl = this._indexChainReplace; // repl for replacing the index chain at the beginning | write the index
-			this._indexChainReplace = this._s.Position + sizeof(byte);
-			this._bw.Write(Consts.IndexSeperator);
-			this._bw.Write(0L);
+			this._indexChainReplace = this._sio.Position;
+			this._sio.WriteJump(0L);
 
 			// values
 
 			foreach (var i in kvps) { // write each value with the value's respective type and length
 				var len = wt2.GetLength(i.Value);
 
-				this._bw.Write(wt2.Id);
-				TypeHandlerLengthManager.WriteLength(this._bw, wt2.GetLength(i.Value));
-				wt2.Write(this._bw, i.Value);
+				this._sio.WriteValue(wt2, len, i.Value);
 			}
 
 			if (repl != 0) { // if it's not 0 ( newly created dbs ), we'll seek to the old index chain and replace it
-				this._s.Seek(repl);
-				this._bw.Write(this._lastStreamLength);
+				this._sio.Seek(repl);
+				this._sio.WriteJump(this._lastStreamLength);
 			}
 
-			this._s.Seek(0); // seek to the beginning of the file and write the new index chain to replace
-			this._bw.Write(this._indexChainReplace);
+			this._sio.Seek(0); // seek to the beginning of the file and write the new index chain to replace
+			this._sio.BinaryWriter.Write(this._indexChainReplace);
 
-			this._lastStreamLength = judge + sizeof(byte) + sizeof(long); // set the new length of the file
+			this._lastStreamLength = this._sio.Length;
 		}
 
 		public long OverwriteValue<T>(TypeHandler<T> wt, T newValue, long oldLen, long dataPos, long posOfDataPos) {
 			var len = wt.GetLength(newValue);
 
 			if (len > oldLen) { //goto the end of the file and just slap it onto the end
-				this._s.Seek(this._lastStreamLength);
-				var newPos = this._lastStreamLength;
+				this._sio.Seek(this._sio.Length);
+				var newPos = this._sio.Length;
 
-				this._bw.Write(wt.Id);
-				TypeHandlerLengthManager.WriteLength(this._bw, len);
-				wt.Write(this._bw, newValue);
+				this._sio.WriteValue(wt, len, newValue);
 
 				//go to posOfDataPos and overwrite that with the new position
 
-				this._s.Seek(posOfDataPos);
-				this._bw.Write(this._lastStreamLength);
-
-				// update stream length
-
-				this._lastStreamLength += TypeHandlerLengthManager.EstimateWriteLengthSize(len) + len + sizeof(byte);
-
+				this._sio.Seek(posOfDataPos);
+				this._sio.BinaryWriter.Write(this._sio.Length);
+				
 				return newPos;
 			} else { // goto the data overwrite it since it's shorter
-				this._s.Seek(dataPos);
+				this._sio.Seek(dataPos);
 
-				this._bw.Write(wt.Id);
-				TypeHandlerLengthManager.WriteLength(this._bw, len);
-				wt.Write(this._bw, newValue);
+				this._sio.WriteValue(wt, len, newValue);
 
 				return dataPos;
 			}

@@ -29,9 +29,10 @@ namespace StringDB {
 		internal Database(Stream s, bool disposeStream) {
 			this._disposeStream = disposeStream;
 
-			this._stream = s;
-			this._reader = new Reader.Reader(s, new RawReader(s));
-			this._writer = new Writer.Writer(new RawWriter(s));
+			this._sio = s.GetStreamIO();
+
+			this._reader = this._sio.GetReader();
+			this._writer = this._sio.GetWriter();
 		}
 
 		/// <summary>Create a new Database from a stream</summary><param name="s">The stream to be using</param><param name="disposeStream">If the stream should be disposed after we're done using it</param>
@@ -41,7 +42,7 @@ namespace StringDB {
 		public static IDatabase FromFile(string name) => new Database(File.Open(name, FileMode.OpenOrCreate), true);
 
 		private readonly bool _disposeStream;
-		private Stream _stream;
+		private StreamIO _sio;
 		private IReader _reader;
 		private IWriter _writer;
 
@@ -57,8 +58,8 @@ namespace StringDB {
 		public void MakeThreadSafe() {
 			var @lock = new object();
 
-			this._reader = new Reader.Reader(this._stream, new ThreadSafeRawReader(new RawReader(this._stream), @lock));
-			this._writer = new Writer.Writer(new ThreadSafeRawWriter(new RawWriter(this._stream), @lock));
+			this._reader = this._sio.GetTSReader(@lock);
+			this._writer = this._sio.GetTSWriter(@lock);
 		}
 
 		#region reader
@@ -98,7 +99,7 @@ namespace StringDB {
 		/// <inheritdoc/>
 		public void Flush() {
 			this._writer.Flush();
-			this._stream.Flush();
+			this._sio.Flush();
 		}
 
 		/// <inheritdoc/>
@@ -133,9 +134,9 @@ namespace StringDB {
 			this._reader = null;
 
 			if (this._disposeStream)
-				this._stream.Dispose();
+				this._sio.Dispose();
 
-			this._stream = null;
+			this._sio = null;
 		}
 
 		private static IEnumerable<KeyValuePair<byte[], Stream>> FromDatabase(IDatabase other) {

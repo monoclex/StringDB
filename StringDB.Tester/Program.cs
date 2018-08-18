@@ -27,33 +27,32 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
-			using(IDatabase db = Database.FromFile("mystring.db")) {
+			var ms = new MemoryStream();
+			using (IDatabase db = Database.FromFile("aa.db")){//.FromStream(ms, true)) {
 				db.Insert("hello", "Hello, World!");
 
-				System.Threading.Tasks.Parallel.For(0, 1_000_000, (i) => db.Insert(i.ToString(), "_"));
-
-				foreach (var i in db)
-					Console.WriteLine(i);
-
 				var pair = db.Get("hello");
-				db.OverwriteValue(pair, "Goodbye, World!");
-
-				foreach (var i in db)
-					Console.WriteLine(i);
+				//db.OverwriteValue(pair, "Goodbye, World!");
+				Console.WriteLine(pair.Value.GetAs<string>());
 
 				db.InsertRange(new KeyValuePair<string, string>[] {
 					new KeyValuePair<string, string>("test1", "Value for 1!"),
 					new KeyValuePair<string, string>("test2", "Value for 2!"),
 					new KeyValuePair<string, string>("test3", "Value for 3!"),
 				});
-
+				
 				foreach(var i in db) {
 					Console.WriteLine(i);
 					Console.WriteLine($"Index's Type: {i.Index.GetTypeOf()}");
 					Console.WriteLine($"Value's Type: {i.Index.GetTypeOf()}");
 					Console.WriteLine($"Index as a byte array: {i.Index.GetAs<byte[]>()}");
 					Console.WriteLine($"Value as a byte array: {i.Value.GetAs<byte[]>()}");
+					Console.WriteLine($"Index as a string: {i.Index.GetAs<string>()}");
+					Console.WriteLine($"Value as a string: {i.Value.GetAs<string>()}");
 				}
+
+				foreach (var i in db)
+					Console.WriteLine($"{i.Index.GetAs<string>()}, {i.Value.GetAs<string>()}");
 			}
 
 			Console.ReadLine();

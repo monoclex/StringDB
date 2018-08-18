@@ -3,12 +3,21 @@
 #define READER_TESTS
 #define CLEAN_TESTS
 
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Columns;
 using BenchmarkDotNet.Attributes.Exporters;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Filters;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-
+using BenchmarkDotNet.Validators;
 using Newtonsoft.Json;
 
 using System;
@@ -29,7 +38,14 @@ namespace StringDB.Benchmarks {
 	[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
 	[CategoriesColumn]
 	[MarkdownExporter]
+	[Config(typeof(AllowNonOptimized))]
 	public class StringDBBenchmark : IDisposable {
+
+		public class AllowNonOptimized : ManualConfig {
+			public AllowNonOptimized() {
+				Add(JitOptimizationsValidator.DontFailOnError); // ALLOW NON-OPTIMIZED DLLS
+			}
+		}
 
 		public void Dispose() {
 			this._db.Dispose();
@@ -39,10 +55,10 @@ namespace StringDB.Benchmarks {
 			GC.SuppressFinalize(this);
 		}
 
-		[Params(GenerateDBType.BlankThreadUnsafe, GenerateDBType.BlankThreadSafe, GenerateDBType.FilledThreadUnsafe, GenerateDBType.FilledThreadSafe)]
+		[Params(GenerateDBType.FilledThreadUnsafe)]
 		public GenerateDBType DatabaseType;
 
-		[Params(ItemPosition.First, ItemPosition.Middle, ItemPosition.End)]
+		[Params(ItemPosition.Middle)]
 		public ItemPosition ItemPosition;
 
 		public IDatabase _db;
