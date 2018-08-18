@@ -108,7 +108,7 @@ namespace StringDB {
 
 		/// <inheritdoc/>
 		public void Fill<T1, T2>(TypeHandler<T1> wt1, TypeHandler<T2> wt2, T1 index, T2 value, int times)
-			=> this._writer.Insert(wt1, wt2, index, value);
+			=> this._writer.Fill(wt1, wt2, index, value, times);
 
 		/// <inheritdoc/>
 		public void Insert<T1, T2>(TypeHandler<T1> typeHandlerT1, TypeHandler<T2> typeHandlerT2, T1 index, T2 value)

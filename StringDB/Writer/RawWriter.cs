@@ -40,6 +40,7 @@ namespace StringDB.Writer {
 
 		public RawWriter(StreamIO s) {
 			this._sio = s;
+			this._lastStreamLength = s.Stream.Length;
 
 			if (this._sio.Length > 8) {
 				this._sio.Seek(0);
@@ -48,7 +49,7 @@ namespace StringDB.Writer {
 
 				var m_buffer = new byte[8];
 
-				//this._s.Stream.StreamRead(m_buffer, 0, 8);
+				this._sio.Stream.Read(m_buffer, 0, 4);
 
 				// https://referencesource.microsoft.com/#mscorlib/system/io/binaryreader.cs,197
 
@@ -76,7 +77,7 @@ namespace StringDB.Writer {
 				pos = sizeof(long);
 			} else this._sio.Seek(this._sio.Length);
 
-			var judge = pos + sizeof(byte) + sizeof(long); // the position and the index chain linker lengths
+			var judge = pos + this._sio.WriteJumpSize(); // the position and the index chain linker lengths
 
 			foreach (var i in kvps) // get the approximate length of every index so we know where the position of the data will be
 				judge += this._sio.WriteIndexSize(wt1.GetLength(i.Key));

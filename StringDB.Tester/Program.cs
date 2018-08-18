@@ -36,17 +36,37 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
-			Console.ReadLine();
-
-			Console.WriteLine("S");
-			var data = new long[880000 * 2];
+			long[] data;
 
 			var rng = new Random();
 
-			for (int i = 0; i < data.Length; i++)
-				data[i] = LongRandom(long.MinValue, long.MaxValue, rng);
+			using (var db = Database.FromFile("test.db")) {
 
-			Console.WriteLine(Marshal.SizeOf(data));
+				for (int i = 0; i < 10; i++)
+				db.Insert("wake me", "up");
+
+				db.Fill("ee", "cc", 1000_000);
+
+				int maxl = 0;
+				int c = 0;
+				foreach (var i in db) {
+					maxl++;
+					//data[c] = i.Position;
+					//c++;
+				}
+				data = new long[maxl];
+				foreach (var i in db) data[c++] = i.Position;
+
+				var stp = Stopwatch.StartNew();
+
+				for(int x = 0; x < 1_000; x++)foreach(var i in db) { }
+				Console.WriteLine($"{stp.ElapsedMilliseconds}, {stp.ElapsedTicks}");
+
+				stp = Stopwatch.StartNew();
+
+				for (int x = 0; x < 1_000; x++) foreach (var i in data) db.ReadFromPosition(i);
+				Console.WriteLine($"{stp.ElapsedMilliseconds}, {stp.ElapsedTicks}");
+			}
 
 			Console.ReadLine();
 
