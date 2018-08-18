@@ -12,19 +12,10 @@ namespace StringDB.Reader {
 		IReaderPair First();
 
 		/// <summary>Gets the ReaderPair responsible for a given index</summary>
-		IReaderPair Get<T>(T index);
-
-		/// <summary>Gets the ReaderPair responsible for a given index</summary>
 		IReaderPair Get<T>(TypeHandler<T> typeHandler, T index);
 
 		/// <summary>Attempts to get the ReaderPair</summary>
-		bool TryGet<T>(T index, out IReaderPair value);
-
-		/// <summary>Attempts to get the ReaderPair</summary>
 		bool TryGet<T>(TypeHandler<T> typeHandler, T index, out IReaderPair value);
-
-		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
-		IEnumerable<IReaderPair> GetAll<T>(T index);
 
 		/// <summary>Gets the multiple ReaderPairs responsible for a given index</summary>
 		IEnumerable<IReaderPair> GetAll<T>(TypeHandler<T> typeHandler, T index);
@@ -58,10 +49,6 @@ namespace StringDB.Reader {
 		}
 
 		/// <inheritdoc/>
-		public IReaderPair Get<T>(T index)
-			=> Get<T>(TypeManager.GetHandlerFor<T>(), index);
-
-		/// <inheritdoc/>
 		public IReaderPair Get<T>(TypeHandler<T> typeHandler, T index) {
 			// prevent the re-use of code
 
@@ -70,10 +57,6 @@ namespace StringDB.Reader {
 
 			throw new InvalidOperationException($"Unable to find the given index {index}");
 		}
-
-		/// <inheritdoc/>
-		public bool TryGet<T>(T index, out IReaderPair value)
-			=> TryGet<T>(TypeManager.GetHandlerFor<T>(), index, out value);
 
 		/// <inheritdoc/>
 		public bool TryGet<T>(TypeHandler<T> typeHandler, T index, out IReaderPair value) {
@@ -91,10 +74,6 @@ namespace StringDB.Reader {
 			value = null;
 			return false;
 		}
-
-		/// <inheritdoc/>
-		public IEnumerable<IReaderPair> GetAll<T>(T index)
-			=> GetAll<T>(TypeManager.GetHandlerFor<T>(), index);
 
 		/// <inheritdoc/>
 		public IEnumerable<IReaderPair> GetAll<T>(TypeHandler<T> typeHandler, T index) {
