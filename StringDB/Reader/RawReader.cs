@@ -124,13 +124,6 @@ namespace StringDB.Reader {
 
 		public long ReadLength(long pos) {
 			this._sio.Seek(pos + 1);
-			var b = this._sio.BinaryReader.ReadByte();
-
-			if (b == 0) {
-				b = 0;
-			}
-
-			this._sio.Seek(pos);
 
 			return TypeHandlerLengthManager.ReadLength(this._sio.BinaryReader); // read the length of the data
 		}
