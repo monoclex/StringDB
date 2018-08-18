@@ -11,17 +11,6 @@ using System.Reflection;
 
 namespace StringDB {
 
-	internal static partial class Consts {
-
-		public const bool UseAssemblies =
-#if USE_ASSEMBLIES
-			true;
-#else
-			false;
-
-#endif
-	}
-
 	internal static class AutoRegisterHelper {
 
 		public static void RegisterTypes() {

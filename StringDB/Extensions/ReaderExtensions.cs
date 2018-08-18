@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace StringDB {
+
+	// Extensions to prevent the user from having to type hte TypeManager.GetHandlerFor<> thing repeatedly.
+	// Should let the end user know they should cache the TypeManager.GetHandlerFor<> result
+
 	public static partial class Extensions {
 		/// <summary>Gets the ReaderPair responsible for a given index</summary>
 		public static IReaderPair Get<T>(this IReader reader, T index)

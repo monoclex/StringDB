@@ -4,6 +4,10 @@ using System.IO;
 using System.Text;
 
 namespace StringDB {
+
+	 // Purpose: Take the majority of the work of the RawReader and RawWriter and put it into one class.
+	 // Makes it easier to modify the file format later.
+
 	internal partial interface IStreamIO {
 		long WriteIndex<T>(TypeHandler<T> typeHandler, long itmLen, T itm, long dataPos);
 		long WriteIndexSize(long itmLen);
