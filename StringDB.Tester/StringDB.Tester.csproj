@@ -7,10 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="newtonsoft.json" Version="11.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\StringDB\StringDB.csproj" />
+    <PackageReference Include="StringDb" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

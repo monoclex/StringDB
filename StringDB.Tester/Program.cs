@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 namespace StringDB.Tester {
-
+	/*
 	[TypeManager.AutoRegister]
 	public class Example : TypeHandler<int> {
 		public override byte Id => 0x2F;
@@ -17,7 +17,7 @@ namespace StringDB.Tester {
 		public override int Read(BinaryReader br, long len) => len == 4 ? br.ReadInt32() : throw new Exception("that's not a freaking int");
 
 		public override void Write(BinaryWriter bw, int item) => bw.Write(item);
-	}
+	}*/
 
 	internal class Program {
 		private static readonly KeyValuePair<byte[], byte[]> CacheKVP = new KeyValuePair<byte[], byte[]>(new byte[100], new byte[1000]);
@@ -36,6 +36,47 @@ namespace StringDB.Tester {
 		}
 
 		private static void Main() {
+
+			using (var db = new Database(File.OpenRead("Worlds.db"), DatabaseMode.Read, DatabaseVersion.Latest, true)) //.FromFile("Worlds.db"))
+			{
+				int c = 0;
+				foreach (var i in db)
+				{
+					c++;
+				}
+				Console.WriteLine(c);
+			}
+
+				System.Threading.Thread.Sleep(1000);
+
+			int[] indexHashCodes = new int[1_000_000];
+
+			System.Threading.Thread.Sleep(1000);
+
+			long[] posHashCodes = new long[1_000_000];
+
+			for(int x = 0; x < 1_000_000; x++)
+			{
+				indexHashCodes[x] = 400;
+				posHashCodes[x] = 500;
+			}
+
+			Console.WriteLine(indexHashCodes[500_000]);
+			Console.WriteLine(posHashCodes[500_000]);
+
+			Console.ReadLine();
+
+			return;/*
+
+			using (var db = Database.FromStream(new MemoryStream(), true)) {
+				db.Insert<string, string>("index", "key");
+				
+				if (db.TryGet<string>("index", out var val)) {
+					Console.WriteLine(val.Value.GetAs<string>());
+				}
+			}
+			Console.ReadLine();
+			return;
 			long[] data;
 
 			var rng = new Random();
@@ -53,6 +94,9 @@ namespace StringDB.Tester {
 					maxl++;
 					//data[c] = i.Position;
 					//c++;
+				}
+				if(db.TryGet<string>("index", out var val)) {
+					Console.WriteLine(val.Value.GetAs<string>());
 				}
 				data = new long[maxl];
 				foreach (var i in db) data[c++] = i.Position;
