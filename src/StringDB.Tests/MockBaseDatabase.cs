@@ -17,5 +17,7 @@ namespace StringDB.Tests
 			=> Data.Select(x => new KeyValuePair<string, ILazyLoading<int>>(x.Key, x.Value));
 
 		public IEnumerable<KeyValuePair<string, ILazyLoading<int>>> Enumerator() => Evaluate();
+
+		public override void Dispose() => throw new NotImplementedException();
 	}
 }

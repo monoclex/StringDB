@@ -43,5 +43,7 @@ namespace StringDB
 		public IEnumerator<KeyValuePair<TKey, ILazyLoading<TValue>>> GetEnumerator() => Evaluate().GetEnumerator();
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+		public abstract void Dispose();
 	}
 }

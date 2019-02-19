@@ -95,5 +95,7 @@ namespace StringDB.Tests
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+		public void Dispose() => throw new System.NotImplementedException();
 	}
 }

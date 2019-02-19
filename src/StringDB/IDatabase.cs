@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace StringDB
 {
-	public interface IDatabase<TKey, TValue> : IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>>
+	public interface IDatabase<TKey, TValue> : IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>>, IDisposable
 	{
 		TValue Get(TKey key);
 

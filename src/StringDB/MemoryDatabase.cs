@@ -14,17 +14,12 @@ namespace StringDB
 			public TValue Load() => _value;
 		}
 
-		private readonly HashSet<KeyValuePair<TKey, TValue>> _data;
+		private readonly List<KeyValuePair<TKey, TValue>> _data;
 
-		public MemoryDatabase(HashSet<KeyValuePair<TKey, TValue>> data = null) => _data = data ?? new HashSet<KeyValuePair<TKey, TValue>>();
+		public MemoryDatabase(List<KeyValuePair<TKey, TValue>> data = null) => _data = data ?? new List<KeyValuePair<TKey, TValue>>();
 
 		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)
-		{
-			foreach (var item in items)
-			{
-				_data.Add(item);
-			}
-		}
+			=> _data.AddRange(items);
 
 		protected override IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate()
 			=> _data
@@ -36,5 +31,10 @@ namespace StringDB
 					value: new LazyValueLoader(item.Value)
 				)
 			);
+
+		public override void Dispose()
+		{
+			_data.Clear();
+		}
 	}
 }
