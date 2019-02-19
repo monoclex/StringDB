@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace StringDB
+namespace StringDB.Databases
 {
 	public sealed class MemoryDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
 	{

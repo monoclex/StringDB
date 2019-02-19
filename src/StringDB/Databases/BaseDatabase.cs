@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace StringDB
+namespace StringDB.Databases
 {
 	public abstract class BaseDatabase<TKey, TValue> : IDatabase<TKey, TValue>
 	{
