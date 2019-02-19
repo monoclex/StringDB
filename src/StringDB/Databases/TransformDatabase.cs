@@ -11,9 +11,11 @@ namespace StringDB.Databases
 			private readonly ITransformer<TPreTransformValue, TPostTransformValue> _transformer;
 			private readonly ILazyLoading<TPreTransformValue> _pre;
 
-			public LazyTransformingValue(
+			public LazyTransformingValue
+			(
 				ILazyLoading<TPreTransformValue> pre,
-				ITransformer<TPreTransformValue, TPostTransformValue> transformer)
+				ITransformer<TPreTransformValue, TPostTransformValue> transformer
+			)
 			{
 				_pre = pre;
 				_transformer = transformer;

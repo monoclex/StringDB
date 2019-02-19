@@ -17,9 +17,20 @@ namespace StringDB.Tests
 			var mdbiod = new MockDatabaseIODevice();
 			var iodb = new IODatabase(mdbiod);
 
+			bool first = true;
+
 			int i = 0;
 			foreach (var item in iodb)
 			{
+				if (first)
+				{
+					mdbiod.ItemOn
+						.Should()
+						.Be(0, "Reset() called by the IODatabase");
+
+					first = false;
+				}
+
 				item.Key
 					.Should()
 					.BeEquivalentTo(mdbiod.Data[i].Key);

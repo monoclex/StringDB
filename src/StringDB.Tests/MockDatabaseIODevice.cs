@@ -26,7 +26,7 @@ namespace StringDB.Tests
 		})
 		.ToList();
 
-		public int ItemOn = 0;
+		public int ItemOn = -1;
 
 		public void Reset() => ItemOn = 0;
 
