@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace StringDB.Tests
 {
-	public class MockBaseDatabase : BaseDatabase<string, int>, IMockDatabase
+	public class MockBaseDatabase : BaseDatabase<string, int>, IMockDatabase<string, int>
 	{
-		public HashSet<KeyValuePair<string, LazyInt>> Data { get; } = new MockDatabase().Data;
+		public List<KeyValuePair<string, LazyItem<int>>> Data { get; } = new MockDatabase().Data;
 
 		public KeyValuePair<string, int>[] Inserted { get; set; }
 

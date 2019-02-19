@@ -37,7 +37,7 @@ namespace StringDB.Tests
 
 			mdb
 				.Values()
-				.Cast<LazyInt>()
+				.Cast<LazyItem<int>>()
 				.Select(x => x.Value)
 				.Should()
 				.BeEquivalentTo

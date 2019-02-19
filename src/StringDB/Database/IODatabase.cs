@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace StringDB.Database
+namespace StringDB
 {
 	public sealed class IODatabase : BaseDatabase<byte[], byte[]>
 	{

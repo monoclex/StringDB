@@ -4,32 +4,10 @@ using System.Linq;
 
 namespace StringDB.Tests
 {
-	public class LazyInt : ILazyLoading<int>
+	public class MockDatabase : IDatabase<string, int>, IMockDatabase<string, int>
 	{
-		public LazyInt(int value) => Value = value;
-
-		public int Value { get; }
-
-		public bool Loaded { get; private set; }
-
-		public int Load()
-		{
-			Loaded = true;
-			return Value;
-		}
-
-		public override string ToString() => $"[{Value}: {Loaded}]";
-	}
-
-	public interface IMockDatabase
-	{
-		HashSet<KeyValuePair<string, LazyInt>> Data { get; }
-	}
-
-	public class MockDatabase : IDatabase<string, int>, IMockDatabase
-	{
-		public HashSet<KeyValuePair<string, LazyInt>> Data { get; } =
-			new HashSet<KeyValuePair<string, LazyInt>>
+		public List<KeyValuePair<string, LazyItem<int>>> Data { get; } =
+			new List<KeyValuePair<string, LazyItem<int>>>
 		(
 			collection: new KeyValuePair<string, int>[]
 			{
@@ -46,10 +24,10 @@ namespace StringDB.Tests
 					new KeyValuePair<string, int>("a", 8 ),
 					new KeyValuePair<string, int>("b", 9 )
 				}
-				.Select(x => new KeyValuePair<string, LazyInt>
+				.Select(x => new KeyValuePair<string, LazyItem<int>>
 					(
 						key: x.Key,
-						value: new LazyInt(x.Value)
+						value: new LazyItem<int>(x.Value)
 					)
 				)
 			);
@@ -69,7 +47,7 @@ namespace StringDB.Tests
 
 		public IEnumerator<KeyValuePair<string, ILazyLoading<int>>> GetEnumerator() => Evaluate().GetEnumerator();
 
-		public void Insert(string key, int value) => Data.Add(new KeyValuePair<string, LazyInt>(key, new LazyInt(value)));
+		public void Insert(string key, int value) => Data.Add(new KeyValuePair<string, LazyItem<int>>(key, new LazyItem<int>(value)));
 
 		public void InsertRange(KeyValuePair<string, int>[] items)
 		{
