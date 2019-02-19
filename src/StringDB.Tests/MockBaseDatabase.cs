@@ -15,5 +15,7 @@ namespace StringDB.Tests
 
 		protected override IEnumerable<KeyValuePair<string, ILazyLoading<int>>> Evaluate()
 			=> Data.Select(x => new KeyValuePair<string, ILazyLoading<int>>(x.Key, x.Value));
+
+		public IEnumerable<KeyValuePair<string, ILazyLoading<int>>> Enumerator() => Evaluate();
 	}
 }
