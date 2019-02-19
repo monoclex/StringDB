@@ -1,4 +1,4 @@
-﻿namespace StringDB
+﻿namespace StringDB.Transformers
 {
 	public sealed class ReverseTransformer<TPost, TPre> : ITransformer<TPost, TPre>
 	{

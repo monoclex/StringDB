@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
+
+using StringDB.Transformers;
+
 using System;
-using System.Collections.Generic;
-using System.Text;
+
 using Xunit;
 
 namespace StringDB.Tests
@@ -21,6 +23,7 @@ namespace StringDB.Tests
 		public class SimpleTransformer : ITransformer<A, B>
 		{
 			public B Transform(A pre) => new B { OtherValue = pre.Value };
+
 			public A Transform(B post) => new A { Value = post.OtherValue };
 		}
 
