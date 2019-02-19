@@ -36,6 +36,5 @@ namespace StringDB
 					value: new LazyValueLoader(item.Value)
 				)
 			);
-
 	}
 }

@@ -1,26 +1,13 @@
 ﻿using FluentAssertions;
+
 using System.Linq;
+
 using Xunit;
 
 namespace StringDB.Tests
 {
 	public class DatabaseExtensionTests
 	{
-		private void EnsureNoValuesLoaded(MockDatabase mdb)
-			=> mdb.Data.Where(x => x.Value.Loaded)
-			.Should()
-			.BeEmpty("No lazy values should be loaded with this operation");
-
-		private void EnsureAllValuesLoaded(MockDatabase mdb)
-			=> mdb.Data.Where(kvp => !kvp.Value.Loaded)
-			.Should()
-			.BeEmpty("All values should be loaded");
-
-		private void EnsureNoValuesLoadedBeyond(MockDatabase mdb, int position)
-			=> mdb.Data.Where((kvp, index) => index <= position ? !kvp.Value.Loaded : kvp.Value.Loaded)
-			.Should()
-			.BeEmpty("No values beyond the current enumeration point should be loaded");
-
 		[Fact]
 		public void Keys()
 		{
@@ -31,7 +18,7 @@ namespace StringDB.Tests
 				.Should()
 				.BeEquivalentTo
 				(
-					new []
+					new[]
 					{
 						"a", "b", "c", "d",
 						"a", "b", "c", "d",
@@ -40,7 +27,7 @@ namespace StringDB.Tests
 					"Returns all keys correctly"
 				);
 
-			EnsureNoValuesLoaded(mdb);
+			mdb.EnsureNoValuesLoaded();
 		}
 
 		[Fact]
@@ -50,12 +37,12 @@ namespace StringDB.Tests
 
 			mdb
 				.Values()
-				.Cast<MockDatabase.LazyInt>()
+				.Cast<LazyInt>()
 				.Select(x => x.Value)
 				.Should()
 				.BeEquivalentTo
 				(
-					new []
+					new[]
 					{
 						0, 1, 2, 3,
 						4, 5, 6, 7,
@@ -64,7 +51,7 @@ namespace StringDB.Tests
 					"Returns all values correctly"
 				);
 
-			EnsureNoValuesLoaded(mdb);
+			mdb.EnsureNoValuesLoaded();
 		}
 
 		[Fact]
@@ -74,14 +61,14 @@ namespace StringDB.Tests
 
 			var enumerator = mdb.ValuesAggresive().GetEnumerator();
 
-			for(var i = 0; i < mdb.Data.Count; i++)
+			for (var i = 0; i < mdb.Data.Count; i++)
 			{
 				enumerator.MoveNext().Should().BeTrue();
 
-				EnsureNoValuesLoadedBeyond(mdb, i);
+				mdb.EnsureNoValuesLoadedBeyond(i);
 			}
 
-			EnsureAllValuesLoaded(mdb);
+			mdb.EnsureAllValuesLoaded();
 		}
 
 		/// <summary>
@@ -93,22 +80,22 @@ namespace StringDB.Tests
 			var mdb = new MockDatabase();
 
 			var enumerator = mdb.EnumerateAggresively(4).GetEnumerator();
-			EnsureNoValuesLoaded(mdb);
+			mdb.EnsureNoValuesLoaded();
 
 			for (var i = 1; i <= 3; i++)
 			{
 				var point = (i * 4) - 1;
 
 				enumerator.MoveNext();
-				EnsureNoValuesLoadedBeyond(mdb, point);
+				mdb.EnsureNoValuesLoadedBeyond(point);
 
-				for(var j = 0; j < 4 - 1; j++)
+				for (var j = 0; j < 4 - 1; j++)
 				{
 					enumerator.MoveNext();
 				}
 			}
 
-			EnsureAllValuesLoaded(mdb);
+			mdb.EnsureAllValuesLoaded();
 		}
 	}
 }

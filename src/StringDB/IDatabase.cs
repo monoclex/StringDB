@@ -40,7 +40,7 @@ namespace StringDB
 				{
 					result = Pool(valueLoadAmount, enumerator, ref lazyList);
 
-					foreach(var item in lazyList)
+					foreach (var item in lazyList)
 					{
 						loadedList.Add(new KeyValuePair<TKey, TValue>(item.Key, item.Value.Load()));
 					}

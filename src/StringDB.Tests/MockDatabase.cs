@@ -4,26 +4,31 @@ using System.Linq;
 
 namespace StringDB.Tests
 {
-	public class MockDatabase : IDatabase<string, int>
+	public class LazyInt : ILazyLoading<int>
 	{
-		public class LazyInt : ILazyLoading<int>
+		public LazyInt(int value) => Value = value;
+
+		public int Value { get; }
+
+		public bool Loaded { get; private set; }
+
+		public int Load()
 		{
-			public LazyInt(int value) => Value = value;
-
-			public int Value { get; }
-
-			public bool Loaded { get; private set; }
-
-			public int Load()
-			{
-				Loaded = true;
-				return Value;
-			}
-
-			public override string ToString() => $"[{Value}: {Loaded}]";
+			Loaded = true;
+			return Value;
 		}
 
-		public HashSet<KeyValuePair<string, LazyInt>> Data =
+		public override string ToString() => $"[{Value}: {Loaded}]";
+	}
+
+	public interface IMockDatabase
+	{
+		HashSet<KeyValuePair<string, LazyInt>> Data { get; }
+	}
+
+	public class MockDatabase : IDatabase<string, int>, IMockDatabase
+	{
+		public HashSet<KeyValuePair<string, LazyInt>> Data { get; } =
 			new HashSet<KeyValuePair<string, LazyInt>>
 		(
 			collection: new KeyValuePair<string, int>[]
