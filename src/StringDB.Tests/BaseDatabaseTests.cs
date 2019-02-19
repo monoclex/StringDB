@@ -17,7 +17,6 @@ namespace StringDB.Tests
 					.Should()
 					.HaveCount(1, "Only 1 item should be inserted")
 				.And
-					.Should()
 					.BeEquivalentTo
 					(
 						new KeyValuePair<string, int>[]
@@ -33,13 +32,14 @@ namespace StringDB.Tests
 		{
 			var mbdb = new MockBaseDatabase();
 
-			int count = 0;
-			foreach(var item in mbdb.GetAll("a"))
-			{
-				mbdb.EnsureNoValuesLoadedBeyond((count * 4) + 3);
+			mbdb.EnsureNoValuesLoaded();
 
-				count++;
+			foreach (var item in mbdb.GetAll("a"))
+			{
+				mbdb.EnsureNoValuesLoaded();
 			}
+
+			mbdb.EnsureNoValuesLoaded();
 		}
 	}
 }
