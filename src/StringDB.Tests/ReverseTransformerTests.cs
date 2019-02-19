@@ -27,17 +27,28 @@ namespace StringDB.Tests
 		[Fact]
 		public void Reverses()
 		{
+			const string Because = "The transformation should call the appropriate method in the underlying transformer";
+
 			var reverse = new ReverseTransformer<B, A>(new SimpleTransformer());
 
 			reverse.Transform(new B { OtherValue = 3 })
 				.Value
 				.Should()
-				.Be(3);
+				.Be(3, Because);
 
 			reverse.Transform(new A { Value = 4 })
 				.OtherValue
 				.Should()
-				.Be(4);
+				.Be(4, Because);
+		}
+
+		[Fact]
+		public void ExtensionWorks()
+		{
+			new SimpleTransformer()
+				.Reverse()
+				.Should()
+				.BeOfType<ReverseTransformer<B, A>>("A reversed SimpleTransformer");
 		}
 	}
 }

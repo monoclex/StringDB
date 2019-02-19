@@ -10,4 +10,10 @@
 
 		public TPost Transform(TPre post) => _transformer.Transform(post);
 	}
+
+	public static class ReverseTransformerExtensions
+	{
+		public static ReverseTransformer<TPost, TPre> Reverse<TPre, TPost>(this ITransformer<TPre, TPost> transformer)
+			=> new ReverseTransformer<TPost, TPre>(transformer);
+	}
 }
