@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
 
+using StringDB.Databases;
+
 using System.Collections.Generic;
 
 using Xunit;
