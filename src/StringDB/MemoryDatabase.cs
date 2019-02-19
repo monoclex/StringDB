@@ -32,9 +32,6 @@ namespace StringDB
 				)
 			);
 
-		public override void Dispose()
-		{
-			_data.Clear();
-		}
+		public override void Dispose() => _data.Clear();
 	}
 }
