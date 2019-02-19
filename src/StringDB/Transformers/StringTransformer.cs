@@ -2,7 +2,7 @@
 
 namespace StringDB.Transformers
 {
-	public class StringTransformer : ITransformer<byte[], string>
+	public sealed class StringTransformer : ITransformer<byte[], string>
 	{
 		public string Transform(byte[] pre) => Encoding.UTF8.GetString(pre);
 
