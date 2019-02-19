@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace StringDB
 {
@@ -26,15 +27,15 @@ namespace StringDB
 		}
 
 		protected override IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate()
-		{
-			foreach (var item in _data)
-			{
-				yield return new KeyValuePair<TKey, ILazyLoading<TValue>>
+			=> _data
+			.Select
+			(
+				item => new KeyValuePair<TKey, ILazyLoading<TValue>>
 				(
 					key: item.Key,
 					value: new LazyValueLoader(item.Value)
-				);
-			}
-		}
+				)
+			);
+
 	}
 }
