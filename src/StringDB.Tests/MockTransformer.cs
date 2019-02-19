@@ -9,7 +9,7 @@ namespace StringDB.Tests
 		public string Transform(int pre)
 		{
 			PreTransform = pre;
-			return pre.ToString();
+			return Convert.ToChar(pre).ToString();
 		}
 
 		public string PostTransform { get; private set; }
@@ -17,7 +17,7 @@ namespace StringDB.Tests
 		public int Transform(string post)
 		{
 			PostTransform = post;
-			return Convert.ToInt32(post);
+			return Convert.ToInt32(Convert.ToChar(post));
 		}
 	}
 }

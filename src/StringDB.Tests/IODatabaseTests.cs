@@ -24,9 +24,11 @@ namespace StringDB.Tests
 			{
 				if (first)
 				{
+					// 1 because it's enumerated by 1 already
+
 					mdbiod.ItemOn
 						.Should()
-						.Be(0, "Reset() called by the IODatabase");
+						.Be(1, "Reset() called by the IODatabase");
 
 					first = false;
 				}

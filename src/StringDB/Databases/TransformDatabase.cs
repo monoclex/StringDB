@@ -59,6 +59,8 @@ namespace StringDB.Databases
 					value: _valueTransformer.Transform(current.Value)
 				);
 			}
+
+			_db.InsertRange(pre);
 		}
 
 		protected override IEnumerable<KeyValuePair<TPostTransformKey, ILazyLoading<TPostTransformValue>>> Evaluate()
