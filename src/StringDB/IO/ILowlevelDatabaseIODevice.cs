@@ -17,10 +17,13 @@ namespace StringDB.IO
 
 	public interface ILowlevelDatabaseIODevice : IDisposable
 	{
+		long JumpPos { get; set; }
+
 		long GetPosition();
 
 		void Reset();
 
+		void SeekEnd();
 		void Seek(long position);
 
 		void Flush();

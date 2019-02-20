@@ -51,7 +51,11 @@ namespace StringDB.IO
 
 		public void Insert(KeyValuePair<byte[], byte[]>[] items)
 		{
+			_lowlevelDBIOD.SeekEnd();
+
 			var offset = _lowlevelDBIOD.GetPosition();
+
+			UpdatePreviousJump(offset);
 
 			// we need to calculate the total offset of all the indexes
 			// then we write every index & increment the offset by the offset of each value
@@ -77,12 +81,33 @@ namespace StringDB.IO
 				offset += _lowlevelDBIOD.CalculateValueOffset(kvp.Value);
 			}
 
+			// TODO: make test to ensure JMP is written
+			WriteJump();
+
 			// phase 3: writing each value sequentially
 
 			foreach (var kvp in items)
 			{
 				_lowlevelDBIOD.WriteValue(kvp.Value);
 			}
+		}
+
+		private void UpdatePreviousJump(long jumpTo)
+		{
+			if (_lowlevelDBIOD.JumpPos != 0)
+			{
+				// goto old jump pos and overwrite it with the current jump pos
+				_lowlevelDBIOD.Seek(_lowlevelDBIOD.JumpPos);
+				_lowlevelDBIOD.WriteJump(jumpTo);
+			}
+		}
+
+		private void WriteJump()
+		{
+			var position = _lowlevelDBIOD.GetPosition();
+
+			_lowlevelDBIOD.JumpPos = position;
+			_lowlevelDBIOD.WriteJump(0);
 		}
 
 		public void Dispose() => _lowlevelDBIOD.Dispose();

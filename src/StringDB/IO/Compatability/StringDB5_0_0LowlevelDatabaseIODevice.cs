@@ -39,11 +39,15 @@ namespace StringDB.IO.Compatability
 			_bw = new BinaryWriter(stream, Encoding.UTF8, leaveStreamOpen);
 		}
 
+		public long JumpPos { get; set; }
+
 		public long GetPosition() => _stream.Position;
 
 		public void Reset() => Seek(0);
 
-		public void Seek(long position) => _stream.Seek(0, SeekOrigin.Begin);
+		public void SeekEnd() => _stream.Seek(0, SeekOrigin.End);
+
+		public void Seek(long position) => _stream.Seek(position, SeekOrigin.Begin);
 
 		public void Flush()
 		{
@@ -84,8 +88,10 @@ namespace StringDB.IO.Compatability
 			};
 		}
 
-		public byte[] ReadValue()
+		public byte[] ReadValue(long dataPosition)
 		{
+			Seek(dataPosition);
+
 			var length = ReadLength();
 
 			return _br.ReadBytes(length);
