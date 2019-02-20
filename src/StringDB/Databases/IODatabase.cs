@@ -32,12 +32,12 @@ namespace StringDB.Databases
 
 			DatabaseItem dbItem;
 
-			while (!(dbItem = _dbIODevice.ReadNext()).IsLast)
+			while (!(dbItem = _dbIODevice.ReadNext()).EndOfItems)
 			{
 				yield return new KeyValuePair<byte[], ILazyLoading<byte[]>>
 				(
 					key: dbItem.Key,
-					value: new LazyLoadValue(_dbIODevice, dbItem.ValuePosition)
+					value: new LazyLoadValue(_dbIODevice, dbItem.DataPosition)
 				);
 			}
 		}

@@ -40,9 +40,9 @@ namespace StringDB.Tests
 
 			return new DatabaseItem
 			{
-				IsLast = ItemOn == Data.Count,
+				EndOfItems = ItemOn == Data.Count,
 				Key = Data[current].Key,
-				ValuePosition = current
+				DataPosition = current
 			};
 		}
 

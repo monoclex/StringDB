@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -28,6 +27,7 @@ namespace StringDB.IO.Compatability
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
 
+		// TODO: the first 8 bytes should be the last index chain, or whatever that is
 		public StringDB5_0_0LowlevelDatabaseIODevice
 		(
 			Stream stream,
@@ -39,7 +39,10 @@ namespace StringDB.IO.Compatability
 			_bw = new BinaryWriter(stream, Encoding.UTF8, leaveStreamOpen);
 		}
 
+		public long GetPosition() => _stream.Position;
+
 		public void Reset() => Seek(0);
+
 		public void Seek(long position) => _stream.Seek(0, SeekOrigin.Begin);
 
 		public void Flush()
@@ -50,7 +53,7 @@ namespace StringDB.IO.Compatability
 
 		public NextItemPeek Peek()
 		{
-			switch(_br.PeekChar())
+			switch (_br.PeekChar())
 			{
 				case -1:
 				case Consts.NoIndex:
@@ -81,17 +84,18 @@ namespace StringDB.IO.Compatability
 			};
 		}
 
-		public byte[] ReadValue(long dataPosition)
-		{
-			Seek(dataPosition);
-			return ReadValue();
-		}
-
 		public byte[] ReadValue()
 		{
 			var length = ReadLength();
 
 			return _br.ReadBytes(length);
+		}
+
+		public long ReadJump()
+		{
+			var jumpKey = _br.ReadByte();
+
+			return _br.ReadInt64();
 		}
 
 		public void WriteJump(long jumpTo)
@@ -131,8 +135,7 @@ namespace StringDB.IO.Compatability
 			+ CalculateWriteLengthOffset(value.Length)
 			+ value.Length;
 
-		public int CalculateJumpOffset(long jumpTo)
-			=> sizeof(byte) + sizeof(long);
+		public int JumpOffsetSize { get; } = sizeof(byte) + sizeof(long);
 
 		public void Dispose()
 		{

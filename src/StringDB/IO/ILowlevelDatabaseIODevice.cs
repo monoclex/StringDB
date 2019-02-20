@@ -17,8 +17,12 @@ namespace StringDB.IO
 
 	public interface ILowlevelDatabaseIODevice : IDisposable
 	{
+		long GetPosition();
+
 		void Reset();
+
 		void Seek(long position);
+
 		void Flush();
 
 		NextItemPeek Peek();
@@ -27,12 +31,18 @@ namespace StringDB.IO
 
 		byte[] ReadValue(long dataPosition);
 
+		long ReadJump();
+
 		void WriteJump(long jumpTo);
+
 		void WriteIndex(byte[] key, long dataPosition);
+
 		void WriteValue(byte[] value);
 
 		int CalculateIndexOffset(byte[] key);
+
 		int CalculateValueOffset(byte[] value);
-		int CalculateJumpOffset(long jumpTo);
+
+		int JumpOffsetSize { get; }
 	}
 }
