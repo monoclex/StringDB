@@ -81,7 +81,6 @@ namespace StringDB.IO
 				offset += _lowlevelDBIOD.CalculateValueOffset(kvp.Value);
 			}
 
-			// TODO: make test to ensure JMP is written
 			WriteJump();
 
 			// phase 3: writing each value sequentially
@@ -94,12 +93,16 @@ namespace StringDB.IO
 
 		private void UpdatePreviousJump(long jumpTo)
 		{
+			var currentPosition = _lowlevelDBIOD.GetPosition();
+
 			if (_lowlevelDBIOD.JumpPos != 0)
 			{
 				// goto old jump pos and overwrite it with the current jump pos
 				_lowlevelDBIOD.Seek(_lowlevelDBIOD.JumpPos);
 				_lowlevelDBIOD.WriteJump(jumpTo);
 			}
+
+			_lowlevelDBIOD.Seek(currentPosition);
 		}
 
 		private void WriteJump()
