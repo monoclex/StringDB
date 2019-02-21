@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using FluentAssertions;
+﻿using FluentAssertions;
+
 using StringDB.Databases;
 using StringDB.Fluency;
 using StringDB.IO;
 using StringDB.Transformers;
+
+using System;
+using System.IO;
+
 using Xunit;
 
 namespace StringDB.Tests

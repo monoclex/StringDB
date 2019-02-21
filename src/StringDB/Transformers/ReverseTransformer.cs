@@ -1,5 +1,6 @@
 ﻿namespace StringDB.Transformers
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// Reverses the post/pre positions of a transformer.
 	/// </summary>
@@ -15,8 +16,10 @@
 		/// <param name="transformer">The transformer to reverse.</param>
 		public ReverseTransformer(ITransformer<TPre, TPost> transformer) => _transformer = transformer;
 
+		/// <inheritdoc />
 		public TPre TransformPre(TPost pre) => _transformer.TransformPost(pre);
 
+		/// <inheritdoc />
 		public TPost TransformPost(TPre post) => _transformer.TransformPre(post);
 	}
 

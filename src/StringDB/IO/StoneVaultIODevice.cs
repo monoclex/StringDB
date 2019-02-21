@@ -4,6 +4,7 @@ using System.Text;
 
 namespace StringDB.IO
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// An IDatabaseIODevice that implements the StoneVault protocol.
 	/// </summary>
@@ -57,7 +58,7 @@ namespace StringDB.IO
 			};
 		}
 
-		private DatabaseItem End()
+		private static DatabaseItem End()
 			=> new DatabaseItem { EndOfItems = true };
 
 		public void Insert(KeyValuePair<byte[], byte[]>[] items)

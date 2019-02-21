@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace StringDB.Databases
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// A database entire in memory.
 	/// </summary>
@@ -21,11 +22,18 @@ namespace StringDB.Databases
 
 		private readonly List<KeyValuePair<TKey, TValue>> _data;
 
-		public MemoryDatabase(List<KeyValuePair<TKey, TValue>> data = null) => _data = data ?? new List<KeyValuePair<TKey, TValue>>();
+		/// <summary>
+		/// Create a new <see cref="MemoryDatabase{TKey,TValue}"/>.
+		/// </summary>
+		/// <param name="data">The data to pre-fill it with.</param>
+		public MemoryDatabase(List<KeyValuePair<TKey, TValue>> data = null)
+			=> _data = data ?? new List<KeyValuePair<TKey, TValue>>();
 
+		/// <inheritdoc />
 		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)
 			=> _data.AddRange(items);
 
+		/// <inheritdoc />
 		protected override IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate()
 			=> _data
 			.Select
@@ -37,6 +45,7 @@ namespace StringDB.Databases
 				)
 			);
 
+		/// <inheritdoc />
 		public override void Dispose() => _data.Clear();
 	}
 }

@@ -15,6 +15,7 @@ namespace StringDB.IO
 		public long DataPosition;
 	}
 
+	/// <inheritdoc />
 	/// <summary>
 	/// Used for StringDB based databases.
 	/// </summary>

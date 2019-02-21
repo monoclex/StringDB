@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace StringDB.Databases
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// An implementor of IDatabase that requires the inheriting class
 	/// to only implement two functions.
@@ -25,7 +26,8 @@ namespace StringDB.Databases
 		/// <returns>An IEnumerable of KeyValuePairs of keys and their lazy-loading values.</returns>
 		protected abstract IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate();
 
-		/// <exception cref="KeyNotFoundException">When the key is unable to be found.</exception>
+		/// <inheritdoc />
+		/// <exception cref="T:System.Collections.Generic.KeyNotFoundException">When the key is unable to be found.</exception>
 		public TValue Get(TKey key)
 			=> TryGet(key, out var value)
 			? value

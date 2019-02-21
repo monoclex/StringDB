@@ -125,7 +125,7 @@ namespace StringDB.Tests
 				.BeEquivalentTo(ms.ToArray());
 		}
 
-		public void WriteBytes(BinaryWriter bw, string str)
+		private static void WriteBytes(BinaryWriter bw, string str)
 			=> bw.Write(Encoding.UTF8.GetBytes(str));
 
 		public class EnumeratesMock : ILowlevelDatabaseIODevice

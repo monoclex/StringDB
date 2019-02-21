@@ -2,8 +2,9 @@
 
 namespace StringDB.IO
 {
+	/// <inheritdoc />
 	/// <summary>
-	/// An <see cref="IDatabaseIODevice"/> that interfaces with <see cref="ILowlevelDatabaseIODevice"/>
+	/// An <see cref="T:StringDB.IO.IDatabaseIODevice" /> that interfaces with <see cref="T:StringDB.IO.ILowlevelDatabaseIODevice" />
 	/// </summary>
 	public sealed class DatabaseIODevice : IDatabaseIODevice
 	{
@@ -16,7 +17,7 @@ namespace StringDB.IO
 		public byte[] ReadValue(long position)
 		{
 			// temporarily go to the position to read the value,
-			// then seek back to the curpos for reading
+			// then seek back to the cursor position for reading
 			var curPos = _lowlevelDBIOD.GetPosition();
 
 			var value = _lowlevelDBIOD.ReadValue(position);
@@ -127,6 +128,10 @@ namespace StringDB.IO
 			_lowlevelDBIOD.WriteJump(0);
 		}
 
-		public void Dispose() => _lowlevelDBIOD.Dispose();
+		public void Dispose()
+		{
+			_lowlevelDBIOD.Flush();
+			_lowlevelDBIOD.Dispose();
+		}
 	}
 }
