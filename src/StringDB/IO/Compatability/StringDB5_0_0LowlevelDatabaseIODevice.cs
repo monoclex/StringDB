@@ -7,7 +7,7 @@ namespace StringDB.IO.Compatability
 	public sealed class StringDB5_0_0LowlevelDatabaseIODevice : ILowlevelDatabaseIODevice
 	{
 		// https://github.com/SirJosh3917/StringDB/blob/fa703ed893b473829b6140f9d7033575d3291846/StringDB/Consts.cs
-		private sealed class Consts
+		private static class Consts
 		{
 			public const int MaxLength = 0xFE;
 			public const byte DeletedValue = 0xFE;
@@ -31,7 +31,7 @@ namespace StringDB.IO.Compatability
 		public StringDB5_0_0LowlevelDatabaseIODevice
 		(
 			Stream stream,
-			bool leaveStreamOpen = true
+			bool leaveStreamOpen = false
 		)
 		{
 			_stream = stream;
@@ -119,10 +119,6 @@ namespace StringDB.IO.Compatability
 
 		public byte[] ReadValue(long dataPosition)
 		{
-			var curPos = GetPosition();
-
-			// temporarily go to value to read it, then go back
-			// TODO: make a using statement for this
 			Seek(dataPosition);
 
 			var inputType = _br.ReadByte(); // backwards compatability - not used
@@ -131,8 +127,6 @@ namespace StringDB.IO.Compatability
 			var length = ReadLength();
 
 			var value = _br.ReadBytes(length);
-
-			Seek(curPos);
 
 			return value;
 		}

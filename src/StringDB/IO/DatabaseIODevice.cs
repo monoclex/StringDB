@@ -10,7 +10,18 @@ namespace StringDB.IO
 
 		public void Reset() => _lowlevelDBIOD.Reset();
 
-		public byte[] ReadValue(long position) => _lowlevelDBIOD.ReadValue(position);
+		public byte[] ReadValue(long position)
+		{
+			// temporarily go to the position to read the value,
+			// then seek back to the curpos for reading
+			var curPos = _lowlevelDBIOD.GetPosition();
+
+			var value = _lowlevelDBIOD.ReadValue(position);
+
+			_lowlevelDBIOD.Seek(curPos);
+
+			return value;
+		}
 
 		public DatabaseItem ReadNext()
 		{
