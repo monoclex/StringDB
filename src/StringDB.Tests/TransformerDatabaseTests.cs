@@ -36,9 +36,9 @@ namespace StringDB.Tests
 				.Should()
 				.BeEquivalentTo(new KeyValuePair<string, int>[]
 				{
-					new KeyValuePair<string, int>(kt.Transform(1), vt.Transform("a")),
-					new KeyValuePair<string, int>(kt.Transform(2), vt.Transform("b")),
-					new KeyValuePair<string, int>(kt.Transform(3), vt.Transform("c")),
+					new KeyValuePair<string, int>(kt.TransformPre(1), vt.TransformPost("a")),
+					new KeyValuePair<string, int>(kt.TransformPre(2), vt.TransformPost("b")),
+					new KeyValuePair<string, int>(kt.TransformPre(3), vt.TransformPost("c")),
 				});
 		}
 

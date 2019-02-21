@@ -2,8 +2,8 @@
 {
 	public interface ITransformer<TPre, TPost>
 	{
-		TPost Transform(TPre pre);
+		TPost TransformPre(TPre pre);
 
-		TPre Transform(TPost post);
+		TPre TransformPost(TPost post);
 	}
 }

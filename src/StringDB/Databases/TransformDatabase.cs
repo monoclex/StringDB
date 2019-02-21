@@ -25,7 +25,7 @@ namespace StringDB.Databases
 			{
 				var loaded = _pre.Load();
 
-				return _transformer.Transform(loaded);
+				return _transformer.TransformPre(loaded);
 			}
 		}
 
@@ -55,8 +55,8 @@ namespace StringDB.Databases
 
 				pre[i] = new KeyValuePair<TPreTransformKey, TPreTransformValue>
 				(
-					key: _keyTransformer.Transform(current.Key),
-					value: _valueTransformer.Transform(current.Value)
+					key: _keyTransformer.TransformPost(current.Key),
+					value: _valueTransformer.TransformPost(current.Value)
 				);
 			}
 
@@ -69,7 +69,7 @@ namespace StringDB.Databases
 			(
 				x => new KeyValuePair<TPostTransformKey, ILazyLoading<TPostTransformValue>>
 				(
-					key: _keyTransformer.Transform(x.Key),
+					key: _keyTransformer.TransformPre(x.Key),
 					value: new LazyTransformingValue(x.Value, _valueTransformer)
 				)
 			);

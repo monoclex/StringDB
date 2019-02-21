@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace StringDB.IO
 {
-	public class StoneVaultIODevice : IDatabaseIODevice
+	public sealed class StoneVaultIODevice : IDatabaseIODevice
 	{
 		private static class Consts
 		{

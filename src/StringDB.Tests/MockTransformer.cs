@@ -6,7 +6,7 @@ namespace StringDB.Tests
 	{
 		public int PreTransform { get; private set; }
 
-		public string Transform(int pre)
+		public string TransformPre(int pre)
 		{
 			PreTransform = pre;
 			return Convert.ToChar(pre).ToString();
@@ -14,7 +14,7 @@ namespace StringDB.Tests
 
 		public string PostTransform { get; private set; }
 
-		public int Transform(string post)
+		public int TransformPost(string post)
 		{
 			PostTransform = post;
 			return Convert.ToInt32(Convert.ToChar(post));

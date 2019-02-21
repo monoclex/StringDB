@@ -6,9 +6,9 @@
 
 		public ReverseTransformer(ITransformer<TPre, TPost> transformer) => _transformer = transformer;
 
-		public TPre Transform(TPost pre) => _transformer.Transform(pre);
+		public TPre TransformPre(TPost pre) => _transformer.TransformPost(pre);
 
-		public TPost Transform(TPre post) => _transformer.Transform(post);
+		public TPost TransformPost(TPre post) => _transformer.TransformPre(post);
 	}
 
 	public static class ReverseTransformerExtensions

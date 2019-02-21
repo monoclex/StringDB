@@ -15,7 +15,7 @@ namespace StringDB.Tests
 		{
 			var t = new StringTransformer();
 
-			t.Transform("test")
+			t.TransformPost("test")
 				.Should()
 				.BeEquivalentTo(Encoding.UTF8.GetBytes("test"));
 		}
@@ -27,7 +27,7 @@ namespace StringDB.Tests
 
 			var bytes = Encoding.UTF8.GetBytes("test");
 
-			t.Transform(bytes)
+			t.TransformPre(bytes)
 				.Should()
 				.BeEquivalentTo("test");
 		}

@@ -22,9 +22,9 @@ namespace StringDB.Tests
 
 		public class SimpleTransformer : ITransformer<A, B>
 		{
-			public B Transform(A pre) => new B { OtherValue = pre.Value };
+			public B TransformPre(A pre) => new B { OtherValue = pre.Value };
 
-			public A Transform(B post) => new A { Value = post.OtherValue };
+			public A TransformPost(B post) => new A { Value = post.OtherValue };
 		}
 
 		[Fact]
@@ -34,12 +34,12 @@ namespace StringDB.Tests
 
 			var reverse = new ReverseTransformer<B, A>(new SimpleTransformer());
 
-			reverse.Transform(new B { OtherValue = 3 })
+			reverse.TransformPre(new B { OtherValue = 3 })
 				.Value
 				.Should()
 				.Be(3, Because);
 
-			reverse.Transform(new A { Value = 4 })
+			reverse.TransformPost(new A { Value = 4 })
 				.OtherValue
 				.Should()
 				.Be(4, Because);
