@@ -141,7 +141,7 @@ namespace StringDB.Tests
 
 			public void Flush() => throw new NotImplementedException();
 
-			public long GetPosition() => throw new NotImplementedException();
+			public long GetPosition() => 0;
 
 			public byte[] ReadValue(long dataPosition)
 			{
@@ -193,6 +193,9 @@ namespace StringDB.Tests
 
 			public void Seek(long position)
 			{
+				// this is because of the GetPosition
+				if (position == 0) return;
+
 				var d = Data.First(x => x.Position == position);
 
 				d.SoughtTo = true;
