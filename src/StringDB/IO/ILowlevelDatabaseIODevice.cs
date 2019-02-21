@@ -15,6 +15,9 @@ namespace StringDB.IO
 		public long DataPosition;
 	}
 
+	/// <summary>
+	/// Used for StringDB based databases.
+	/// </summary>
 	public interface ILowlevelDatabaseIODevice : IDisposable
 	{
 		long JumpPos { get; set; }

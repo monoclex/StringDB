@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace StringDB.Databases
 {
+	/// <summary>
+	/// A database for IO-based operations, using an IDatabaseIODevice.
+	/// </summary>
 	public sealed class IODatabase : BaseDatabase<byte[], byte[]>
 	{
 		private sealed class LazyLoadValue : ILazyLoading<byte[]>
@@ -22,6 +25,10 @@ namespace StringDB.Databases
 
 		private readonly IDatabaseIODevice _dbIODevice;
 
+		/// <summary>
+		/// Create an IODatabase with the IDatabaseIODevice specified.
+		/// </summary>
+		/// <param name="dbIODevice">The DatabaseIODevice to use under the hood.</param>
 		public IODatabase(IDatabaseIODevice dbIODevice) => _dbIODevice = dbIODevice;
 
 		public override void InsertRange(KeyValuePair<byte[], byte[]>[] items) => _dbIODevice.Insert(items);

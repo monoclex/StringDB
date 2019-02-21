@@ -2,6 +2,9 @@
 
 namespace StringDB.IO
 {
+	/// <summary>
+	/// An <see cref="IDatabaseIODevice"/> that interfaces with <see cref="ILowlevelDatabaseIODevice"/>
+	/// </summary>
 	public sealed class DatabaseIODevice : IDatabaseIODevice
 	{
 		private readonly ILowlevelDatabaseIODevice _lowlevelDBIOD;

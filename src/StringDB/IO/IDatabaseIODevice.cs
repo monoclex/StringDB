@@ -3,14 +3,34 @@ using System.Collections.Generic;
 
 namespace StringDB.IO
 {
+	/// <summary>
+	/// An IO Device for a database.
+	/// </summary>
 	public interface IDatabaseIODevice : IDisposable
 	{
+		/// <summary>
+		/// Resets the device back to the start of reading.
+		/// </summary>
 		void Reset();
 
+		/// <summary>
+		/// Reads the next item in the database.
+		/// </summary>
+		/// <returns>A database item.</returns>
 		DatabaseItem ReadNext();
 
+		/// <summary>
+		/// Reads the value specified at a position;
+		/// typically gotten from the result of a <see cref="DatabaseItem"/> returned by <seealso cref="ReadNext"/>.
+		/// </summary>
+		/// <param name="position">The position to begin reading the value from.</param>
+		/// <returns>A byte[] with the data.</returns>
 		byte[] ReadValue(long position);
 
+		/// <summary>
+		/// Inserts data into the database.
+		/// </summary>
+		/// <param name="items">The items to insert.</param>
 		void Insert(KeyValuePair<byte[], byte[]>[] items);
 	}
 }

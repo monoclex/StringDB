@@ -3,6 +3,11 @@ using System.Linq;
 
 namespace StringDB.Databases
 {
+	/// <summary>
+	/// A database entire in memory.
+	/// </summary>
+	/// <typeparam name="TKey">The type of key of the database.</typeparam>
+	/// <typeparam name="TValue">The type of value of the database.</typeparam>
 	public sealed class MemoryDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
 	{
 		private sealed class LazyValueLoader : ILazyLoading<TValue>

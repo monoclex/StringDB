@@ -4,6 +4,9 @@ using System.Text;
 
 namespace StringDB.IO
 {
+	/// <summary>
+	/// An IDatabaseIODevice that implements the StoneVault protocol.
+	/// </summary>
 	public sealed class StoneVaultIODevice : IDatabaseIODevice
 	{
 		private static class Consts
@@ -16,7 +19,6 @@ namespace StringDB.IO
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
 
-		// TODO: the first 8 bytes should be the last index chain, or whatever that is
 		public StoneVaultIODevice
 		(
 			Stream stream,

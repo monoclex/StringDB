@@ -4,6 +4,12 @@ using System.Linq;
 
 namespace StringDB.Databases
 {
+	/// <summary>
+	/// An implementor of IDatabase that requires the inheriting class
+	/// to only implement two functions.
+	/// </summary>
+	/// <typeparam name="TKey">The type of key of the database.</typeparam>
+	/// <typeparam name="TValue">The type of value of the database.</typeparam>
 	public abstract class BaseDatabase<TKey, TValue> : IDatabase<TKey, TValue>
 	{
 		private readonly EqualityComparer<TKey> _keyComparer;
@@ -13,8 +19,13 @@ namespace StringDB.Databases
 
 		public abstract void InsertRange(KeyValuePair<TKey, TValue>[] items);
 
+		/// <summary>
+		/// Enumerates over all the items in the database.
+		/// </summary>
+		/// <returns>An IEnumerable of KeyValuePairs of keys and their lazy-loading values.</returns>
 		protected abstract IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate();
 
+		/// <exception cref="KeyNotFoundException">When the key is unable to be found.</exception>
 		public TValue Get(TKey key)
 			=> TryGet(key, out var value)
 			? value
@@ -44,6 +55,9 @@ namespace StringDB.Databases
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+		/// <summary>
+		/// Cleans up any resources the database is using.
+		/// </summary>
 		public abstract void Dispose();
 	}
 }
