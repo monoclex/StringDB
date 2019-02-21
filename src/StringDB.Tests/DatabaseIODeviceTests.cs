@@ -5,6 +5,7 @@ using StringDB.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using Xunit;
@@ -126,5 +127,212 @@ namespace StringDB.Tests
 
 		public void WriteBytes(BinaryWriter bw, string str)
 			=> bw.Write(Encoding.UTF8.GetBytes(str));
+
+		public class EnumeratesMock : ILowlevelDatabaseIODevice
+		{
+			public long JumpPos { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+			public int JumpOffsetSize => throw new NotImplementedException();
+
+			public int CalculateIndexOffset(byte[] key) => throw new NotImplementedException();
+
+			public int CalculateValueOffset(byte[] value) => throw new NotImplementedException();
+
+			public void Dispose() => throw new NotImplementedException();
+
+			public void Flush() => throw new NotImplementedException();
+
+			public long GetPosition() => throw new NotImplementedException();
+
+			public byte[] ReadValue(long dataPosition)
+			{
+				Seek(dataPosition);
+				return Data.First(x => x.Position == dataPosition).Value;
+			}
+
+			public void Reset() => throw new NotImplementedException();
+
+			public void SeekEnd() => throw new NotImplementedException();
+
+			public void WriteIndex(byte[] key, long dataPosition) => throw new NotImplementedException();
+
+			public void WriteJump(long jumpTo) => throw new NotImplementedException();
+
+			public void WriteValue(byte[] value) => throw new NotImplementedException();
+
+			public class SomeData
+			{
+				public int Position { get; set; }
+
+				public bool SoughtTo { get; set; }
+
+				public byte[] Key { get; set; }
+				public byte[] Value { get; set; }
+			}
+
+			public SomeData[] Data = new SomeData[]
+			{
+				new SomeData
+				{
+					Position = 123,
+					Key = Encoding.UTF8.GetBytes("key"),
+					Value = Encoding.UTF8.GetBytes("value")
+				},
+				new SomeData
+				{
+					Position = 456,
+					Key = Encoding.UTF8.GetBytes("key2"),
+					Value = Encoding.UTF8.GetBytes("value2")
+				},
+				new SomeData
+				{
+					Position = 789,
+					Key = Encoding.UTF8.GetBytes("key33"),
+					Value = Encoding.UTF8.GetBytes("value33")
+				},
+			};
+
+			public void Seek(long position)
+			{
+				var d = Data.First(x => x.Position == position);
+
+				d.SoughtTo = true;
+			}
+
+			public NextItemPeek PeekToReturn { get; set; } = NextItemPeek.Index;
+
+			public NextItemPeek Peek()
+			{
+				if (ArrayIndex == Data.Length) return NextItemPeek.EOF;
+
+				if (PeekToReturn == NextItemPeek.Jump)
+				{
+					// we will jmp then back
+					PeekToReturn = NextItemPeek.Index;
+
+					return NextItemPeek.Jump;
+				}
+
+				return PeekToReturn;
+			}
+
+			public int ArrayIndex { get; set; } = 0;
+
+			public LowLevelDatabaseItem ReadIndex()
+			{
+				var data = Data[ArrayIndex];
+
+				var item = new LowLevelDatabaseItem
+				{
+					DataPosition = data.Position,
+					Index = data.Key
+				};
+
+				ArrayIndex++;
+
+				return item;
+			}
+
+			public long SendJump { get; set; }
+
+			public long ReadJump() => SendJump;
+		}
+
+		[Fact]
+		public void EnumeratesProperly()
+		{
+			var em = new EnumeratesMock();
+
+			var diod = new DatabaseIODevice(em);
+
+			var a = diod.ReadNext();
+
+			a.Should()
+				.BeEquivalentTo(new DatabaseItem
+				{
+					DataPosition = 123,
+					Key = Encoding.UTF8.GetBytes("key"),
+					EndOfItems = false
+				});
+
+			var b = diod.ReadNext();
+
+			b.Should()
+				.BeEquivalentTo(new DatabaseItem
+				{
+					DataPosition = 456,
+					Key = Encoding.UTF8.GetBytes("key2"),
+					EndOfItems = false
+				});
+
+			var c = diod.ReadNext();
+
+			c.Should()
+				.BeEquivalentTo(new DatabaseItem
+				{
+					DataPosition = 789,
+					Key = Encoding.UTF8.GetBytes("key33"),
+					EndOfItems = false
+				});
+
+			var d = diod.ReadNext();
+
+			d.EndOfItems
+				.Should()
+				.BeTrue();
+		}
+
+		[Fact]
+		public void ExecutesJumpProperly()
+		{
+			var em = new EnumeratesMock();
+
+			var diod = new DatabaseIODevice(em);
+
+			var a = diod.ReadNext();
+
+			a.Should()
+				.BeEquivalentTo(new DatabaseItem
+				{
+					DataPosition = 123,
+					Key = Encoding.UTF8.GetBytes("key"),
+					EndOfItems = false
+				});
+
+			em.SendJump = 789;
+			em.PeekToReturn = NextItemPeek.Jump;
+			em.ArrayIndex = 2;
+
+			var b = diod.ReadNext();
+
+			b.Should()
+				.BeEquivalentTo(new DatabaseItem
+				{
+					DataPosition = 789,
+					Key = Encoding.UTF8.GetBytes("key33"),
+					EndOfItems = false
+				});
+
+			var d = diod.ReadNext();
+
+			d.EndOfItems
+				.Should()
+				.BeTrue();
+		}
+
+		[Fact]
+		public void ReadsValueFine()
+		{
+			var em = new EnumeratesMock();
+
+			var diod = new DatabaseIODevice(em);
+
+			diod.ReadValue(123)
+				.Should()
+				.BeEquivalentTo(Encoding.UTF8.GetBytes("value"));
+
+			em.Data[0].SoughtTo
+				.Should()
+				.BeTrue();
+		}
 	}
 }

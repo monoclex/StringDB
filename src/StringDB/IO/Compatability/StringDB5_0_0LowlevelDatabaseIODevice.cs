@@ -37,13 +37,24 @@ namespace StringDB.IO.Compatability
 			_stream = stream;
 			_br = new BinaryReader(stream, Encoding.UTF8, leaveStreamOpen);
 			_bw = new BinaryWriter(stream, Encoding.UTF8, leaveStreamOpen);
+
+			if (_stream.Length < 8)
+			{
+				_bw.Write(0L);
+				Seek(0);
+			}
+
+			JumpPos = _br.ReadInt64();
+
+			// we have to inc/dec jumppos since we write the index
+			if (JumpPos > 0) JumpPos--;
 		}
 
 		public long JumpPos { get; set; }
 
 		public long GetPosition() => _stream.Position;
 
-		public void Reset() => Seek(0);
+		public void Reset() => Seek(8);
 
 		public void SeekEnd() => _stream.Seek(0, SeekOrigin.End);
 
@@ -55,9 +66,27 @@ namespace StringDB.IO.Compatability
 			_stream.Flush();
 		}
 
+		// unfortunate :v
+		private int PeekByte()
+		{
+			int peek = -1;
+
+			if (_stream.Length - 1 == _stream.Position)
+			{
+				return peek;
+			}
+
+			peek = _br.ReadByte();
+			_stream.Position--;
+
+			return peek;
+		}
+
 		public NextItemPeek Peek()
 		{
-			switch (_br.PeekChar())
+			var peek = PeekByte();
+
+			switch (peek)
 			{
 				case -1:
 				case Consts.NoIndex:
@@ -75,9 +104,9 @@ namespace StringDB.IO.Compatability
 		{
 			var indexLength = _br.ReadByte();
 			var dataPosition = _br.ReadInt64();
-			var inputType = _br.ReadByte();
 
-			// inputType is for TypeManager stuff in StringDB, we can throw it out of the window
+			var inputType = _br.ReadByte(); // backwards compatability - not used
+											// inputType is for TypeManager stuff in StringDB, we can throw it out of the window
 
 			var index = _br.ReadBytes(indexLength);
 
@@ -90,11 +119,22 @@ namespace StringDB.IO.Compatability
 
 		public byte[] ReadValue(long dataPosition)
 		{
+			var curPos = GetPosition();
+
+			// temporarily go to value to read it, then go back
+			// TODO: make a using statement for this
 			Seek(dataPosition);
+
+			var inputType = _br.ReadByte(); // backwards compatability - not used
+											// inputType is for TypeManager stuff in StringDB, we can throw it out of the window
 
 			var length = ReadLength();
 
-			return _br.ReadBytes(length);
+			var value = _br.ReadBytes(length);
+
+			Seek(curPos);
+
+			return value;
 		}
 
 		public long ReadJump()
@@ -145,6 +185,11 @@ namespace StringDB.IO.Compatability
 
 		public void Dispose()
 		{
+			Seek(0);
+
+			// inc/dec jumppos since we account for the 0xFF in our storage of it
+			_bw.Write(JumpPos + 1);
+
 			Flush();
 
 			_br.Dispose();
