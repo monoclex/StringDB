@@ -60,6 +60,7 @@ namespace StringDB.Fluency
 			switch (version)
 			{
 				case StringDBVersions.v5_0_0: return new StringDB5_0_0LowlevelDatabaseIODevice(stream, leaveStreamOpen);
+				case StringDBVersions.v10_0_0: return new StringDB10_0_0LowlevelDatabaseIODevice(stream, leaveStreamOpen);
 				default: throw new NotSupportedException($"Didn't expect a {version}");
 			}
 		}

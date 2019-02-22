@@ -8,6 +8,16 @@
 		/// <summary>
 		/// StringDB 5.0.0
 		/// </summary>
-		v5_0_0
+		v5_0_0,
+
+		/// <summary>
+		/// StringDB 10.0.0
+		/// </summary>
+		v10_0_0,
+
+		/// <summary>
+		/// The latest file format.
+		/// </summary>
+		Latest = v10_0_0
 	}
 }
