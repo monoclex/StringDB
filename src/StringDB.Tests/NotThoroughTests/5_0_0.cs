@@ -23,10 +23,10 @@ namespace StringDB.Tests.NotThoroughTests
 		{
 			var st = new StringTransformer();
 
-			using (var fs = File.Open("copy.db", FileMode.OpenOrCreate))
+			// using (var fs = File.Open("copy.db", FileMode.OpenOrCreate))
 			using (var ms = new MemoryStream())
 			{
-				using (var lowlevelDBIODevice = new StringDB5_0_0LowlevelDatabaseIODevice(ms))
+				using (var lowlevelDBIODevice = new StringDB5_0_0LowlevelDatabaseIODevice(ms, true))
 				using (var dbIODevice = new DatabaseIODevice(lowlevelDBIODevice))
 				using (var iodb = new IODatabase(dbIODevice))
 				using (var db = new TransformDatabase<byte[], byte[], string, string>(iodb, st, st))
@@ -54,7 +54,7 @@ namespace StringDB.Tests.NotThoroughTests
 				}
 
 				ms.Seek(0, SeekOrigin.Begin);
-				ms.CopyTo(fs);
+				// ms.CopyTo(fs);
 			}
 		}
 	}
