@@ -27,7 +27,6 @@ namespace StringDB.IO.Compatability
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
 
-		// TODO: the first 8 bytes should be the last index chain, or whatever that is
 		public StringDB5_0_0LowlevelDatabaseIODevice
 		(
 			Stream stream,

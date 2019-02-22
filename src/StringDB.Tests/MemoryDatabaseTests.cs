@@ -13,7 +13,6 @@ namespace StringDB.Tests
 		[Fact]
 		public void Works()
 		{
-			// TODO: de-duplicate code but /shrug
 			var mdb = new MemoryDatabase<string, int>();
 
 			mdb.InsertRange(new KeyValuePair<string, int>[]
