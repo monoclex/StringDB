@@ -8,21 +8,21 @@ namespace StringDB.IO
 	/// </summary>
 	public sealed class DatabaseIODevice : IDatabaseIODevice
 	{
-		private readonly ILowlevelDatabaseIODevice _lowlevelDBIOD;
+		public ILowlevelDatabaseIODevice LowLevelDatabaseIODevice { get; }
 
-		public DatabaseIODevice(ILowlevelDatabaseIODevice lowlevelDBIOD) => _lowlevelDBIOD = lowlevelDBIOD;
+		public DatabaseIODevice(ILowlevelDatabaseIODevice lowlevelDBIOD) => LowLevelDatabaseIODevice = lowlevelDBIOD;
 
-		public void Reset() => _lowlevelDBIOD.Reset();
+		public void Reset() => LowLevelDatabaseIODevice.Reset();
 
 		public byte[] ReadValue(long position)
 		{
 			// temporarily go to the position to read the value,
 			// then seek back to the cursor position for reading
-			var curPos = _lowlevelDBIOD.GetPosition();
+			var curPos = LowLevelDatabaseIODevice.GetPosition();
 
-			var value = _lowlevelDBIOD.ReadValue(position);
+			var value = LowLevelDatabaseIODevice.ReadValue(position);
 
-			_lowlevelDBIOD.Seek(curPos);
+			LowLevelDatabaseIODevice.Seek(curPos);
 
 			return value;
 		}
@@ -30,7 +30,7 @@ namespace StringDB.IO
 		public DatabaseItem ReadNext()
 		{
 			// handle EOFs/Jumps
-			var peek = _lowlevelDBIOD.Peek();
+			var peek = LowLevelDatabaseIODevice.Peek();
 
 			ExecuteJumps(ref peek);
 
@@ -44,7 +44,7 @@ namespace StringDB.IO
 
 			// peek HAS to be an Index at this point
 
-			var item = _lowlevelDBIOD.ReadIndex();
+			var item = LowLevelDatabaseIODevice.ReadIndex();
 
 			return new DatabaseItem
 			{
@@ -58,17 +58,17 @@ namespace StringDB.IO
 		{
 			while (peek == NextItemPeek.Jump)
 			{
-				var jump = _lowlevelDBIOD.ReadJump();
-				_lowlevelDBIOD.Seek(jump);
-				peek = _lowlevelDBIOD.Peek();
+				var jump = LowLevelDatabaseIODevice.ReadJump();
+				LowLevelDatabaseIODevice.Seek(jump);
+				peek = LowLevelDatabaseIODevice.Peek();
 			}
 		}
 
 		public void Insert(KeyValuePair<byte[], byte[]>[] items)
 		{
-			_lowlevelDBIOD.SeekEnd();
+			LowLevelDatabaseIODevice.SeekEnd();
 
-			var offset = _lowlevelDBIOD.GetPosition();
+			var offset = LowLevelDatabaseIODevice.GetPosition();
 
 			UpdatePreviousJump(offset);
 
@@ -80,20 +80,20 @@ namespace StringDB.IO
 
 			foreach (var kvp in items)
 			{
-				offset += _lowlevelDBIOD.CalculateIndexOffset(kvp.Key);
+				offset += LowLevelDatabaseIODevice.CalculateIndexOffset(kvp.Key);
 			}
 
 			// the jump offset is important, we will be jumping after
-			offset += _lowlevelDBIOD.JumpOffsetSize;
+			offset += LowLevelDatabaseIODevice.JumpOffsetSize;
 
 			// phase 2: writing each key
 			//			and incrementing the offset by the value
 
 			foreach (var kvp in items)
 			{
-				_lowlevelDBIOD.WriteIndex(kvp.Key, offset);
+				LowLevelDatabaseIODevice.WriteIndex(kvp.Key, offset);
 
-				offset += _lowlevelDBIOD.CalculateValueOffset(kvp.Value);
+				offset += LowLevelDatabaseIODevice.CalculateValueOffset(kvp.Value);
 			}
 
 			WriteJump();
@@ -102,36 +102,36 @@ namespace StringDB.IO
 
 			foreach (var kvp in items)
 			{
-				_lowlevelDBIOD.WriteValue(kvp.Value);
+				LowLevelDatabaseIODevice.WriteValue(kvp.Value);
 			}
 		}
 
 		private void UpdatePreviousJump(long jumpTo)
 		{
-			var currentPosition = _lowlevelDBIOD.GetPosition();
+			var currentPosition = LowLevelDatabaseIODevice.GetPosition();
 
-			if (_lowlevelDBIOD.JumpPos != 0)
+			if (LowLevelDatabaseIODevice.JumpPos != 0)
 			{
 				// goto old jump pos and overwrite it with the current jump pos
-				_lowlevelDBIOD.Seek(_lowlevelDBIOD.JumpPos);
-				_lowlevelDBIOD.WriteJump(jumpTo);
+				LowLevelDatabaseIODevice.Seek(LowLevelDatabaseIODevice.JumpPos);
+				LowLevelDatabaseIODevice.WriteJump(jumpTo);
 			}
 
-			_lowlevelDBIOD.Seek(currentPosition);
+			LowLevelDatabaseIODevice.Seek(currentPosition);
 		}
 
 		private void WriteJump()
 		{
-			var position = _lowlevelDBIOD.GetPosition();
+			var position = LowLevelDatabaseIODevice.GetPosition();
 
-			_lowlevelDBIOD.JumpPos = position;
-			_lowlevelDBIOD.WriteJump(0);
+			LowLevelDatabaseIODevice.JumpPos = position;
+			LowLevelDatabaseIODevice.WriteJump(0);
 		}
 
 		public void Dispose()
 		{
-			_lowlevelDBIOD.Flush();
-			_lowlevelDBIOD.Dispose();
+			LowLevelDatabaseIODevice.Flush();
+			LowLevelDatabaseIODevice.Dispose();
 		}
 	}
 }

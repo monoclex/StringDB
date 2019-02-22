@@ -3,6 +3,7 @@
 using StringDB.Databases;
 using StringDB.Fluency;
 using StringDB.IO;
+using StringDB.IO.Compatability;
 using StringDB.Transformers;
 
 using System;
@@ -67,6 +68,48 @@ namespace StringDB.Tests
 			dbiod
 				.Should()
 				.BeOfType<DatabaseIODevice>();
+		}
+
+		[Fact]
+		public void CreatesStringDB10_0_0LowlevelDatabaseIODevice()
+		{
+			var dbiod = new DatabaseIODeviceBuilder()
+				.UseStringDB(StringDBVersions.v10_0_0, new MemoryStream());
+
+			dbiod
+				.Should()
+				.BeOfType<DatabaseIODevice>();
+
+			((DatabaseIODevice)dbiod)
+				.LowLevelDatabaseIODevice
+				.Should()
+				.BeOfType<StringDB10_0_0LowlevelDatabaseIODevice>();
+		}
+
+		[Fact]
+		public void LatestIsJust10()
+		{
+			var dbiod = new DatabaseIODeviceBuilder()
+				.UseStringDB(StringDBVersions.Latest, new MemoryStream());
+
+			dbiod
+				.Should()
+				.BeOfType<DatabaseIODevice>();
+
+			((DatabaseIODevice)dbiod)
+				.LowLevelDatabaseIODevice
+				.Should()
+				.BeOfType<StringDB10_0_0LowlevelDatabaseIODevice>();
+		}
+
+		[Fact]
+		public void ThrowsOnInvalidStringDBCreation()
+		{
+			Action throws = () => new DatabaseIODeviceBuilder()
+				.UseStringDB((StringDBVersions)1337, new MemoryStream());
+
+			throws.Should()
+				.ThrowExactly<NotSupportedException>();
 		}
 
 		[Fact]
