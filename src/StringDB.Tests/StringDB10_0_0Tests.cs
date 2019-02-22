@@ -1,16 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using FluentAssertions;
 using Moq;
+using StringDB.Fluency;
+using StringDB.IO;
 using StringDB.IO.Compatability;
+using StringDB.Transformers;
 using Xunit;
 
 namespace StringDB.Tests
 {
 	public class StringDB10_0_0Tests
 	{
+		[Fact]
+		public void Test()
+		{
+			using (var db = new DatabaseBuilder()
+				.UseIODatabase((builder) =>
+					builder.UseStringDB(StringDBVersions.v10_0_0, File.Open("test.db", FileMode.OpenOrCreate)))
+				.WithTransform(new StringTransformer(), new StringTransformer()))
+			{
+				db.Insert("test key", "test value");
+				db.Insert("another key", "another value");
+
+				db.EnumerateAggresively(2)
+					.Should()
+					.BeEquivalentTo(new KeyValuePair<string, string>[]
+					{
+						new KeyValuePair<string, string>("test key", "test value"),
+						new KeyValuePair<string, string>("another key", "another value")
+					});
+			}
+		}
+
 		public static (MemoryStream ms, StringDB10_0_0LowlevelDatabaseIODevice io) Generate()
 		{
 			var ms = new MemoryStream();
@@ -55,9 +80,11 @@ namespace StringDB.Tests
 			public void Value()
 			{
 				var (ms, io) = Generate();
-				var value = new byte[16];
+				var value = Enumerable.Repeat<byte>(0xFF, 16).ToArray();
 
 				io.WriteValue(value);
+
+				io.Flush();
 
 				ms.Length
 					.Should()

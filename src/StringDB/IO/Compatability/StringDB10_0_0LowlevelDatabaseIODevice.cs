@@ -57,47 +57,102 @@ namespace StringDB.IO.Compatability
 
 		public NextItemPeek Peek()
 		{
-			throw new NotImplementedException();
+			switch (PeekByte())
+			{
+				case Constants.IndexSeparator:
+					return NextItemPeek.Jump;
+
+				case 0x00:
+					return NextItemPeek.EOF;
+
+				default:
+					return NextItemPeek.Index;
+			}
+		}
+
+		private byte PeekByte()
+		{
+			if (EOF)
+			{
+				return 0x00;
+			}
+
+			var peek = _br.ReadByte();
+			_stream.Position--;
+			return peek;
 		}
 
 		public LowLevelDatabaseItem ReadIndex()
 		{
-			throw new NotImplementedException();
+			if (EOF)
+			{
+				throw new NotSupportedException("Cannot read past EOF.");
+			}
+
+			var length = ReadIndexLength();
+			var dataPosition = ReadDownsizedLong();
+			var index = _br.ReadBytes(length);
+
+			return new LowLevelDatabaseItem
+			{
+				DataPosition = dataPosition,
+				Index = index
+			};
 		}
+
+		private bool EOF => GetPosition() == _stream.Length;
 
 		public byte[] ReadValue(long dataPosition)
 		{
-			throw new NotImplementedException();
+			Seek(dataPosition);
+			var length = ReadVariableLength();
+			return _br.ReadBytes(length);
 		}
 
 		public long ReadJump()
 		{
-			throw new NotImplementedException();
+			var separator = _br.ReadByte();
+
+			if (separator != Constants.IndexSeparator)
+			{
+				throw new NotSupportedException(
+					$"Expected to read a {Constants.IndexSeparator}, but got {separator:x2} instead.");
+			}
+
+			return ReadDownsizedLong();
 		}
 
 		public void WriteIndex(byte[] key, long dataPosition)
 		{
-			throw new NotImplementedException();
+			_bw.Write(GetIndexSize(key.Length));
+			_bw.Write(GetJumpSize(dataPosition));
+			_bw.Write(key);
 		}
 
 		public void WriteValue(byte[] value)
 		{
-			throw new NotImplementedException();
+			WriteVariableLength(value.Length);
+			_bw.Write(value);
 		}
 
 		public void WriteJump(long jumpTo)
 		{
-			throw new NotImplementedException();
+			_bw.Write(Constants.IndexSeparator);
+			_bw.Write(GetJumpSize(jumpTo));
 		}
 
 		public int CalculateIndexOffset(byte[] key)
-		{
-			throw new NotImplementedException();
-		}
+			=> sizeof(byte)
+			+ sizeof(int)
+			+ key.Length;
 
 		public int CalculateValueOffset(byte[] value)
+			=> CalculateVariableSize(value.Length)
+			+ value.Length;
+
+		private long ReadDownsizedLong()
 		{
-			throw new NotImplementedException();
+			return GetPosition() + _br.ReadInt32();
 		}
 
 		private int ReadIndexLength() => _br.ReadByte();
@@ -114,6 +169,32 @@ namespace StringDB.IO.Compatability
 			}
 
 			_bw.Write(length);
+		}
+
+		private byte GetIndexSize(int length)
+		{
+			if (length >= Constants.IndexSeparator)
+			{
+				throw new ArgumentException($"Didn't expect length to be longer than {Constants.IndexSeparator}", nameof(length));
+			}
+
+			return (byte)length;
+		}
+
+		private int GetJumpSize(long jumpTo)
+		{
+			var result = jumpTo - GetPosition();
+
+			if (result > int.MaxValue || result < int.MinValue)
+			{
+				throw new ArgumentException
+				(
+					$"Attempting to jump too far: {jumpTo}, and currently at {GetPosition()} (resulting in a jump of {result})",
+					nameof(result)
+				);
+			}
+
+			return (int)result;
 		}
 
 		// https://wiki.vg/Data_types#VarInt_and_VarLong
@@ -152,9 +233,10 @@ namespace StringDB.IO.Compatability
 
 			do
 			{
-				var read = currentValue & 0b01111111;
+				var read = (byte)(currentValue & 0b01111111);
 
-				currentValue >>= 7;
+				// `>>>` in c#
+				currentValue = (int)((uint)currentValue >> 7);
 
 				if (currentValue != 0)
 				{
@@ -166,7 +248,7 @@ namespace StringDB.IO.Compatability
 			while (currentValue != 0);
 		}
 
-		private int CalculateVariableByteSize(int value)
+		private int CalculateVariableSize(int value)
 		{
 			var result = 0;
 			var currentValue = value;
