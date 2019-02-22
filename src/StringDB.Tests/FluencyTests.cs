@@ -29,7 +29,18 @@ namespace StringDB.Tests
 		public void ReturnsIODatabase()
 		{
 			var db = new DatabaseBuilder()
-				.UseIODatabaseProvider(new StoneVaultIODevice(new MemoryStream()));
+				.UseIODatabase(new StoneVaultIODevice(new MemoryStream()));
+
+			db
+				.Should()
+				.BeOfType<IODatabase>();
+		}
+
+		[Fact]
+		public void ReturnsIODatabase_WhenUsingBuilderPattern()
+		{
+			var db = new DatabaseBuilder()
+				.UseIODatabase(builder => builder.UseStoneVault(new MemoryStream()));
 
 			db
 				.Should()
@@ -45,6 +56,28 @@ namespace StringDB.Tests
 
 			db.Should()
 				.BeOfType<TransformDatabase<string, int, int, string>>();
+		}
+
+		[Fact]
+		public void CreatesStringDB5_0_0LowlevelDatabaseIODevice()
+		{
+			var dbiod = new DatabaseIODeviceBuilder()
+				.UseStringDB(StringDBVersions.v5_0_0, new MemoryStream());
+
+			dbiod
+				.Should()
+				.BeOfType<DatabaseIODevice>();
+		}
+
+		[Fact]
+		public void CreatesStoneVaultIODevice()
+		{
+			var dbiod = new DatabaseIODeviceBuilder()
+				.UseStoneVault(new MemoryStream());
+
+			dbiod
+				.Should()
+				.BeOfType<StoneVaultIODevice>();
 		}
 	}
 }
