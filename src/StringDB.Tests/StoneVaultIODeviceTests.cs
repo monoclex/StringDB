@@ -117,9 +117,9 @@ namespace StringDB.Tests
 			// ensure that the stream seeks back to where we were reading when we read a value
 			var pos = sviod.ReadNext().DataPosition;
 			var value = sviod.ReadValue(pos);
-			var key2_clone = sviod.ReadNext();
+			var cloneOfKey2 = sviod.ReadNext();
 
-			key2_clone
+			cloneOfKey2
 				.Should().BeEquivalentTo(key2);
 		}
 	}

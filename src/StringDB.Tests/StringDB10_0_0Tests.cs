@@ -1,47 +1,78 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FluentAssertions;
+
+using Moq;
+
+using StringDB.IO;
+using StringDB.IO.Compatability;
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using FluentAssertions;
-using Moq;
-using StringDB.Fluency;
-using StringDB.IO;
-using StringDB.IO.Compatability;
-using StringDB.Transformers;
+
 using Xunit;
 
 namespace StringDB.Tests
 {
 	public class StringDB10_0_0Tests
 	{
-		[Fact]
-		public void Test()
-		{
-			using (var db = new DatabaseBuilder()
-				.UseIODatabase((builder) =>
-					builder.UseStringDB(StringDBVersions.v10_0_0, File.Open("test.db", FileMode.OpenOrCreate)))
-				.WithTransform(new StringTransformer(), new StringTransformer()))
-			{
-				db.Insert("test key", "test value");
-				db.Insert("another key", "another value");
-
-				db.EnumerateAggresively(2)
-					.Should()
-					.BeEquivalentTo(new KeyValuePair<string, string>[]
-					{
-						new KeyValuePair<string, string>("test key", "test value"),
-						new KeyValuePair<string, string>("another key", "another value")
-					});
-			}
-		}
-
 		public static (MemoryStream ms, StringDB10_0_0LowlevelDatabaseIODevice io) Generate()
 		{
 			var ms = new MemoryStream();
 			var io = new StringDB10_0_0LowlevelDatabaseIODevice(ms);
 
 			return (ms, io);
+		}
+
+		public class Exceptions
+		{
+			[Fact]
+			public void ThrowsOnVeryLongVariableIntegerRead()
+			{
+				var (ms, io) = Generate();
+				ms.Write(new byte[6] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+
+				Action throws = () => io.ReadValue(8);
+
+				throws.Should()
+					.ThrowExactly<FormatException>();
+			}
+
+			[Fact]
+			public void NotIndexChainOnReadJump()
+			{
+				var (ms, io) = Generate();
+
+				ms.Write(new byte[1] { 0x00 });
+				io.Reset();
+
+				Action throws = () => io.ReadJump();
+
+				throws.Should()
+					.ThrowExactly<NotSupportedException>();
+			}
+
+			[Fact]
+			public void TooLargeJumpRead()
+			{
+				var (ms, io) = Generate();
+
+				Action throws = () => io.WriteJump(0xDEAD_BEEF);
+
+				throws.Should()
+					.ThrowExactly<ArgumentException>();
+			}
+
+			[Fact]
+			public void AtEOF()
+			{
+				var (ms, io) = Generate();
+
+				Action throws = () => io.ReadIndex();
+
+				throws.Should()
+					.ThrowExactly<NotSupportedException>();
+			}
 		}
 
 		public class Write
@@ -57,6 +88,214 @@ namespace StringDB.Tests
 
 					throws.Should()
 						.ThrowExactly<ArgumentException>();
+				}
+
+				[Fact]
+				public void ShortBoi()
+				{
+					var (ms, io) = Generate();
+
+					Action throws = () => io.WriteIndex(new byte[0], 0);
+
+					throws.Should()
+						.ThrowExactly<ArgumentException>();
+				}
+
+				[Fact]
+				public void Format()
+				{
+					var (ms, io) = Generate();
+
+					var val = new byte[] { 0xAA, 0xBB };
+					io.WriteIndex(val, 0xBEEF);
+
+					ms.Position = 8;
+					var data = new byte[io.CalculateIndexOffset(val)];
+					ms.Read(data, 0, data.Length);
+
+					data
+						.Should()
+						.BeEquivalentTo(new byte[]
+						{
+							// index length, as a single byte
+							0x02,
+
+							// data position
+
+							// E6 and not EF because E6 - 10(dec), and
+							// the jump pos is relative to our location;
+							// which is 9 (the index length + 8 beginning bytes)
+							0xE6, 0xBE, 0x00, 0x00,
+
+							//the actual index
+							0xAA, 0xBB
+						});
+				}
+			}
+
+			public class Value
+			{
+				[Fact]
+				public void ShortValue()
+				{
+					var (ms, io) = Generate();
+
+					var val = new byte[] { 0xDE, 0xAD, 0x00, 0xBE, 0xEF };
+					io.WriteValue(val);
+
+					ms.Position = 8;
+					var data = new byte[io.CalculateValueOffset(val)];
+					ms.Read(data, 0, data.Length);
+
+					data
+						.Should()
+						.BeEquivalentTo(new byte[]
+						{
+							// 5 in binary,
+							// leading bit off
+							0b0_0000101,
+
+							0xDE, 0xAD, 0x00, 0xBE, 0xEF
+						});
+				}
+
+				[Fact]
+				public void LongValue()
+				{
+					var (ms, io) = Generate();
+
+					var val = new byte[12345];
+					io.WriteValue(val);
+
+					ms.Position = 8;
+					var data = new byte[io.CalculateValueOffset(val)];
+					ms.Read(data, 0, data.Length);
+
+					data
+						.Should()
+						.BeEquivalentTo(new byte[]
+						{
+							// 12345 in binary is "0011 0000 0011 1001"
+							// this is the variable int format
+							0b1_011_1001, 0b0_110_0000
+						}.Concat(val));
+				}
+			}
+
+			public class Jump
+			{
+				[Fact]
+				public void JumpShortened()
+				{
+					var (ms, io) = Generate();
+
+					io.WriteJump(1337);
+
+					const int pos = 9;
+
+					ms.Position = pos - 1; // to read the index separator
+					var bytes = new byte[4];
+					ms.ReadByte()
+						.Should()
+						.Be(0xFF, "Index separator");
+					ms.Read(bytes, 0, 4);
+
+					BitConverter.ToInt32(bytes)
+						.Should()
+						.Be(1337 - pos);
+				}
+			}
+		}
+
+		public class Read
+		{
+			public class Index
+			{
+				[Fact]
+				public void ReadsIndexOk()
+				{
+					var (ms, io) = Generate();
+
+					io.WriteIndex(Encoding.UTF8.GetBytes("key"), 1337);
+
+					io.Reset();
+
+					var index = io.ReadIndex();
+
+					index.Index
+						.Should().BeEquivalentTo(Encoding.UTF8.GetBytes("key"));
+
+					index.DataPosition
+						.Should().Be(1337);
+				}
+			}
+
+			public class Value
+			{
+				[Fact]
+				public void ReadsValueOk()
+				{
+					var (ms, io) = Generate();
+
+					const int len = 12345;
+
+					io.WriteValue(new byte[len]);
+
+					io.ReadValue(8)
+						.Should()
+						.BeEquivalentTo(Enumerable.Repeat<byte>(0x00, len));
+				}
+			}
+
+			public class Peek
+			{
+				public class EOF
+				{
+					[Fact]
+					public void PeeksEOFFine()
+					{
+						var (ms, io) = Generate();
+
+						io.Peek()
+							.Should().Be(NextItemPeek.EOF);
+
+						ms.Write(new byte[88]);
+						io.Reset();
+
+						io.Peek()
+							.Should().Be(NextItemPeek.EOF);
+					}
+				}
+
+				public class Jump
+				{
+					[Fact]
+					public void PeeksJumpFine()
+					{
+						var (ms, io) = Generate();
+
+						io.WriteJump(1337);
+						io.Reset();
+
+						io.Peek().Should().Be(NextItemPeek.Jump);
+
+						io.ReadJump().Should().Be(1337);
+					}
+				}
+
+				public class PeekElse
+				{
+					[Fact]
+					public void PeeksElse()
+					{
+						var (ms, io) = Generate();
+
+						ms.WriteByte(0x12);
+						io.Reset();
+
+						io.Peek()
+							.Should().Be(NextItemPeek.Index);
+					}
 				}
 			}
 		}

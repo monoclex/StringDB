@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -37,7 +36,6 @@ namespace StringDB.IO.Compatability
 			// we will create it if it doesn't exist
 			_bw.Write(0L);
 			return 0;
-
 		}
 
 		public int JumpOffsetSize { get; } = sizeof(byte) + sizeof(int);
@@ -45,8 +43,11 @@ namespace StringDB.IO.Compatability
 		public long JumpPos { get; set; }
 
 		public long GetPosition() => _stream.Position;
+
 		public void Reset() => Seek(sizeof(long));
+
 		public void Seek(long position) => _stream.Seek(position, SeekOrigin.Begin);
+
 		public void SeekEnd() => _stream.Seek(0, SeekOrigin.End);
 
 		public void Flush()
@@ -150,32 +151,20 @@ namespace StringDB.IO.Compatability
 			=> CalculateVariableSize(value.Length)
 			+ value.Length;
 
-		private long ReadDownsizedLong()
-		{
-			return GetPosition() + _br.ReadInt32();
-		}
+		private long ReadDownsizedLong() => GetPosition() + _br.ReadInt32();
 
 		private int ReadIndexLength() => _br.ReadByte();
-
-		private void WriteIndexLength(byte length)
-		{
-			if (length >= Constants.IndexSeparator)
-			{
-				throw new ArgumentException
-				(
-					$"The index length is too long - must be shorter than {Constants.IndexSeparator}",
-					nameof(length)
-				);
-			}
-
-			_bw.Write(length);
-		}
 
 		private byte GetIndexSize(int length)
 		{
 			if (length >= Constants.IndexSeparator)
 			{
 				throw new ArgumentException($"Didn't expect length to be longer than {Constants.IndexSeparator}", nameof(length));
+			}
+
+			if (length < 1)
+			{
+				throw new ArgumentException($"Didn't expect length shorter than 1", nameof(length));
 			}
 
 			return (byte)length;
@@ -220,7 +209,6 @@ namespace StringDB.IO.Compatability
 				{
 					throw new FormatException("Not expected to read more than 5 numbers.");
 				}
-
 			}
 			while ((current & 0b10000000) != 0);
 

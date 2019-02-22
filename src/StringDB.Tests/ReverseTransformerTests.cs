@@ -30,19 +30,19 @@ namespace StringDB.Tests
 		[Fact]
 		public void Reverses()
 		{
-			const string Because = "The transformation should call the appropriate method in the underlying transformer";
+			const string because = "The transformation should call the appropriate method in the underlying transformer";
 
 			var reverse = new ReverseTransformer<B, A>(new SimpleTransformer());
 
 			reverse.TransformPre(new B { OtherValue = 3 })
 				.Value
 				.Should()
-				.Be(3, Because);
+				.Be(3, because);
 
 			reverse.TransformPost(new A { Value = 4 })
 				.OtherValue
 				.Should()
-				.Be(4, Because);
+				.Be(4, because);
 		}
 
 		[Fact]

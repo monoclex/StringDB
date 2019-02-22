@@ -19,13 +19,13 @@ namespace StringDB.Tests
 			public InsertsProperlyMock()
 			{
 				Stream = new MemoryStream();
-				BW = new BinaryWriter(Stream);
-				BR = new BinaryReader(Stream);
+				BinaryWriter = new BinaryWriter(Stream);
+				BinaryReader = new BinaryReader(Stream);
 			}
 
 			public MemoryStream Stream { get; }
-			public BinaryWriter BW { get; }
-			public BinaryReader BR { get; }
+			public BinaryWriter BinaryWriter { get; }
+			public BinaryReader BinaryReader { get; }
 
 			public void Dispose() => throw new NotImplementedException();
 
@@ -47,11 +47,11 @@ namespace StringDB.Tests
 
 			public void WriteIndex(byte[] key, long dataPosition)
 			{
-				BW.Write(key);
-				BW.Write(dataPosition);
+				BinaryWriter.Write(key);
+				BinaryWriter.Write(dataPosition);
 			}
 
-			public void WriteValue(byte[] value) => BW.Write(value);
+			public void WriteValue(byte[] value) => BinaryWriter.Write(value);
 
 			public int JumpOffsetSize => "JMP_xxxxxxxx".Length;
 
@@ -59,8 +59,8 @@ namespace StringDB.Tests
 
 			public void WriteJump(long jumpTo)
 			{
-				BW.Write(Encoding.UTF8.GetBytes("JMP_"));
-				BW.Write(jumpTo);
+				BinaryWriter.Write(Encoding.UTF8.GetBytes("JMP_"));
+				BinaryWriter.Write(jumpTo);
 			}
 
 			public void Seek(long position) => Stream.Seek(position, SeekOrigin.Begin);
