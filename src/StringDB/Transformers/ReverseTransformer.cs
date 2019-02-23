@@ -23,6 +23,9 @@
 		public TPost TransformPost(TPre post) => _transformer.TransformPre(post);
 	}
 
+	/// <summary>
+	/// Some handy extensions to make using a reverse transformer easier.
+	/// </summary>
 	public static class ReverseTransformerExtensions
 	{
 		/// <summary>

@@ -48,6 +48,9 @@ namespace StringDB
 		void InsertRange(KeyValuePair<TKey, TValue>[] items);
 	}
 
+	/// <summary>
+	/// Handy extensions for a database.
+	/// </summary>
 	public static class DatabaseExtensions
 	{
 		/// <summary>
