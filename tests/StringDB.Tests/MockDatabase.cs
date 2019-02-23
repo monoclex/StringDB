@@ -32,20 +32,20 @@ namespace StringDB.Tests
 				)
 			);
 
-		public IEnumerable<KeyValuePair<string, ILazyLoading<int>>> Evaluate()
+		public IEnumerable<KeyValuePair<string, ILazyLoader<int>>> Evaluate()
 		{
 			foreach (var item in Data)
 			{
-				yield return new KeyValuePair<string, ILazyLoading<int>>(item.Key, item.Value);
+				yield return new KeyValuePair<string, ILazyLoader<int>>(item.Key, item.Value);
 			}
 		}
 
 		public int Get(string key) => Data.First(x => x.Key == key).Value.Load();
 
-		public IEnumerable<ILazyLoading<int>> GetAll(string key) =>
+		public IEnumerable<ILazyLoader<int>> GetAll(string key) =>
 			Data.Where(x => x.Key == key).Select(x => x.Value);
 
-		public IEnumerator<KeyValuePair<string, ILazyLoading<int>>> GetEnumerator() => Evaluate().GetEnumerator();
+		public IEnumerator<KeyValuePair<string, ILazyLoader<int>>> GetEnumerator() => Evaluate().GetEnumerator();
 
 		public void Insert(string key, int value) => Data.Add(new KeyValuePair<string, LazyItem<int>>(key, new LazyItem<int>(value)));
 

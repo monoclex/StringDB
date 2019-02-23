@@ -1,6 +1,6 @@
 ﻿namespace StringDB.Tests
 {
-	public class LazyItem<T> : ILazyLoading<T>
+	public class LazyItem<T> : ILazyLoader<T>
 	{
 		public LazyItem(T value) => Value = value;
 

@@ -272,7 +272,7 @@ namespace StringDB.Tests
 					var jumpPos = new byte[8];
 					ms.Read(jumpPos, 0, jumpPos.Length);
 
-					jumpPos.Should().BeEquivalentTo(BitConverter.GetBytes((long)0xDEADBEEF5));
+					jumpPos.Should().BeEquivalentTo(BitConverter.GetBytes(0xDEADBEEF5));
 				}
 			}
 		}

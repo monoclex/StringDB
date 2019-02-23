@@ -11,11 +11,11 @@ namespace StringDB.Databases
 	/// <typeparam name="TValue">The type of value of the database.</typeparam>
 	public sealed class MemoryDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
 	{
-		private sealed class LazyValueLoader : ILazyLoading<TValue>
+		private sealed class MemoryLazyLoader : ILazyLoader<TValue>
 		{
 			private readonly TValue _value;
 
-			public LazyValueLoader(TValue value) => _value = value;
+			public MemoryLazyLoader(TValue value) => _value = value;
 
 			public TValue Load() => _value;
 		}
@@ -34,14 +34,14 @@ namespace StringDB.Databases
 			=> _data.AddRange(items);
 
 		/// <inheritdoc />
-		protected override IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate()
+		protected override IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate()
 			=> _data
 			.Select
 			(
-				item => new KeyValuePair<TKey, ILazyLoading<TValue>>
+				item => new KeyValuePair<TKey, ILazyLoader<TValue>>
 				(
 					key: item.Key,
-					value: new LazyValueLoader(item.Value)
+					value: new MemoryLazyLoader(item.Value)
 				)
 			);
 

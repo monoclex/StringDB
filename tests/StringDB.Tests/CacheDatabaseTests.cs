@@ -13,11 +13,11 @@ namespace StringDB.Tests
 	{
 		public class MockDatabase : BaseDatabase<string, int>
 		{
-			public class LazyLoader : ILazyLoading<int>
+			public class LazyLoader : ILazyLoader<int>
 			{
-				private readonly ILazyLoading<int> _inner;
+				private readonly ILazyLoader<int> _inner;
 
-				public LazyLoader(ILazyLoading<int> inner) => _inner = inner;
+				public LazyLoader(ILazyLoader<int> inner) => _inner = inner;
 
 				public int Loads { get; set; }
 
@@ -45,7 +45,7 @@ namespace StringDB.Tests
 
 			public int Iterations { get; set; }
 
-			protected override IEnumerable<KeyValuePair<string, ILazyLoading<int>>> Evaluate()
+			protected override IEnumerable<KeyValuePair<string, ILazyLoader<int>>> Evaluate()
 			{
 				Evaluations++;
 
@@ -59,7 +59,7 @@ namespace StringDB.Tests
 
 					Iterations++;
 
-					yield return new KeyValuePair<string, ILazyLoading<int>>(item.Key, _lazyloaderCache[c]);
+					yield return new KeyValuePair<string, ILazyLoader<int>>(item.Key, _lazyloaderCache[c]);
 					c++;
 				}
 			}

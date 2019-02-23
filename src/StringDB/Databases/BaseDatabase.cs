@@ -25,7 +25,7 @@ namespace StringDB.Databases
 		/// Enumerates over all the items in the database.
 		/// </summary>
 		/// <returns>An IEnumerable of KeyValuePairs of keys and their lazy-loading values.</returns>
-		protected abstract IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate();
+		protected abstract IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate();
 
 		/// <inheritdoc />
 		/// <exception cref="T:System.Collections.Generic.KeyNotFoundException">When the key is unable to be found.</exception>
@@ -49,12 +49,12 @@ namespace StringDB.Databases
 		public void Insert(TKey key, TValue value)
 			=> InsertRange(new[] { new KeyValuePair<TKey, TValue>(key, value) });
 
-		public IEnumerable<ILazyLoading<TValue>> GetAll(TKey key)
+		public IEnumerable<ILazyLoader<TValue>> GetAll(TKey key)
 			=> Evaluate()
 			.Where(item => _keyComparer.Equals(key, item.Key))
 			.Select(item => item.Value);
 
-		public IEnumerator<KeyValuePair<TKey, ILazyLoading<TValue>>> GetEnumerator() => Evaluate().GetEnumerator();
+		public IEnumerator<KeyValuePair<TKey, ILazyLoader<TValue>>> GetEnumerator() => Evaluate().GetEnumerator();
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

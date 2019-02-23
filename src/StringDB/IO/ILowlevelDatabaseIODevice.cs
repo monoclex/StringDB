@@ -2,19 +2,6 @@
 
 namespace StringDB.IO
 {
-	public enum NextItemPeek
-	{
-		Index,
-		Jump,
-		EOF
-	}
-
-	public struct LowLevelDatabaseItem
-	{
-		public byte[] Index;
-		public long DataPosition;
-	}
-
 	/// <inheritdoc />
 	/// <summary>
 	/// Used for StringDB based databases.

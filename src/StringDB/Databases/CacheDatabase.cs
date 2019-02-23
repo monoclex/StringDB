@@ -13,14 +13,14 @@ namespace StringDB.Databases
 	/// <typeparam name="TValue">The type of value.</typeparam>
 	public sealed class CacheDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
 	{
-		private sealed class CacheLazyLoader : ILazyLoading<TValue>, IDisposable
+		private sealed class CacheLazyLoader : ILazyLoader<TValue>, IDisposable
 		{
-			private readonly ILazyLoading<TValue> _inner;
+			private readonly ILazyLoader<TValue> _inner;
 
 			private bool _loaded;
 			private TValue _value;
 
-			public CacheLazyLoader(ILazyLoading<TValue> inner)
+			public CacheLazyLoader(ILazyLoader<TValue> inner)
 				=> _inner = inner;
 
 			public TValue Load()
@@ -65,7 +65,7 @@ namespace StringDB.Databases
 			=> _database.InsertRange(items);
 
 		/// <inheritdoc />
-		protected override IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate()
+		protected override IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate()
 		{
 			var counter = 0;
 
@@ -84,7 +84,7 @@ namespace StringDB.Databases
 				}
 
 				var current = _cache[counter];
-				yield return new KeyValuePair<TKey, ILazyLoading<TValue>>(current.Key, current.Value);
+				yield return new KeyValuePair<TKey, ILazyLoader<TValue>>(current.Key, current.Value);
 
 				counter++;
 			}

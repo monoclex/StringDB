@@ -10,12 +10,12 @@ namespace StringDB.Databases
 	/// </summary>
 	public sealed class IODatabase : BaseDatabase<byte[], byte[]>
 	{
-		private sealed class LazyLoadValue : ILazyLoading<byte[]>
+		private sealed class IOLazyLoader : ILazyLoader<byte[]>
 		{
 			private readonly IDatabaseIODevice _dbIODevice;
 			private readonly long _position;
 
-			public LazyLoadValue(IDatabaseIODevice dbIODevice, long position)
+			public IOLazyLoader(IDatabaseIODevice dbIODevice, long position)
 			{
 				_dbIODevice = dbIODevice;
 				_position = position;
@@ -36,7 +36,7 @@ namespace StringDB.Databases
 		public override void InsertRange(KeyValuePair<byte[], byte[]>[] items) => _dbIODevice.Insert(items);
 
 		/// <inheritdoc />
-		protected override IEnumerable<KeyValuePair<byte[], ILazyLoading<byte[]>>> Evaluate()
+		protected override IEnumerable<KeyValuePair<byte[], ILazyLoader<byte[]>>> Evaluate()
 		{
 			_dbIODevice.Reset();
 
@@ -44,10 +44,10 @@ namespace StringDB.Databases
 
 			while (!(dbItem = _dbIODevice.ReadNext()).EndOfItems)
 			{
-				yield return new KeyValuePair<byte[], ILazyLoading<byte[]>>
+				yield return new KeyValuePair<byte[], ILazyLoader<byte[]>>
 				(
 					key: dbItem.Key,
-					value: new LazyLoadValue(_dbIODevice, dbItem.DataPosition)
+					value: new IOLazyLoader(_dbIODevice, dbItem.DataPosition)
 				);
 			}
 		}

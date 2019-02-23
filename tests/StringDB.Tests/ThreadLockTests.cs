@@ -14,7 +14,7 @@ namespace StringDB.Tests
 	{
 		public class MockDatabase : BaseDatabase<int, int>
 		{
-			public class LazyLoader : ILazyLoading<int>
+			public class LazyLoader : ILazyLoader<int>
 			{
 				private readonly MockDatabase _db;
 				private readonly int _load;
@@ -36,12 +36,12 @@ namespace StringDB.Tests
 
 			public override void InsertRange(KeyValuePair<int, int>[] items) => Counter++;
 
-			protected override IEnumerable<KeyValuePair<int, ILazyLoading<int>>> Evaluate()
+			protected override IEnumerable<KeyValuePair<int, ILazyLoader<int>>> Evaluate()
 			{
 				for (var i = 0; i < 10; i++)
 				{
 					Counter++;
-					yield return new KeyValuePair<int, ILazyLoading<int>>(i, new LazyLoader(this, i));
+					yield return new KeyValuePair<int, ILazyLoader<int>>(i, new LazyLoader(this, i));
 				}
 			}
 

@@ -15,14 +15,14 @@ namespace StringDB.Databases
 	public sealed class TransformDatabase<TPreKey, TPreValue, TPostKey, TPostValue>
 		: BaseDatabase<TPostKey, TPostValue>
 	{
-		private sealed class LazyTransformingValue : ILazyLoading<TPostValue>
+		private sealed class TransformLazyLoader : ILazyLoader<TPostValue>
 		{
 			private readonly ITransformer<TPreValue, TPostValue> _transformer;
-			private readonly ILazyLoading<TPreValue> _pre;
+			private readonly ILazyLoader<TPreValue> _pre;
 
-			public LazyTransformingValue
+			public TransformLazyLoader
 			(
-				ILazyLoading<TPreValue> pre,
+				ILazyLoader<TPreValue> pre,
 				ITransformer<TPreValue, TPostValue> transformer
 			)
 			{
@@ -80,14 +80,14 @@ namespace StringDB.Databases
 		}
 
 		/// <inheritdoc />
-		protected override IEnumerable<KeyValuePair<TPostKey, ILazyLoading<TPostValue>>> Evaluate()
+		protected override IEnumerable<KeyValuePair<TPostKey, ILazyLoader<TPostValue>>> Evaluate()
 			=> _db
 			.Select
 			(
-				x => new KeyValuePair<TPostKey, ILazyLoading<TPostValue>>
+				x => new KeyValuePair<TPostKey, ILazyLoader<TPostValue>>
 				(
 					key: _keyTransformer.TransformPre(x.Key),
-					value: new LazyTransformingValue(x.Value, _valueTransformer)
+					value: new TransformLazyLoader(x.Value, _valueTransformer)
 				)
 			);
 

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StringDB\StringDB.csproj" />
+    <ProjectReference Include="..\..\src\StringDB\StringDB.csproj" />
   </ItemGroup>
 
 </Project>

@@ -12,12 +12,12 @@ namespace StringDB.Databases
 	/// <typeparam name="TValue">The type of value.</typeparam>
 	public sealed class ThreadLockDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
 	{
-		private sealed class ThreadLazyLoader : ILazyLoading<TValue>
+		private sealed class ThreadLoackLazyLoader : ILazyLoader<TValue>
 		{
 			private readonly object _lock;
-			private readonly ILazyLoading<TValue> _inner;
+			private readonly ILazyLoader<TValue> _inner;
 
-			public ThreadLazyLoader(object @lock, ILazyLoading<TValue> inner)
+			public ThreadLoackLazyLoader(object @lock, ILazyLoader<TValue> inner)
 			{
 				_lock = @lock;
 				_inner = inner;
@@ -32,11 +32,11 @@ namespace StringDB.Databases
 			}
 		}
 
-		private sealed class ThinDatabaseIEnumeratorWrapper : IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>>, IEnumerator<KeyValuePair<TKey, ILazyLoading<TValue>>>
+		private sealed class ThinDatabaseIEnumeratorWrapper : IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>>, IEnumerator<KeyValuePair<TKey, ILazyLoader<TValue>>>
 		{
 			private readonly object _lock;
-			private readonly IEnumerator<KeyValuePair<TKey, ILazyLoading<TValue>>> _enumerator;
-			private KeyValuePair<TKey, ILazyLoading<TValue>> _current;
+			private readonly IEnumerator<KeyValuePair<TKey, ILazyLoader<TValue>>> _enumerator;
+			private KeyValuePair<TKey, ILazyLoader<TValue>> _current;
 
 			public ThinDatabaseIEnumeratorWrapper(object @lock, IDatabase<TKey, TValue> database)
 			{
@@ -58,10 +58,10 @@ namespace StringDB.Databases
 
 					var current = _enumerator.Current;
 
-					_current = new KeyValuePair<TKey, ILazyLoading<TValue>>
+					_current = new KeyValuePair<TKey, ILazyLoader<TValue>>
 					(
 						current.Key,
-						new ThreadLazyLoader(_lock, current.Value)
+						new ThreadLoackLazyLoader(_lock, current.Value)
 					);
 
 					return true;
@@ -76,7 +76,7 @@ namespace StringDB.Databases
 				}
 			}
 
-			public KeyValuePair<TKey, ILazyLoading<TValue>> Current => _current;
+			public KeyValuePair<TKey, ILazyLoader<TValue>> Current => _current;
 
 			object IEnumerator.Current => Current;
 
@@ -88,7 +88,7 @@ namespace StringDB.Databases
 				}
 			}
 
-			public IEnumerator<KeyValuePair<TKey, ILazyLoading<TValue>>> GetEnumerator() => this;
+			public IEnumerator<KeyValuePair<TKey, ILazyLoader<TValue>>> GetEnumerator() => this;
 
 			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		}
@@ -116,7 +116,7 @@ namespace StringDB.Databases
 		}
 
 		/// <inheritdoc />
-		protected override IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate()
+		protected override IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate()
 			=> new ThinDatabaseIEnumeratorWrapper(_lock, _db);
 
 		/// <inheritdoc />
