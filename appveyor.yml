@@ -8,10 +8,12 @@ branches:
 init:
   - cmd: git config --global core.autocrlf true
 build_script:
+  - cmd: cd "src"
   - cmd: dotnet --version
   - cmd: dotnet restore -v q
-  - cmd: dotnet build -c Release -f net45 "src\StringDB\StringDB.csproj"
-  - cmd: dotnet build -c Release -f netstandard2.0 "src\StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Release -f net45 "StringDB\StringDB.csproj"
+  - cmd: dotnet build -c Release -f netstandard2.0 "StringDB\StringDB.csproj"
+  - cmd: cd ..
 artifacts:
  - path: 'src\StringDB\bin\Release\netstandard2.0\'
    name: StringDB_netstandard2.0
