@@ -1,6 +1,6 @@
 # StringDB
 <p align="center">
-    <img src="https://raw.githubusercontent.com/SirJosh3917/StringDB/master/icons/banner_ad.png" alt="StringDB" />
+    <img src="https://rawcdn.githack.com/SirJosh3917/StringDB/master/icons/banner_ad.png" alt="StringDB" />
 </p>
 
 [![AppVeyor Build Status][badge_appveyor_build_image]][badge_appveyor_build_page]
