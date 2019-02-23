@@ -32,7 +32,7 @@ namespace StringDB.Tests
 					}
 				);
 
-			mdb.ValuesAggresive()
+			mdb.ValuesAggressive()
 				.Should()
 				.BeEquivalentTo
 				(
@@ -59,7 +59,7 @@ namespace StringDB.Tests
 					}
 				);
 
-			mdb.ValuesAggresive()
+			mdb.ValuesAggressive()
 				.Should()
 				.BeEquivalentTo
 				(

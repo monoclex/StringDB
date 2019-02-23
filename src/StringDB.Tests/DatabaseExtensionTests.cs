@@ -59,7 +59,7 @@ namespace StringDB.Tests
 		{
 			var mdb = new MockDatabase();
 
-			var enumerator = mdb.ValuesAggresive().GetEnumerator();
+			var enumerator = mdb.ValuesAggressive().GetEnumerator();
 
 			for (var i = 0; i < mdb.Data.Count; i++)
 			{
@@ -79,7 +79,7 @@ namespace StringDB.Tests
 		{
 			var mdb = new MockDatabase();
 
-			var enumerator = mdb.EnumerateAggresively(4).GetEnumerator();
+			var enumerator = mdb.EnumerateAggressively(4).GetEnumerator();
 			mdb.EnsureNoValuesLoaded();
 
 			for (var i = 1; i <= 3; i++)

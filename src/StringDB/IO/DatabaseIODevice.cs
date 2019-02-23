@@ -14,6 +14,7 @@ namespace StringDB.IO
 
 		public void Reset() => LowLevelDatabaseIODevice.Reset();
 
+		/// <inheritdoc />
 		public byte[] ReadValue(long position)
 		{
 			// temporarily go to the position to read the value,
@@ -27,6 +28,7 @@ namespace StringDB.IO
 			return value;
 		}
 
+		/// <inheritdoc />
 		public DatabaseItem ReadNext()
 		{
 			// handle EOFs/Jumps
@@ -64,6 +66,7 @@ namespace StringDB.IO
 			}
 		}
 
+		/// <inheritdoc />
 		public void Insert(KeyValuePair<byte[], byte[]>[] items)
 		{
 			LowLevelDatabaseIODevice.SeekEnd();

@@ -3,6 +3,14 @@ using System.Collections.Generic;
 
 namespace StringDB.Databases
 {
+	/// <inheritdoc />
+	/// <summary>
+	/// Non-thread-safely caches results and loaded values from a database.
+	/// This could be used in scenarios where you're repeatedly iterating
+	/// over an IODatabase.
+	/// </summary>
+	/// <typeparam name="TKey">The type of key.</typeparam>
+	/// <typeparam name="TValue">The type of value.</typeparam>
 	public sealed class CacheDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
 	{
 		private sealed class CacheLazyLoader : ILazyLoading<TValue>, IDisposable
@@ -40,17 +48,23 @@ namespace StringDB.Databases
 		private readonly List<KeyValuePair<TKey, CacheLazyLoader>> _cache;
 		private readonly IDatabase<TKey, TValue> _database;
 
+		/// <summary>
+		/// Create a new <see cref="CacheDatabase{TKey,TValue}"/>.
+		/// </summary>
+		/// <param name="database">The database to cache.</param>
 		public CacheDatabase(IDatabase<TKey, TValue> database)
 		{
 			_cache = new List<KeyValuePair<TKey, CacheLazyLoader>>();
 			_database = database;
 		}
 
+		/// <inheritdoc />
 		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)
 
 			// we can't add it to our cache otherwise it might change the order of things
 			=> _database.InsertRange(items);
 
+		/// <inheritdoc />
 		protected override IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate()
 		{
 			var counter = 0;
@@ -76,6 +90,7 @@ namespace StringDB.Databases
 			}
 		}
 
+		/// <inheritdoc />
 		public override void Dispose()
 		{
 			foreach (var item in _cache)

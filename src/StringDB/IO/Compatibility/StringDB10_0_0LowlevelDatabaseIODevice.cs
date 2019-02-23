@@ -2,9 +2,9 @@
 using System.IO;
 using System.Text;
 
-namespace StringDB.IO.Compatability
+namespace StringDB.IO.Compatibility
 {
-	public class StringDB10_0_0LowlevelDatabaseIODevice : ILowlevelDatabaseIODevice
+	public sealed class StringDB10_0_0LowlevelDatabaseIODevice : ILowlevelDatabaseIODevice
 	{
 		private static class Constants
 		{
@@ -164,7 +164,7 @@ namespace StringDB.IO.Compatability
 
 			if (length < 1)
 			{
-				throw new ArgumentException($"Didn't expect length shorter than 1", nameof(length));
+				throw new ArgumentException("Didn't expect length shorter than 1", nameof(length));
 			}
 
 			return (byte)length;

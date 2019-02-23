@@ -56,10 +56,10 @@ namespace StringDB
 		public static IEnumerable<ILazyLoading<TValue>> Values<TKey, TValue>(this IDatabase<TKey, TValue> db)
 			=> db.Select(x => x.Value);
 
-		public static IEnumerable<TValue> ValuesAggresive<TKey, TValue>(this IDatabase<TKey, TValue> db)
+		public static IEnumerable<TValue> ValuesAggressive<TKey, TValue>(this IDatabase<TKey, TValue> db)
 			=> db.Values().Select(x => x.Load());
 
-		public static IEnumerable<KeyValuePair<TKey, TValue>> EnumerateAggresively<TKey, TValue>(this IDatabase<TKey, TValue> db, int valueLoadAmount)
+		public static IEnumerable<KeyValuePair<TKey, TValue>> EnumerateAggressively<TKey, TValue>(this IDatabase<TKey, TValue> db, int valueLoadAmount)
 		{
 			var lazyList = new List<KeyValuePair<TKey, ILazyLoading<TValue>>>(valueLoadAmount);
 			var loadedList = new List<KeyValuePair<TKey, TValue>>(valueLoadAmount);

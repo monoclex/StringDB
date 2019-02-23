@@ -47,7 +47,7 @@ namespace StringDB.Databases
 		}
 
 		public void Insert(TKey key, TValue value)
-			=> InsertRange(new KeyValuePair<TKey, TValue>[] { new KeyValuePair<TKey, TValue>(key, value) });
+			=> InsertRange(new[] { new KeyValuePair<TKey, TValue>(key, value) });
 
 		public IEnumerable<ILazyLoading<TValue>> GetAll(TKey key)
 			=> Evaluate()

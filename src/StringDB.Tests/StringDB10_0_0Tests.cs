@@ -3,7 +3,7 @@
 using Moq;
 
 using StringDB.IO;
-using StringDB.IO.Compatability;
+using StringDB.IO.Compatibility;
 
 using System;
 using System.IO;
@@ -14,7 +14,7 @@ using Xunit;
 
 namespace StringDB.Tests
 {
-	public class StringDB10_0_0Tests
+	public static class StringDB10_0_0Tests
 	{
 		public static (MemoryStream ms, StringDB10_0_0LowlevelDatabaseIODevice io) Generate()
 		{
@@ -75,7 +75,7 @@ namespace StringDB.Tests
 			}
 		}
 
-		public class Write
+		public static class Write
 		{
 			public class Index
 			{
@@ -207,7 +207,7 @@ namespace StringDB.Tests
 			}
 		}
 
-		public class Read
+		public static class Read
 		{
 			public class Index
 			{
@@ -247,7 +247,7 @@ namespace StringDB.Tests
 				}
 			}
 
-			public class Peek
+			public static class Peek
 			{
 				public class EOF
 				{

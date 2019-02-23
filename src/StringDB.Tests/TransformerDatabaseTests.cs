@@ -32,7 +32,7 @@ namespace StringDB.Tests
 				new KeyValuePair<int, string>(3, "c"),
 			});
 
-			db.EnumerateAggresively(3)
+			db.EnumerateAggressively(3)
 				.Should()
 				.BeEquivalentTo(new KeyValuePair<string, int>[]
 				{
@@ -63,7 +63,7 @@ namespace StringDB.Tests
 				new KeyValuePair<int, string>(3, "c"),
 			});
 
-			tdb.EnumerateAggresively(3)
+			tdb.EnumerateAggressively(3)
 				.Should()
 				.BeEquivalentTo(new KeyValuePair<int, string>[]
 				{

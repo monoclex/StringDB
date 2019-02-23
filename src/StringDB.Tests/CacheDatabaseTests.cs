@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using FluentAssertions;
+﻿using FluentAssertions;
+
 using StringDB.Databases;
 using StringDB.Fluency;
+
+using System.Collections.Generic;
+
 using Xunit;
 
 namespace StringDB.Tests
@@ -16,10 +17,7 @@ namespace StringDB.Tests
 			{
 				private readonly ILazyLoading<int> _inner;
 
-				public LazyLoader(ILazyLoading<int> inner)
-				{
-					_inner = inner;
-				}
+				public LazyLoader(ILazyLoading<int> inner) => _inner = inner;
 
 				public int Loads { get; set; }
 
@@ -33,10 +31,7 @@ namespace StringDB.Tests
 			private readonly IDatabase<string, int> _db;
 			private List<LazyLoader> _lazyloaderCache = new List<LazyLoader>();
 
-			public MockDatabase(IDatabase<string, int> db)
-			{
-				_db = db;
-			}
+			public MockDatabase(IDatabase<string, int> db) => _db = db;
 
 			public int InsertRanges { get; set; }
 
@@ -69,10 +64,7 @@ namespace StringDB.Tests
 				}
 			}
 
-			public override void Dispose()
-			{
-				_db.Dispose();
-			}
+			public override void Dispose() => _db.Dispose();
 		}
 
 		[Fact]

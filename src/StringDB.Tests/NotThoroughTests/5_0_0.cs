@@ -2,7 +2,7 @@
 
 using StringDB.Databases;
 using StringDB.IO;
-using StringDB.IO.Compatability;
+using StringDB.IO.Compatibility;
 using StringDB.Transformers;
 
 using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace StringDB.Tests.NotThoroughTests
 
 					File.WriteAllBytes("sdb.db", ms.ToArray());
 
-					db.EnumerateAggresively(2)
+					db.EnumerateAggressively(2)
 						.Should()
 						.BeEquivalentTo
 						(

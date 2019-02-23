@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace StringDB.IO.Compatability
+namespace StringDB.IO.Compatibility
 {
 	public sealed class StringDB5_0_0LowlevelDatabaseIODevice : ILowlevelDatabaseIODevice
 	{
@@ -11,7 +11,7 @@ namespace StringDB.IO.Compatability
 		{
 			public const int MaxLength = 0xFE;
 			public const byte DeletedValue = 0xFE;
-			public const byte IndexSeperator = 0xFF;
+			public const byte IndexSeparator = 0xFF;
 			public const byte IsByteValue = 0x01;
 			public const byte IsUShortValue = 0x02;
 			public const byte IsUIntValue = 0x03;
@@ -91,7 +91,7 @@ namespace StringDB.IO.Compatability
 				case Consts.NoIndex:
 					return NextItemPeek.EOF;
 
-				case Consts.IndexSeperator:
+				case Consts.IndexSeparator:
 					return NextItemPeek.Jump;
 
 				default:
@@ -104,8 +104,8 @@ namespace StringDB.IO.Compatability
 			var indexLength = _br.ReadByte();
 			var dataPosition = _br.ReadInt64();
 
-			var inputType = _br.ReadByte(); // backwards compatability - not used
-											// inputType is for TypeManager stuff in StringDB, we can throw it out of the window
+			_br.ReadByte(); // backwards compatibility - not used
+							// inputType is for TypeManager stuff in StringDB, we can throw it out of the window
 
 			var index = _br.ReadBytes(indexLength);
 
@@ -120,8 +120,8 @@ namespace StringDB.IO.Compatability
 		{
 			Seek(dataPosition);
 
-			var inputType = _br.ReadByte(); // backwards compatability - not used
-											// inputType is for TypeManager stuff in StringDB, we can throw it out of the window
+			_br.ReadByte(); // backwards compatibility - not used
+							// inputType is for TypeManager stuff in StringDB, we can throw it out of the window
 
 			var length = ReadLength();
 
@@ -132,14 +132,15 @@ namespace StringDB.IO.Compatability
 
 		public long ReadJump()
 		{
-			var jumpKey = _br.ReadByte();
+			// 0xFF
+			_br.ReadByte();
 
 			return _br.ReadInt64();
 		}
 
 		public void WriteJump(long jumpTo)
 		{
-			_bw.Write(Consts.IndexSeperator);
+			_bw.Write(Consts.IndexSeparator);
 			_bw.Write(jumpTo);
 		}
 

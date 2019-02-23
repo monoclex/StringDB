@@ -96,12 +96,17 @@ namespace StringDB.Databases
 		private readonly IDatabase<TKey, TValue> _db;
 		private readonly object _lock;
 
+		/// <summary>
+		/// Creates a new <see cref="ThreadLockDatabase{TKey,TValue}"/> around a database.
+		/// </summary>
+		/// <param name="database">The database to intelligently lock on.</param>
 		public ThreadLockDatabase(IDatabase<TKey, TValue> database)
 		{
 			_lock = new object();
 			_db = database;
 		}
 
+		/// <inheritdoc />
 		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)
 		{
 			lock (_lock)
@@ -110,9 +115,11 @@ namespace StringDB.Databases
 			}
 		}
 
+		/// <inheritdoc />
 		protected override IEnumerable<KeyValuePair<TKey, ILazyLoading<TValue>>> Evaluate()
 			=> new ThinDatabaseIEnumeratorWrapper(_lock, _db);
 
+		/// <inheritdoc />
 		public override void Dispose()
 		{
 			lock (_lock)

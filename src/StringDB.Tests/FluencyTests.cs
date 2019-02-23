@@ -3,7 +3,7 @@
 using StringDB.Databases;
 using StringDB.Fluency;
 using StringDB.IO;
-using StringDB.IO.Compatability;
+using StringDB.IO.Compatibility;
 using StringDB.Transformers;
 
 using System;

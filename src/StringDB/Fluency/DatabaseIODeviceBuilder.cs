@@ -1,5 +1,5 @@
 ﻿using StringDB.IO;
-using StringDB.IO.Compatability;
+using StringDB.IO.Compatibility;
 
 using System;
 using System.IO;
@@ -9,7 +9,7 @@ namespace StringDB.Fluency
 	/// <summary>
 	/// A class that allows the extensive usage of extensions to create DatabaseIODevices.
 	/// </summary>
-	public class DatabaseIODeviceBuilder
+	public sealed class DatabaseIODeviceBuilder
 	{
 	}
 
