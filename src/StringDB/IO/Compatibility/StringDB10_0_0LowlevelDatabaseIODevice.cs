@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace StringDB.IO.Compatibility
@@ -42,12 +43,16 @@ namespace StringDB.IO.Compatibility
 
 		public long JumpPos { get; set; }
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public long GetPosition() => _stream.Position;
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Reset() => Seek(sizeof(long));
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Seek(long position) => _stream.Seek(position, SeekOrigin.Begin);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void SeekEnd() => _stream.Seek(0, SeekOrigin.End);
 
 		public void Flush()
@@ -107,7 +112,13 @@ namespace StringDB.IO.Compatibility
 		{
 			Seek(dataPosition);
 			var length = ReadVariableLength();
-			return _br.ReadBytes(length);
+
+			if (length > int.MaxValue)
+			{
+				throw new NotSupportedException($"Cannot read a value outside the integer bounds: {length}");
+			}
+
+			return _br.ReadBytes((int)length);
 		}
 
 		public long ReadJump()
@@ -132,23 +143,29 @@ namespace StringDB.IO.Compatibility
 
 		public void WriteValue(byte[] value)
 		{
-			WriteVariableLength(value.Length);
+			WriteVariableLength((uint)value.Length);
 			_bw.Write(value);
 		}
 
 		public void WriteJump(long jumpTo)
 		{
 			_bw.Write(Constants.IndexSeparator);
-			_bw.Write(GetJumpSize(jumpTo));
+
+			// this is to cope with the DatabaseIODevice
+			// it's pretty much a hacky workaround :v
+
+			_bw.Write(jumpTo == 0 ? 0u : GetJumpSize(jumpTo));
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CalculateIndexOffset(byte[] key)
 			=> sizeof(byte)
 			+ sizeof(int)
 			+ key.Length;
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CalculateValueOffset(byte[] value)
-			=> CalculateVariableSize(value.Length)
+			=> CalculateVariableSize((uint)value.Length)
 			+ value.Length;
 
 		private long ReadDownsizedLong() => GetPosition() + _br.ReadInt32();
@@ -170,11 +187,11 @@ namespace StringDB.IO.Compatibility
 			return (byte)length;
 		}
 
-		private int GetJumpSize(long jumpTo)
+		private uint GetJumpSize(long jumpTo)
 		{
 			var result = jumpTo - GetPosition();
 
-			if (result > int.MaxValue || result < int.MinValue)
+			if (result > uint.MaxValue || result < uint.MinValue)
 			{
 				throw new ArgumentException
 				(
@@ -183,23 +200,23 @@ namespace StringDB.IO.Compatibility
 				);
 			}
 
-			return (int)result;
+			return (uint)result;
 		}
 
 		// https://wiki.vg/Data_types#VarInt_and_VarLong
 		// the first bit tells us if we need to read more
 		// the other 7 are used to encode the value
 
-		private int ReadVariableLength()
+		private uint ReadVariableLength()
 		{
 			var bytesRead = 0;
-			var totalResult = 0;
+			var totalResult = 0u;
 			byte current;
 
 			do
 			{
 				current = _br.ReadByte();
-				var value = current & 0b01111111;
+				var value = (uint)(current & 0b01111111);
 
 				totalResult |= value << 7 * bytesRead;
 
@@ -215,7 +232,7 @@ namespace StringDB.IO.Compatibility
 			return totalResult;
 		}
 
-		private void WriteVariableLength(int value)
+		private void WriteVariableLength(uint value)
 		{
 			var currentValue = value;
 
@@ -224,7 +241,7 @@ namespace StringDB.IO.Compatibility
 				var read = (byte)(currentValue & 0b01111111);
 
 				// `>>>` in c#
-				currentValue = (int)((uint)currentValue >> 7);
+				currentValue = currentValue >> 7;
 
 				if (currentValue != 0)
 				{
@@ -236,7 +253,7 @@ namespace StringDB.IO.Compatibility
 			while (currentValue != 0);
 		}
 
-		private int CalculateVariableSize(int value)
+		private int CalculateVariableSize(uint value)
 		{
 			var result = 0;
 			var currentValue = value;
@@ -253,6 +270,11 @@ namespace StringDB.IO.Compatibility
 
 		public void Dispose()
 		{
+			Seek(0);
+
+			// write the jump position at the beginning
+			_bw.Write(JumpPos);
+
 			Flush();
 
 			_bw.Dispose();

@@ -1,6 +1,6 @@
 # StringDB
 <p align="center">
-    <img src="https://raw.githubusercontent.com/SirJosh3917/StringDB/master/icons/banner_ad.png" alt="StringDB" />
+    <img src="https://rawcdn.githack.com/SirJosh3917/StringDB/master/icons/banner_ad.png" alt="StringDB" />
 </p>
 
 [![AppVeyor Build Status][badge_appveyor_build_image]][badge_appveyor_build_page]
@@ -61,5 +61,5 @@ using(var db = StringDatabase.Create())
 [section_understandable]: #understandable-
 [section_simple]: #simple-
 
-[wiki_stringdb_format]: .
-[wiki_tutorials]: .
+[wiki_stringdb_format]: https://github.com/SirJosh3917/StringDB/wiki/StringDB-10.0.0-Format
+[wiki_tutorials]: https://github.com/SirJosh3917/StringDB/wiki/Getting-Started

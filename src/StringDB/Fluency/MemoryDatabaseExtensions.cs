@@ -1,6 +1,7 @@
 ﻿using StringDB.Databases;
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace StringDB.Fluency
 {
@@ -16,6 +17,7 @@ namespace StringDB.Fluency
 		/// <typeparam name="TValue">The type of value to use.</typeparam>
 		/// <param name="builder">The builder.</param>
 		/// <returns>A <see cref="MemoryDatabase{TKey,TValue}"/></returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<TKey, TValue> UseMemoryDatabase<TKey, TValue>
 		(
 			this DatabaseBuilder builder
@@ -30,6 +32,7 @@ namespace StringDB.Fluency
 		/// <param name="builder">The builder.</param>
 		/// <param name="data">The data to prefill it with.</param>
 		/// <returns>A <see cref="MemoryDatabase{TKey,TValue}"/></returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<TKey, TValue> UseMemoryDatabase<TKey, TValue>
 		(
 			this DatabaseBuilder builder,

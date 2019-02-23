@@ -1,5 +1,7 @@
 ﻿using StringDB.Databases;
 
+using System.Runtime.CompilerServices;
+
 namespace StringDB.Fluency
 {
 	/// <summary>
@@ -18,6 +20,7 @@ namespace StringDB.Fluency
 		/// <param name="keyTransformer">A transformer for the keys.</param>
 		/// <param name="valueTransformer">A transformer for the values.</param>
 		/// <returns>A <see cref="TransformDatabase{TPreTransformKey,TPreTransformValue,TPostTransformKey,TPostTransformValue}"/>.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<TPostKey, TPostValue> WithTransform<TPreKey, TPreValue, TPostKey, TPostValue>
 		(
 			this IDatabase<TPreKey, TPreValue> database,

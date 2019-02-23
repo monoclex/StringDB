@@ -1,4 +1,6 @@
-﻿namespace StringDB.Transformers
+﻿using System.Runtime.CompilerServices;
+
+namespace StringDB.Transformers
 {
 	/// <inheritdoc />
 	/// <summary>
@@ -17,12 +19,17 @@
 		public ReverseTransformer(ITransformer<TPre, TPost> transformer) => _transformer = transformer;
 
 		/// <inheritdoc />
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public TPre TransformPre(TPost pre) => _transformer.TransformPost(pre);
 
 		/// <inheritdoc />
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public TPost TransformPost(TPre post) => _transformer.TransformPre(post);
 	}
 
+	/// <summary>
+	/// Some handy extensions to make using a reverse transformer easier.
+	/// </summary>
 	public static class ReverseTransformerExtensions
 	{
 		/// <summary>

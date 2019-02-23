@@ -3,6 +3,7 @@ using StringDB.IO.Compatibility;
 
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace StringDB.Fluency
 {
@@ -22,6 +23,7 @@ namespace StringDB.Fluency
 		/// <param name="stream">The stream to use.</param>
 		/// <param name="leaveStreamOpen">If the stream should be left open after disposing of the <see cref="IDatabaseIODevice"/>.</param>
 		/// <returns>A <see cref="StoneVaultIODevice"/>.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabaseIODevice UseStoneVault
 		(
 			this DatabaseIODeviceBuilder builder,

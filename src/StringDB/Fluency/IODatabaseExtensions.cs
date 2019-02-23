@@ -2,6 +2,7 @@
 using StringDB.IO;
 
 using System;
+using System.Runtime.CompilerServices;
 
 namespace StringDB.Fluency
 {
@@ -16,6 +17,7 @@ namespace StringDB.Fluency
 		/// <param name="builder">The builder.</param>
 		/// <param name="databaseIODevice">The <see cref="IDatabaseIODevice"/> to pass to the IODatabase.</param>
 		/// <returns>An IODatabase.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<byte[], byte[]> UseIODatabase
 		(
 			this DatabaseBuilder builder,
@@ -29,6 +31,7 @@ namespace StringDB.Fluency
 		/// <param name="builder">The builder.</param>
 		/// <param name="databaseIODevice">A delegate that allows for fluent building of an IDatabaseIODevice.</param>
 		/// <returns>An IODatabase.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<byte[], byte[]> UseIODatabase
 		(
 			this DatabaseBuilder builder,
