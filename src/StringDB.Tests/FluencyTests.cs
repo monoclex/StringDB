@@ -71,6 +71,17 @@ namespace StringDB.Tests
 		}
 
 		[Fact]
+		public void ReturnsCacheDatabase()
+		{
+			var db = new DatabaseBuilder()
+				.UseMemoryDatabase<string, int>()
+				.WithCache();
+
+			db.Should()
+				.BeOfType<CacheDatabase<string, int>>();
+		}
+
+		[Fact]
 		public void CreatesStringDB5_0_0LowlevelDatabaseIODevice()
 		{
 			var dbiod = new DatabaseIODeviceBuilder()
