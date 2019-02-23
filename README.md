@@ -13,8 +13,8 @@ StringDB embodies 2 things:
 
  - [Tiny][section_tiny]
  - [Modularity][section_modular]
- 
- In addition to this, the StringDB file format is made to be a very compact yet decently fast way of storing data. [Read up about it on the wiki.][wiki_stringdb_format]
+
+
 
 ## Tiny ![icon_tiny]
 
@@ -46,6 +46,10 @@ StringDB was made to be *modular*. Pick up features and use them as you need the
 
 By chaining database types to extend functionality, you become freed and can easily add and extend functionality without sacrificing cleanliness or testability.
 
+## Addons
+
+StringDB will officially maintain support for integration with some libraries. [View them here.][link_addons]
+
 [icon_banner_ad]: ./icons/banner_ad.png
 [icon_modular]: ./icons/modular.png
 [icon_tiny]: ./icons/tiny.png
@@ -55,6 +59,7 @@ By chaining database types to extend functionality, you become freed and can eas
 [badge_appveyor_build_page]: https://ci.appveyor.com/project/sirjosh3917/stringdb
 
 [link_nuget]: https://www.nuget.org/packages/StringDB
+[link_addons]: ./addons/addons.md
 
 [section_modular]: #modular-
 [section_tiny]: #tiny-

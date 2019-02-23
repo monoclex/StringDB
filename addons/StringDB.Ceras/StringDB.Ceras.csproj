@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <Version>10.0.1</Version>
+    <Authors>SirJosh3917</Authors>
+    <Description>Integrate StringDB with Ceras easier.</Description>
+    <Copyright>MIT License 2019</Copyright>
+    <PackageProjectUrl>https://github.com/SirJosh3917/StringDB/tree/master/src/StringDB.Ceras</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/SirJosh3917/StringDB/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://rawcdn.githack.com/SirJosh3917/StringDB/master/icons/banner_ad.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/SirJosh3917/StringDB/</RepositoryUrl>
+    <PackageTags>Ceras, StringDB</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ceras" Version="3.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\StringDB\StringDB.csproj" />
+  </ItemGroup>
+
+</Project>
