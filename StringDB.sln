@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringDB.Tests", "tests\Str
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringDB.PerformanceNumbers", "src\StringDB.PerformanceNumbers\StringDB.PerformanceNumbers.csproj", "{6EDA5430-F663-487C-9C3C-B9F5D351DD41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringDB.Ceras", "addons\StringDB.Ceras\StringDB.Ceras.csproj", "{549EAB71-DE37-4E34-898F-A53FA5AAD573}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringDB.Ceras", "addons\StringDB.Ceras\StringDB.Ceras.csproj", "{549EAB71-DE37-4E34-898F-A53FA5AAD573}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "addons", "addons", "{C054D45E-5919-486F-A808-AE1835EBCB4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +74,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{549EAB71-DE37-4E34-898F-A53FA5AAD573} = {C054D45E-5919-486F-A808-AE1835EBCB4A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {33F9EBBB-1CB1-4C36-9F2B-D2684AFA8371}
