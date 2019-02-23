@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringDB", "StringDB\StringDB.csproj", "{0D4250DC-5B7F-4DED-9311-C19EC460BD07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringDB", "src\StringDB\StringDB.csproj", "{0D4250DC-5B7F-4DED-9311-C19EC460BD07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringDB.Tests", "StringDB.Tests\StringDB.Tests.csproj", "{4DC0410C-243F-4586-8286-58C8859FAC67}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringDB.Tests", "tests\StringDB.Tests\StringDB.Tests.csproj", "{4DC0410C-243F-4586-8286-58C8859FAC67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
