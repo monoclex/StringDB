@@ -60,6 +60,17 @@ namespace StringDB.Tests
 		}
 
 		[Fact]
+		public void ReturnsThreadLockDatabase()
+		{
+			var db = new DatabaseBuilder()
+				.UseMemoryDatabase<string, int>()
+				.WithThreadLock();
+
+			db.Should()
+				.BeOfType<ThreadLockDatabase<string, int>>();
+		}
+
+		[Fact]
 		public void CreatesStringDB5_0_0LowlevelDatabaseIODevice()
 		{
 			var dbiod = new DatabaseIODeviceBuilder()
