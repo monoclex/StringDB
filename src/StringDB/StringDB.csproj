@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>SirJosh3917</Authors>
     <Company>SirJosh3917</Company>
-    <Description>StringDB is a modular, fluent, and understandable archival key/value pair DB.</Description>
+    <Description>StringDB is a modular, key/value pair DB designed to consume *tiny* amounts of ram &amp; produce *tiny* databases.</Description>
     <Copyright>SirJosh3917</Copyright>
     <PackageLicenseUrl>https://github.com/SirJosh3917/StringDB/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/SirJosh3917/StringDB</PackageProjectUrl>
