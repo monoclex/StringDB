@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace StringDB.IO
@@ -58,6 +59,7 @@ namespace StringDB.IO
 			};
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static DatabaseItem End()
 			=> new DatabaseItem { EndOfItems = true };
 
@@ -122,6 +124,7 @@ namespace StringDB.IO
 			return value;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Reset() => _stream.Seek(0, SeekOrigin.Begin);
 
 		public void Dispose()

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace StringDB.Transformers
 {
@@ -9,9 +10,11 @@ namespace StringDB.Transformers
 	public sealed class StringTransformer : ITransformer<byte[], string>
 	{
 		/// <inheritdoc />
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string TransformPre(byte[] pre) => Encoding.UTF8.GetString(pre);
 
 		/// <inheritdoc />
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public byte[] TransformPost(string post) => Encoding.UTF8.GetBytes(post);
 	}
 }

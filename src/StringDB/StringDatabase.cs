@@ -3,6 +3,7 @@ using StringDB.IO;
 using StringDB.Transformers;
 
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace StringDB
 {
@@ -15,6 +16,7 @@ namespace StringDB
 		/// Creates a string database entirely in memory.
 		/// </summary>
 		/// <returns>A string database, located in memory.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<string, string> Create()
 			=> new DatabaseBuilder()
 				.UseMemoryDatabase<string, string>();
@@ -25,6 +27,7 @@ namespace StringDB
 		/// <param name="stream">The stream to write/read data to/from.</param>
 		/// <param name="leaveStreamOpen">If the stream should be left open when the database is getting disposed.</param>
 		/// <returns>An IODatabase with a transform, using the latest version of StringDB.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<string, string> Create
 		(
 			Stream stream,

@@ -1,5 +1,7 @@
 ﻿using StringDB.Databases;
 
+using System.Runtime.CompilerServices;
+
 namespace StringDB.Fluency
 {
 	/// <summary>
@@ -14,6 +16,7 @@ namespace StringDB.Fluency
 		/// <typeparam name="TValue">The type of value.</typeparam>
 		/// <param name="database">The database to cache results from.</param>
 		/// <returns>A database with caching.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<TKey, TValue> WithCache<TKey, TValue>(this IDatabase<TKey, TValue> database)
 			=> new CacheDatabase<TKey, TValue>(database);
 	}

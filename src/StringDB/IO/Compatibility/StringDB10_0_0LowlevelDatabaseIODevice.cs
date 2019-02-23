@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace StringDB.IO.Compatibility
@@ -42,12 +43,16 @@ namespace StringDB.IO.Compatibility
 
 		public long JumpPos { get; set; }
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public long GetPosition() => _stream.Position;
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Reset() => Seek(sizeof(long));
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Seek(long position) => _stream.Seek(position, SeekOrigin.Begin);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void SeekEnd() => _stream.Seek(0, SeekOrigin.End);
 
 		public void Flush()
@@ -142,11 +147,13 @@ namespace StringDB.IO.Compatibility
 			_bw.Write(GetJumpSize(jumpTo));
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CalculateIndexOffset(byte[] key)
 			=> sizeof(byte)
 			+ sizeof(int)
 			+ key.Length;
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CalculateValueOffset(byte[] value)
 			=> CalculateVariableSize(value.Length)
 			+ value.Length;
