@@ -73,6 +73,20 @@ namespace StringDB.Tests
 				throws.Should()
 					.ThrowExactly<NotSupportedException>();
 			}
+
+			[Fact]
+			public void ReadingVeryLargeVariableInt()
+			{
+				var (ms, io) = Generate();
+
+				Action throws = () => io.ReadValue(8);
+
+				io.Reset();
+				ms.Write(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0b0_1111111, 0x00 });
+
+				throws.Should()
+					.ThrowExactly<NotSupportedException>();
+			}
 		}
 
 		public static class Write

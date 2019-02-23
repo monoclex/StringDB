@@ -112,7 +112,13 @@ namespace StringDB.IO.Compatibility
 		{
 			Seek(dataPosition);
 			var length = ReadVariableLength();
-			return _br.ReadBytes(length);
+
+			if (length > int.MaxValue)
+			{
+				throw new NotSupportedException($"Cannot read a value outside the integer bounds: {length}");
+			}
+
+			return _br.ReadBytes((int)length);
 		}
 
 		public long ReadJump()
@@ -137,7 +143,7 @@ namespace StringDB.IO.Compatibility
 
 		public void WriteValue(byte[] value)
 		{
-			WriteVariableLength(value.Length);
+			WriteVariableLength((uint)value.Length);
 			_bw.Write(value);
 		}
 
@@ -155,7 +161,7 @@ namespace StringDB.IO.Compatibility
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CalculateValueOffset(byte[] value)
-			=> CalculateVariableSize(value.Length)
+			=> CalculateVariableSize((uint)value.Length)
 			+ value.Length;
 
 		private long ReadDownsizedLong() => GetPosition() + _br.ReadInt32();
@@ -197,16 +203,16 @@ namespace StringDB.IO.Compatibility
 		// the first bit tells us if we need to read more
 		// the other 7 are used to encode the value
 
-		private int ReadVariableLength()
+		private uint ReadVariableLength()
 		{
 			var bytesRead = 0;
-			var totalResult = 0;
+			var totalResult = 0u;
 			byte current;
 
 			do
 			{
 				current = _br.ReadByte();
-				var value = current & 0b01111111;
+				var value = (uint)(current & 0b01111111);
 
 				totalResult |= value << 7 * bytesRead;
 
@@ -222,7 +228,7 @@ namespace StringDB.IO.Compatibility
 			return totalResult;
 		}
 
-		private void WriteVariableLength(int value)
+		private void WriteVariableLength(uint value)
 		{
 			var currentValue = value;
 
@@ -231,7 +237,7 @@ namespace StringDB.IO.Compatibility
 				var read = (byte)(currentValue & 0b01111111);
 
 				// `>>>` in c#
-				currentValue = (int)((uint)currentValue >> 7);
+				currentValue = currentValue >> 7;
 
 				if (currentValue != 0)
 				{
@@ -243,7 +249,7 @@ namespace StringDB.IO.Compatibility
 			while (currentValue != 0);
 		}
 
-		private int CalculateVariableSize(int value)
+		private int CalculateVariableSize(uint value)
 		{
 			var result = 0;
 			var currentValue = value;

@@ -61,5 +61,5 @@ using(var db = StringDatabase.Create())
 [section_understandable]: #understandable-
 [section_simple]: #simple-
 
-[wiki_stringdb_format]: .
-[wiki_tutorials]: .
+[wiki_stringdb_format]: https://github.com/SirJosh3917/StringDB/wiki/StringDB-10.0.0-Format
+[wiki_tutorials]: https://github.com/SirJosh3917/StringDB/wiki/Getting-Started
