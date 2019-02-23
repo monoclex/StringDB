@@ -9,19 +9,12 @@
 
 [```Install-Package StringDB```][link_nuget]
 
-StringDB embodies 3 things:
+StringDB embodies 2 things:
 
- - [Modularity][section_modular]
  - [Tiny][section_tiny]
- - [Understandability][section_understandable]
+ - [Modularity][section_modular]
  
  In addition to this, the StringDB file format is made to be a very compact yet decently fast way of storing data. [Read up about it on the wiki.][wiki_stringdb_format]
-
-## Modular ![icon_modular]
-
-StringDB was made to be *modular*. Pick up features and use them as you need them, *when* you need them.
-
-By chaining database types to extend functionality, you become freed and can easily add and extend functionality without sacrificing cleanliness or testability.
 
 ## Tiny ![icon_tiny]
 
@@ -30,7 +23,7 @@ StringDB is *tiny*. Use *tiny* amounts of RAM, and *tiny* amounts of space.
 ### [StringDB 10.0.0 file size after single inserts with 128 length keys and 1024 length values][source_insert_test]
 
 | Inserts | Size (in KB, 1000 bytes) | Absolute Minimum Size Possible | StringDB Overhead Percentage |
-|
+| --- | --- | --- | --- |
 | 1 | 1.172 KB | 1.152 KB | 1.706485% |
 | 50 | 58.208 KB | 57.6 KB | 1.04453% |
 | 100 | 116.408 KB | 115.2 KB | 1.037729% |
@@ -40,24 +33,18 @@ This chart shows the size of a StringDB file after multiple *single inserts*. Ev
 ### [StringDB 10.0.0 file size after an insert range with 128 length keys and 1024 length values][source_insertrange_test]
 
 | Elements in Insert Range | Size (in KB, 1000 bytes) | Absolute Minimum Size Possible | StringDB Overhead Percentage |
-|
+| --- | --- | --- | --- |
 | 1 | 1.172 KB | 1.152 KB | 1.706485% |
 | 50 | 57.963 KB | 57.6 KB | 0.626262% |
 | 100 | 115.913 KB | 115.2 KB | 0.615117% |
 
 This chart shows the size of a StringDB file after a single insert range with the amount of items specified.
 
-## Understandable ![icon_understand]
+## Modular ![icon_modular]
 
-StringDB is easily understandable. Get started in as little as *5 lines*, and apply more knowledge as you go. [See the tutorials.][wiki_tutorials]
+StringDB was made to be *modular*. Pick up features and use them as you need them, *when* you need them.
 
-```cs
-using(var db = StringDatabase.Create())
-{
-    db.Insert("init", "Hello, World!");
-    Console.WriteLine(db.Get("init"));
-}
-```
+By chaining database types to extend functionality, you become freed and can easily add and extend functionality without sacrificing cleanliness or testability.
 
 [icon_banner_ad]: ./icons/banner_ad.png
 [icon_modular]: ./icons/modular.png
