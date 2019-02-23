@@ -150,7 +150,11 @@ namespace StringDB.IO.Compatibility
 		public void WriteJump(long jumpTo)
 		{
 			_bw.Write(Constants.IndexSeparator);
-			_bw.Write(GetJumpSize(jumpTo));
+
+			// this is to cope with the DatabaseIODevice
+			// it's pretty much a hacky workaround :v
+
+			_bw.Write(jumpTo == 0 ? 0u : GetJumpSize(jumpTo));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -183,11 +187,11 @@ namespace StringDB.IO.Compatibility
 			return (byte)length;
 		}
 
-		private int GetJumpSize(long jumpTo)
+		private uint GetJumpSize(long jumpTo)
 		{
 			var result = jumpTo - GetPosition();
 
-			if (result > int.MaxValue || result < int.MinValue)
+			if (result > uint.MaxValue || result < uint.MinValue)
 			{
 				throw new ArgumentException
 				(
@@ -196,7 +200,7 @@ namespace StringDB.IO.Compatibility
 				);
 			}
 
-			return (int)result;
+			return (uint)result;
 		}
 
 		// https://wiki.vg/Data_types#VarInt_and_VarLong
@@ -266,6 +270,11 @@ namespace StringDB.IO.Compatibility
 
 		public void Dispose()
 		{
+			Seek(0);
+
+			// write the jump position at the beginning
+			_bw.Write(JumpPos);
+
 			Flush();
 
 			_bw.Dispose();

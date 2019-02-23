@@ -6,6 +6,7 @@ using StringDB.IO;
 using StringDB.IO.Compatibility;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,10 +17,49 @@ namespace StringDB.Tests
 {
 	public static class StringDB10_0_0Tests
 	{
+		public class IntegrationTests
+		{
+			[Fact]
+			public void IntegrationTest()
+			{
+				if (File.Exists("stringdb.db"))
+					File.Delete("stringdb.db");
+
+				using (var db = StringDatabase.Create(File.Open("stringdb.db", FileMode.OpenOrCreate)))
+				{
+					db.Insert("test", "value");
+					db.Insert("test", "value2");
+					db.Insert("test", "value3");
+
+					db.EnumerateAggressively(3)
+						.Should().BeEquivalentTo(new[]
+						{
+							new KeyValuePair<string, string>("test", "value"),
+							new KeyValuePair<string, string>("test", "value2"),
+							new KeyValuePair<string, string>("test", "value3"),
+						});
+				}
+
+				using (var db = StringDatabase.Create(File.Open("stringdb.db", FileMode.OpenOrCreate)))
+				{
+					db.Insert("test", "value4");
+
+					db.EnumerateAggressively(3)
+						.Should().BeEquivalentTo(new[]
+						{
+							new KeyValuePair<string, string>("test", "value"),
+							new KeyValuePair<string, string>("test", "value2"),
+							new KeyValuePair<string, string>("test", "value3"),
+							new KeyValuePair<string, string>("test", "value4")
+						});
+				}
+			}
+		}
+
 		public static (MemoryStream ms, StringDB10_0_0LowlevelDatabaseIODevice io) Generate()
 		{
 			var ms = new MemoryStream();
-			var io = new StringDB10_0_0LowlevelDatabaseIODevice(ms);
+			var io = new StringDB10_0_0LowlevelDatabaseIODevice(ms, true);
 
 			return (ms, io);
 		}
@@ -57,7 +97,7 @@ namespace StringDB.Tests
 			{
 				var (ms, io) = Generate();
 
-				Action throws = () => io.WriteJump(0xDEAD_BEEF);
+				Action throws = () => io.WriteJump(0xDEAD_BEEF_5);
 
 				throws.Should()
 					.ThrowExactly<ArgumentException>();
@@ -217,6 +257,22 @@ namespace StringDB.Tests
 					BitConverter.ToInt32(bytes)
 						.Should()
 						.Be(1337 - pos);
+				}
+
+				[Fact]
+				public void WritesJumpPosition()
+				{
+					var (ms, io) = Generate();
+
+					io.JumpPos = 0xDEADBEEF5;
+
+					io.Dispose();
+
+					ms.Position = 0;
+					var jumpPos = new byte[8];
+					ms.Read(jumpPos, 0, jumpPos.Length);
+
+					jumpPos.Should().BeEquivalentTo(BitConverter.GetBytes((long)0xDEADBEEF5));
 				}
 			}
 		}
