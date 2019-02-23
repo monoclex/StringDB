@@ -2,7 +2,19 @@
 
   <PropertyGroup>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>latest</LangVersion>
+    <Version>10.0.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>SirJosh3917</Authors>
+    <Company>SirJosh3917</Company>
+    <Description>StringDB is a modular, fluent, and understandable archival key/value pair DB.</Description>
+    <Copyright>SirJosh3917</Copyright>
+    <PackageLicenseUrl>https://github.com/SirJosh3917/StringDB/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/SirJosh3917/StringDB</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/SirJosh3917/StringDB/master/icons/banner_ad.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/SirJosh3917/StringDB</RepositoryUrl>
+    <PackageTags>Database, KeyValue, Archival, Storage, Modular, Fluent</PackageTags>
+    <PackageReleaseNotes>Complete rewrite. It's beautiful now.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
