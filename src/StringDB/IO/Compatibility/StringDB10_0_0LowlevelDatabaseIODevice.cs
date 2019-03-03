@@ -240,8 +240,7 @@ namespace StringDB.IO.Compatibility
 			{
 				var read = (byte)(currentValue & 0b01111111);
 
-				// `>>>` in c#
-				currentValue = currentValue >> 7;
+				currentValue >>= 7;
 
 				if (currentValue != 0)
 				{

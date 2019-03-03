@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace StringDB.PerformanceNumbers
 {
@@ -11,16 +9,16 @@ namespace StringDB.PerformanceNumbers
 	{
 		public void Run()
 		{
-			Action<IDatabase<string, string>, int> insert = (db, c) =>
+			void Insert(IDatabase<string, string> db, int c)
 			{
 				var kvp = GenerateKeyValuePair(128, 1024);
 
 				db.InsertRange(Enumerable.Repeat(kvp, c).ToArray());
-			};
+			}
 
-			var size1 = GetSizeAfter(1, insert);
-			var size2 = GetSizeAfter(50, insert);
-			var size3 = GetSizeAfter(100, insert);
+			var size1 = GetSizeAfter(1, Insert);
+			var size2 = GetSizeAfter(50, Insert);
+			var size3 = GetSizeAfter(100, Insert);
 
 			Console.WriteLine($"Size after 1 elements in an insert range: {size1}");
 			Console.WriteLine($"Size after 50 elements in an insert range: {size2}");
@@ -42,8 +40,8 @@ namespace StringDB.PerformanceNumbers
 
 		public static KeyValuePair<string, string> GenerateKeyValuePair(int keySize, int valueSize)
 		{
-			string key = new string('X', keySize);
-			string value = new string('X', valueSize);
+			var key = new string('X', keySize);
+			var value = new string('X', valueSize);
 
 			return new KeyValuePair<string, string>(key, value);
 		}

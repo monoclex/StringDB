@@ -68,7 +68,7 @@ namespace StringDB.IO.Compatibility
 		// unfortunate :v
 		private int PeekByte()
 		{
-			int peek = -1;
+			var peek = -1;
 
 			if (_stream.Length - 1 == _stream.Position)
 			{

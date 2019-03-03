@@ -57,7 +57,7 @@ namespace StringDB.Tests
 
 			var db = mockdb.WithThreadLock();
 
-			List<Task> tasks = new List<Task>();
+			var tasks = new List<Task>();
 
 			for (var i = 0; i < 10_000; i++)
 			{
@@ -70,7 +70,7 @@ namespace StringDB.Tests
 				}));
 			}
 
-			await Task.WhenAll(tasks);
+			await Task.WhenAll(tasks).ConfigureAwait(false);
 
 			// 100 inserts, 10,000 threads
 			// 100 * 10,000 = 1,000,000
@@ -87,14 +87,14 @@ namespace StringDB.Tests
 
 			var db = mockdb.WithThreadLock();
 
-			List<Task> tasks = new List<Task>();
+			var tasks = new List<Task>();
 
 			for (var i = 0; i < 10_000; i++)
 			{
 				tasks.Add(Task.Run(action: () => Parallel.ForEach(db, j => j.Value.Load())));
 			}
 
-			await Task.WhenAll(tasks);
+			await Task.WhenAll(tasks).ConfigureAwait(false);
 
 			// 10,000 threads, 10 items each with 1 load
 			// 10,000 * (10 * (1 + 1)) = 10,000 * 20 = 200,000

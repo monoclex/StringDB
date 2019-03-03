@@ -1,9 +1,9 @@
-﻿using System;
+﻿using BenchmarkDotNet.Attributes;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using BenchmarkDotNet.Attributes;
 
 namespace StringDB.PerformanceNumbers
 {
@@ -14,6 +14,7 @@ namespace StringDB.PerformanceNumbers
 	 *	|    BenchmarkYield |  90.93 ns | 0.8003 ns | 0.7094 ns |  1.00 |    0.00 |
 	 *	| CustomIEnumerator |  77.81 ns | 1.1261 ns | 1.0534 ns |  0.86 |    0.01 |
 	 */
+
 	public class YieldOrLinq
 	{
 		public void PrintResults()
@@ -102,13 +103,15 @@ namespace StringDB.PerformanceNumbers
 		{
 			while (_enumerator.MoveNext())
 			{
-				var current = _enumerator.Current;
+				var (key, value) = _enumerator.Current;
 
-				if (current.Item2 == 2)
+				if (value != 2)
 				{
-					Current = current.Item1;
-					return true;
+					continue;
 				}
+
+				Current = key;
+				return true;
 			}
 
 			return false;
@@ -120,19 +123,10 @@ namespace StringDB.PerformanceNumbers
 
 		object IEnumerator.Current => Current;
 
-		public void Dispose()
-		{
-			_enumerator.Dispose();
-		}
+		public void Dispose() => _enumerator.Dispose();
 
-		public IEnumerator<int> GetEnumerator()
-		{
-			return this;
-		}
+		public IEnumerator<int> GetEnumerator() => this;
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }

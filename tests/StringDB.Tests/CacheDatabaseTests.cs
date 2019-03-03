@@ -29,7 +29,7 @@ namespace StringDB.Tests
 			}
 
 			private readonly IDatabase<string, int> _db;
-			private List<LazyLoader> _lazyloaderCache = new List<LazyLoader>();
+			private readonly List<LazyLoader> _lazyLoaderCache = new List<LazyLoader>();
 
 			public MockDatabase(IDatabase<string, int> db) => _db = db;
 
@@ -52,14 +52,14 @@ namespace StringDB.Tests
 				var c = 0;
 				foreach (var item in _db)
 				{
-					if (_lazyloaderCache.Count <= c)
+					if (_lazyLoaderCache.Count <= c)
 					{
-						_lazyloaderCache.Add(new LazyLoader(item.Value));
+						_lazyLoaderCache.Add(new LazyLoader(item.Value));
 					}
 
 					Iterations++;
 
-					yield return new KeyValuePair<string, ILazyLoader<int>>(item.Key, _lazyloaderCache[c]);
+					yield return new KeyValuePair<string, ILazyLoader<int>>(item.Key, _lazyLoaderCache[c]);
 					c++;
 				}
 			}

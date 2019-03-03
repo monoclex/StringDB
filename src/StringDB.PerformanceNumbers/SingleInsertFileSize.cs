@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Text;
 
 namespace StringDB.PerformanceNumbers
 {
@@ -10,11 +7,11 @@ namespace StringDB.PerformanceNumbers
 	{
 		public void Run()
 		{
-			Action<IDatabase<string, string>> insert = (db) => DoWrite(db, 128, 1024);
+			void Insert(IDatabase<string, string> db) => DoWrite(db, 128, 1024);
 
-			var size1 = GetSizeAfter(1, insert);
-			var size2 = GetSizeAfter(50, insert);
-			var size3 = GetSizeAfter(100, insert);
+			var size1 = GetSizeAfter(1, Insert);
+			var size2 = GetSizeAfter(50, Insert);
+			var size3 = GetSizeAfter(100, Insert);
 
 			Console.WriteLine($"Size after 1 single insert: {size1}");
 			Console.WriteLine($"Size after 50 single inserts: {size2}");
@@ -33,15 +30,14 @@ namespace StringDB.PerformanceNumbers
 					action(db);
 				}
 
-
 				return ms.Length;
 			}
 		}
 
 		public static void DoWrite(IDatabase<string, string> db, int keySize, int valueSize)
 		{
-			string key = new string('X', keySize);
-			string value = new string('X', valueSize);
+			var key = new string('X', keySize);
+			var value = new string('X', valueSize);
 
 			db.Insert(key, value);
 		}
