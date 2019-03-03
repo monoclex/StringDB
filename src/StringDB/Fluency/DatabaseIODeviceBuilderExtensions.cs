@@ -1,4 +1,6 @@
-﻿using StringDB.IO;
+﻿using JetBrains.Annotations;
+
+using StringDB.IO;
 using StringDB.IO.Compatibility;
 
 using System;
@@ -7,6 +9,10 @@ using System.Runtime.CompilerServices;
 
 namespace StringDB.Fluency
 {
+	/// <summary>
+	/// Fluent extensions for a <see cref="DatabaseIODeviceBuilder"/>
+	/// </summary>
+	[PublicAPI]
 	public static class DatabaseIODeviceBuilderExtensions
 	{
 		/// <summary>
@@ -16,11 +22,12 @@ namespace StringDB.Fluency
 		/// <param name="stream">The stream to use.</param>
 		/// <param name="leaveStreamOpen">If the stream should be left open after disposing of the <see cref="IDatabaseIODevice"/>.</param>
 		/// <returns>A <see cref="StoneVaultIODevice"/>.</returns>
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabaseIODevice UseStoneVault
 		(
-			this DatabaseIODeviceBuilder builder,
-			Stream stream,
+			[CanBeNull] this DatabaseIODeviceBuilder builder,
+			[NotNull] Stream stream,
 			bool leaveStreamOpen = false
 		)
 			=> new StoneVaultIODevice(stream, leaveStreamOpen);
@@ -33,11 +40,13 @@ namespace StringDB.Fluency
 		/// <param name="stream">The stream to use.</param>
 		/// <param name="leaveStreamOpen">If the stream should be left open after disposing of the <see cref="IDatabaseIODevice"/>.</param>
 		/// <returns>An <see cref="IDatabaseIODevice"/></returns>
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabaseIODevice UseStringDB
 		(
-			this DatabaseIODeviceBuilder builder,
+			[CanBeNull] this DatabaseIODeviceBuilder builder,
 			StringDBVersions version,
-			Stream stream,
+			[NotNull] Stream stream,
 			bool leaveStreamOpen = false
 		)
 			=> new DatabaseIODevice
@@ -45,10 +54,11 @@ namespace StringDB.Fluency
 				version.UseVersion(stream, leaveStreamOpen)
 			);
 
+		[NotNull]
 		private static ILowlevelDatabaseIODevice UseVersion
 		(
 			this StringDBVersions version,
-			Stream stream,
+			[NotNull] Stream stream,
 			bool leaveStreamOpen = false
 		)
 		{

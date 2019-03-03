@@ -1,8 +1,11 @@
-﻿namespace StringDB.IO
+﻿using JetBrains.Annotations;
+
+namespace StringDB.IO
 {
 	/// <summary>
 	/// The versions of StringDB that can be used.
 	/// </summary>
+	[PublicAPI]
 	public enum StringDBVersions
 	{
 		/// <summary>

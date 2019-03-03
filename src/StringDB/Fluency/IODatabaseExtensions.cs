@@ -1,4 +1,6 @@
-﻿using StringDB.Databases;
+﻿using JetBrains.Annotations;
+
+using StringDB.Databases;
 using StringDB.IO;
 
 using System;
@@ -9,6 +11,7 @@ namespace StringDB.Fluency
 	/// <summary>
 	/// Fluent extensions for an <see cref="IODatabase"/>
 	/// </summary>
+	[PublicAPI]
 	public static class IODatabaseExtensions
 	{
 		/// <summary>
@@ -17,11 +20,12 @@ namespace StringDB.Fluency
 		/// <param name="builder">The builder.</param>
 		/// <param name="databaseIODevice">The <see cref="IDatabaseIODevice"/> to pass to the IODatabase.</param>
 		/// <returns>An IODatabase.</returns>
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<byte[], byte[]> UseIODatabase
 		(
-			this DatabaseBuilder builder,
-			IDatabaseIODevice databaseIODevice
+			[CanBeNull] this DatabaseBuilder builder,
+			[NotNull] IDatabaseIODevice databaseIODevice
 		)
 			=> new IODatabase(databaseIODevice);
 
@@ -31,12 +35,13 @@ namespace StringDB.Fluency
 		/// <param name="builder">The builder.</param>
 		/// <param name="databaseIODevice">A delegate that allows for fluent building of an IDatabaseIODevice.</param>
 		/// <returns>An IODatabase.</returns>
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<byte[], byte[]> UseIODatabase
 		(
-			this DatabaseBuilder builder,
-			Func<DatabaseIODeviceBuilder, IDatabaseIODevice> databaseIODevice
+			[CanBeNull] this DatabaseBuilder builder,
+			[NotNull] Func<DatabaseIODeviceBuilder, IDatabaseIODevice> databaseIODevice
 		)
-			=> new IODatabase(databaseIODevice(new DatabaseIODeviceBuilder()));
+			=> builder.UseIODatabase(databaseIODevice(new DatabaseIODeviceBuilder()));
 	}
 }

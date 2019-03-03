@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using JetBrains.Annotations;
+
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace StringDB.Transformers
@@ -7,6 +9,7 @@ namespace StringDB.Transformers
 	/// <summary>
 	/// Transforms a <see cref="T:System.Byte" /> into a <see cref="T:System.String" />.
 	/// </summary>
+	[PublicAPI]
 	public sealed class StringTransformer : ITransformer<byte[], string>
 	{
 		/// <inheritdoc />

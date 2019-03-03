@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using JetBrains.Annotations;
+
+using System.Runtime.CompilerServices;
 
 namespace StringDB.Transformers
 {
@@ -8,6 +10,7 @@ namespace StringDB.Transformers
 	/// </summary>
 	/// <typeparam name="TPost">Previously the TPre.</typeparam>
 	/// <typeparam name="TPre">Previously the TPost.</typeparam>
+	[PublicAPI]
 	public sealed class ReverseTransformer<TPost, TPre> : ITransformer<TPost, TPre>
 	{
 		private readonly ITransformer<TPre, TPost> _transformer;

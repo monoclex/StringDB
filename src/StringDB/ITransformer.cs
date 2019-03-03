@@ -1,10 +1,13 @@
-﻿namespace StringDB
+﻿using JetBrains.Annotations;
+
+namespace StringDB
 {
 	/// <summary>
 	/// Transforms an item.
 	/// </summary>
 	/// <typeparam name="TPre">The type of item before the transform.</typeparam>
 	/// <typeparam name="TPost">The type of item after the transform.</typeparam>
+	[PublicAPI]
 	public interface ITransformer<TPre, TPost>
 	{
 		/// <summary>
@@ -12,13 +15,13 @@
 		/// </summary>
 		/// <param name="pre">The <typeparamref name="TPre"/> to transform.</param>
 		/// <returns>A <typeparamref name="TPost"/>.</returns>
-		TPost TransformPre(TPre pre);
+		[NotNull] TPost TransformPre([NotNull] TPre pre);
 
 		/// <summary>
 		/// Transforms a <typeparamref name="TPost"/> into a <typeparamref name="TPre"/>
 		/// </summary>
 		/// <param name="post">The <typeparamref name="TPost"/> to transform.</param>
 		/// <returns>A <typeparamref name="TPre"/>.</returns>
-		TPre TransformPost(TPost post);
+		[NotNull] TPre TransformPost([NotNull] TPost post);
 	}
 }

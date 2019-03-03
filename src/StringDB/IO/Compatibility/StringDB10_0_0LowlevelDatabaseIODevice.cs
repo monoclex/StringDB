@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+
+using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -16,7 +18,11 @@ namespace StringDB.IO.Compatibility
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
 
-		public StringDB10_0_0LowlevelDatabaseIODevice(Stream stream, bool leaveStreamOpen = false)
+		public StringDB10_0_0LowlevelDatabaseIODevice
+		(
+			[NotNull] Stream stream,
+			bool leaveStreamOpen = false
+		)
 		{
 			_stream = stream;
 			_br = new BinaryReader(_stream, Encoding.UTF8, leaveStreamOpen);

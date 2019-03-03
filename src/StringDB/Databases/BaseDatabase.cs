@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using JetBrains.Annotations;
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,6 +13,7 @@ namespace StringDB.Databases
 	/// </summary>
 	/// <typeparam name="TKey">The type of key of the database.</typeparam>
 	/// <typeparam name="TValue">The type of value of the database.</typeparam>
+	[PublicAPI]
 	public abstract class BaseDatabase<TKey, TValue> : IDatabase<TKey, TValue>
 	{
 		private readonly EqualityComparer<TKey> _keyComparer;
@@ -25,14 +28,22 @@ namespace StringDB.Databases
 		/// Enumerates over all the items in the database.
 		/// </summary>
 		/// <returns>An IEnumerable of KeyValuePairs of keys and their lazy-loading values.</returns>
+		[NotNull]
 		protected abstract IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate();
 
 		/// <inheritdoc />
 		/// <exception cref="T:System.Collections.Generic.KeyNotFoundException">When the key is unable to be found.</exception>
 		public TValue Get(TKey key)
-			=> TryGet(key, out var value)
-			? value
-			: throw new KeyNotFoundException($"Unable to find {key} in the database.");
+		{
+			var success = TryGet(key, out var value);
+
+			if (success && !EqualityComparer<TValue>.Equals(value, null))
+			{
+				return value;
+			}
+
+			throw new KeyNotFoundException($"Unable to find {key} in the database.");
+		}
 
 		public bool TryGet(TKey key, out TValue value)
 		{

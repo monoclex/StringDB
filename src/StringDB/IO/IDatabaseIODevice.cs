@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+
+using System;
 using System.Collections.Generic;
 
 namespace StringDB.IO
@@ -6,6 +8,7 @@ namespace StringDB.IO
 	/// <summary>
 	/// An IO Device for a database.
 	/// </summary>
+	[PublicAPI]
 	public interface IDatabaseIODevice : IDisposable
 	{
 		/// <summary>
@@ -25,12 +28,13 @@ namespace StringDB.IO
 		/// </summary>
 		/// <param name="position">The position to begin reading the value from.</param>
 		/// <returns>A byte[] with the data.</returns>
+		[NotNull]
 		byte[] ReadValue(long position);
 
 		/// <summary>
 		/// Inserts data into the database.
 		/// </summary>
 		/// <param name="items">The items to insert.</param>
-		void Insert(KeyValuePair<byte[], byte[]>[] items);
+		void Insert([NotNull] KeyValuePair<byte[], byte[]>[] items);
 	}
 }

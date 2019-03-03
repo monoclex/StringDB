@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+
+using System;
 
 namespace StringDB.IO
 {
@@ -6,6 +8,7 @@ namespace StringDB.IO
 	/// <summary>
 	/// Used for StringDB based databases.
 	/// </summary>
+	[PublicAPI]
 	public interface ILowlevelDatabaseIODevice : IDisposable
 	{
 		long JumpPos { get; set; }
@@ -24,19 +27,20 @@ namespace StringDB.IO
 
 		LowLevelDatabaseItem ReadIndex();
 
+		[NotNull]
 		byte[] ReadValue(long dataPosition);
 
 		long ReadJump();
 
 		void WriteJump(long jumpTo);
 
-		void WriteIndex(byte[] key, long dataPosition);
+		void WriteIndex([NotNull] byte[] key, long dataPosition);
 
-		void WriteValue(byte[] value);
+		void WriteValue([NotNull] byte[] value);
 
-		int CalculateIndexOffset(byte[] key);
+		int CalculateIndexOffset([NotNull] byte[] key);
 
-		int CalculateValueOffset(byte[] value);
+		int CalculateValueOffset([NotNull] byte[] value);
 
 		int JumpOffsetSize { get; }
 	}

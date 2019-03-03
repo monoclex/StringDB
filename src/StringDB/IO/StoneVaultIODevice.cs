@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using JetBrains.Annotations;
+
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -9,6 +11,7 @@ namespace StringDB.IO
 	/// <summary>
 	/// An IDatabaseIODevice that implements the StoneVault protocol.
 	/// </summary>
+	[PublicAPI]
 	public sealed class StoneVaultIODevice : IDatabaseIODevice
 	{
 		private static class Consts

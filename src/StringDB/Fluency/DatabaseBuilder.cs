@@ -1,8 +1,11 @@
-﻿namespace StringDB.Fluency
+﻿using JetBrains.Annotations;
+
+namespace StringDB.Fluency
 {
 	/// <summary>
 	/// A class that allows the extensive usage of extensions to create databases.
 	/// </summary>
+	[PublicAPI]
 	public sealed class DatabaseBuilder
 	{
 	}

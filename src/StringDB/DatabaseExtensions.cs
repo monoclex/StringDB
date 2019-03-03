@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using JetBrains.Annotations;
+
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace StringDB
 {
 	/// <summary>
 	/// Handy extensions for a database.
 	/// </summary>
+	[PublicAPI]
 	public static class DatabaseExtensions
 	{
 		/// <summary>
@@ -15,7 +19,11 @@ namespace StringDB
 		/// <typeparam name="TValue">The type of value.</typeparam>
 		/// <param name="db">The database to fetch all the keys from.</param>
 		/// <returns>A <see cref="IEnumerable{T}"/> of keys.</returns>
-		public static IEnumerable<TKey> Keys<TKey, TValue>(this IDatabase<TKey, TValue> db)
+		[NotNull, MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<TKey> Keys<TKey, TValue>
+		(
+			[NotNull] this IDatabase<TKey, TValue> db
+		)
 			=> db.Select(x => x.Key);
 
 		/// <summary>
@@ -25,7 +33,11 @@ namespace StringDB
 		/// <typeparam name="TValue">The type of value.</typeparam>
 		/// <param name="db">The database to fetch all the values from.</param>
 		/// <returns>A <see cref="IEnumerable{T}"/> of values.</returns>
-		public static IEnumerable<ILazyLoader<TValue>> Values<TKey, TValue>(this IDatabase<TKey, TValue> db)
+		[NotNull, MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<ILazyLoader<TValue>> Values<TKey, TValue>
+		(
+			[NotNull] this IDatabase<TKey, TValue> db
+		)
 			=> db.Select(x => x.Value);
 
 		/// <summary>
@@ -35,7 +47,11 @@ namespace StringDB
 		/// <typeparam name="TValue">The type of value.</typeparam>
 		/// <param name="db">The database to fetch all the values from.</param>
 		/// <returns>A <see cref="IEnumerable{T}"/> of loaded values.</returns>
-		public static IEnumerable<TValue> ValuesAggressive<TKey, TValue>(this IDatabase<TKey, TValue> db)
+		[NotNull, MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<TValue> ValuesAggressive<TKey, TValue>
+		(
+			[NotNull] this IDatabase<TKey, TValue> db
+		)
 			=> db.Values().Select(x => x.Load());
 
 		/// <summary>
@@ -46,7 +62,12 @@ namespace StringDB
 		/// <param name="db">The database to fetch all the values from.</param>
 		/// <param name="valueLoadAmount">The amount of values to load at a time.</param>
 		/// <returns>An <see cref="IEnumerator{T}"/> of <see cref="KeyValuePair{TKey,TValue}"/>s with the data.</returns>
-		public static IEnumerable<KeyValuePair<TKey, TValue>> EnumerateAggressively<TKey, TValue>(this IDatabase<TKey, TValue> db, int valueLoadAmount)
+		[NotNull]
+		public static IEnumerable<KeyValuePair<TKey, TValue>> EnumerateAggressively<TKey, TValue>
+		(
+			[NotNull] this IDatabase<TKey, TValue> db,
+			int valueLoadAmount
+		)
 		{
 			var lazyList = new List<KeyValuePair<TKey, ILazyLoader<TValue>>>(valueLoadAmount);
 			var loadedList = new List<KeyValuePair<TKey, TValue>>(valueLoadAmount);
@@ -79,8 +100,8 @@ namespace StringDB
 		private static int Pool<TKey, TValue>
 		(
 			int amount,
-			IEnumerator<KeyValuePair<TKey, ILazyLoader<TValue>>> enumerator,
-			ref List<KeyValuePair<TKey, ILazyLoader<TValue>>> lazyList
+			[NotNull] IEnumerator<KeyValuePair<TKey, ILazyLoader<TValue>>> enumerator,
+			[NotNull] ref List<KeyValuePair<TKey, ILazyLoader<TValue>>> lazyList
 		)
 		{
 			var fillAmount = 0;

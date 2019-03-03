@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using JetBrains.Annotations;
+
+using System.Collections.Generic;
 using System.Linq;
 
 namespace StringDB.Databases
@@ -9,13 +11,14 @@ namespace StringDB.Databases
 	/// </summary>
 	/// <typeparam name="TKey">The type of key of the database.</typeparam>
 	/// <typeparam name="TValue">The type of value of the database.</typeparam>
+	[PublicAPI]
 	public sealed class MemoryDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
 	{
 		private sealed class MemoryLazyLoader : ILazyLoader<TValue>
 		{
 			private readonly TValue _value;
 
-			public MemoryLazyLoader(TValue value) => _value = value;
+			public MemoryLazyLoader([NotNull] TValue value) => _value = value;
 
 			public TValue Load() => _value;
 		}
@@ -26,7 +29,7 @@ namespace StringDB.Databases
 		/// Create a new <see cref="MemoryDatabase{TKey,TValue}"/>.
 		/// </summary>
 		/// <param name="data">The data to pre-fill it with.</param>
-		public MemoryDatabase(List<KeyValuePair<TKey, TValue>> data = null)
+		public MemoryDatabase([CanBeNull] List<KeyValuePair<TKey, TValue>> data = null)
 			=> _data = data ?? new List<KeyValuePair<TKey, TValue>>();
 
 		/// <inheritdoc />

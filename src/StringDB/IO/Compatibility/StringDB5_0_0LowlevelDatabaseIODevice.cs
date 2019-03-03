@@ -1,9 +1,12 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+
+using System;
 using System.IO;
 using System.Text;
 
 namespace StringDB.IO.Compatibility
 {
+	[PublicAPI]
 	public sealed class StringDB5_0_0LowlevelDatabaseIODevice : ILowlevelDatabaseIODevice
 	{
 		// https://github.com/SirJosh3917/StringDB/blob/fa703ed893b473829b6140f9d7033575d3291846/StringDB/Consts.cs
@@ -29,7 +32,7 @@ namespace StringDB.IO.Compatibility
 
 		public StringDB5_0_0LowlevelDatabaseIODevice
 		(
-			Stream stream,
+			[NotNull] Stream stream,
 			bool leaveStreamOpen = false
 		)
 		{

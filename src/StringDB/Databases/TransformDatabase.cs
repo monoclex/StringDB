@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using JetBrains.Annotations;
+
+using System.Collections.Generic;
 using System.Linq;
 
 namespace StringDB.Databases
@@ -12,6 +14,7 @@ namespace StringDB.Databases
 	/// <typeparam name="TPreValue">The value type before transformation.</typeparam>
 	/// <typeparam name="TPostKey">The key type after transformation.</typeparam>
 	/// <typeparam name="TPostValue">The value type after transformation</typeparam>
+	[PublicAPI]
 	public sealed class TransformDatabase<TPreKey, TPreValue, TPostKey, TPostValue>
 		: BaseDatabase<TPostKey, TPostValue>
 	{
@@ -22,8 +25,8 @@ namespace StringDB.Databases
 
 			public TransformLazyLoader
 			(
-				ILazyLoader<TPreValue> pre,
-				ITransformer<TPreValue, TPostValue> transformer
+				[NotNull] ILazyLoader<TPreValue> pre,
+				[NotNull] ITransformer<TPreValue, TPostValue> transformer
 			)
 			{
 				_pre = pre;
@@ -50,9 +53,9 @@ namespace StringDB.Databases
 		/// <param name="valueTransformer">The transformer for the value.</param>
 		public TransformDatabase
 		(
-			IDatabase<TPreKey, TPreValue> db,
-			ITransformer<TPreKey, TPostKey> keyTransformer,
-			ITransformer<TPreValue, TPostValue> valueTransformer
+			[NotNull] IDatabase<TPreKey, TPreValue> db,
+			[NotNull] ITransformer<TPreKey, TPostKey> keyTransformer,
+			[NotNull] ITransformer<TPreValue, TPostValue> valueTransformer
 		)
 		{
 			_db = db;

@@ -1,4 +1,6 @@
-﻿using StringDB.Fluency;
+﻿using JetBrains.Annotations;
+
+using StringDB.Fluency;
 using StringDB.IO;
 using StringDB.Transformers;
 
@@ -10,6 +12,7 @@ namespace StringDB
 	/// <summary>
 	/// A simple utility class to allow for very easy creation of string databases.
 	/// </summary>
+	[PublicAPI]
 	public static class StringDatabase
 	{
 		/// <summary>
@@ -30,7 +33,7 @@ namespace StringDB
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<string, string> Create
 		(
-			Stream stream,
+			[NotNull] Stream stream,
 			bool leaveStreamOpen = false
 		)
 			=> Create(stream, StringDBVersions.Latest, leaveStreamOpen);
@@ -44,7 +47,7 @@ namespace StringDB
 		/// <returns>An IODatabase with a transform, using the specified version of StringDB.</returns>
 		public static IDatabase<string, string> Create
 		(
-			Stream stream,
+			[NotNull] Stream stream,
 			StringDBVersions version,
 			bool leaveStreamOpen
 		)
@@ -54,7 +57,7 @@ namespace StringDB
 
 		private static IDatabase<string, string> ApplyStringTransformation
 		(
-			this IDatabase<byte[], byte[]> database
+			[NotNull] this IDatabase<byte[], byte[]> database
 		)
 		{
 			var transformer = new StringTransformer();

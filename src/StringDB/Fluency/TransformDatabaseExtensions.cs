@@ -1,4 +1,6 @@
-﻿using StringDB.Databases;
+﻿using JetBrains.Annotations;
+
+using StringDB.Databases;
 
 using System.Runtime.CompilerServices;
 
@@ -7,6 +9,7 @@ namespace StringDB.Fluency
 	/// <summary>
 	/// Fluent extensions for a <see cref="TransformDatabase{TPreTransformKey,TPreTransformValue,TPostTransformKey,TPostTransformValue}"/>.
 	/// </summary>
+	[PublicAPI]
 	public static class TransformDatabaseExtensions
 	{
 		/// <summary>
@@ -20,12 +23,13 @@ namespace StringDB.Fluency
 		/// <param name="keyTransformer">A transformer for the keys.</param>
 		/// <param name="valueTransformer">A transformer for the values.</param>
 		/// <returns>A <see cref="TransformDatabase{TPreTransformKey,TPreTransformValue,TPostTransformKey,TPostTransformValue}"/>.</returns>
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<TPostKey, TPostValue> WithTransform<TPreKey, TPreValue, TPostKey, TPostValue>
 		(
-			this IDatabase<TPreKey, TPreValue> database,
-			ITransformer<TPreKey, TPostKey> keyTransformer,
-			ITransformer<TPreValue, TPostValue> valueTransformer
+			[NotNull] this IDatabase<TPreKey, TPreValue> database,
+			[NotNull] ITransformer<TPreKey, TPostKey> keyTransformer,
+			[NotNull] ITransformer<TPreValue, TPostValue> valueTransformer
 		)
 			=> new TransformDatabase<TPreKey, TPreValue, TPostKey, TPostValue>
 			(

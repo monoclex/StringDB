@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+
+using System;
 using System.Collections.Generic;
 
 namespace StringDB.Databases
@@ -11,6 +13,7 @@ namespace StringDB.Databases
 	/// </summary>
 	/// <typeparam name="TKey">The type of key.</typeparam>
 	/// <typeparam name="TValue">The type of value.</typeparam>
+	[PublicAPI]
 	public sealed class CacheDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
 	{
 		private sealed class CacheLazyLoader : ILazyLoader<TValue>, IDisposable
@@ -20,7 +23,7 @@ namespace StringDB.Databases
 			private bool _loaded;
 			private TValue _value;
 
-			public CacheLazyLoader(ILazyLoader<TValue> inner)
+			public CacheLazyLoader([NotNull] ILazyLoader<TValue> inner)
 				=> _inner = inner;
 
 			public TValue Load()
@@ -52,7 +55,7 @@ namespace StringDB.Databases
 		/// Create a new <see cref="CacheDatabase{TKey,TValue}"/>.
 		/// </summary>
 		/// <param name="database">The database to cache.</param>
-		public CacheDatabase(IDatabase<TKey, TValue> database)
+		public CacheDatabase([NotNull] IDatabase<TKey, TValue> database)
 		{
 			_cache = new List<KeyValuePair<TKey, CacheLazyLoader>>();
 			_database = database;

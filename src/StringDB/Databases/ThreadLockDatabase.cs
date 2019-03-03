@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using JetBrains.Annotations;
+
+using System.Collections;
 using System.Collections.Generic;
 
 namespace StringDB.Databases
@@ -10,6 +12,7 @@ namespace StringDB.Databases
 	/// </summary>
 	/// <typeparam name="TKey">The type of key.</typeparam>
 	/// <typeparam name="TValue">The type of value.</typeparam>
+	[PublicAPI]
 	public sealed class ThreadLockDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
 	{
 		private sealed class ThreadLoackLazyLoader : ILazyLoader<TValue>
@@ -17,7 +20,7 @@ namespace StringDB.Databases
 			private readonly object _lock;
 			private readonly ILazyLoader<TValue> _inner;
 
-			public ThreadLoackLazyLoader(object @lock, ILazyLoader<TValue> inner)
+			public ThreadLoackLazyLoader([NotNull] object @lock, [NotNull] ILazyLoader<TValue> inner)
 			{
 				_lock = @lock;
 				_inner = inner;

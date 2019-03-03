@@ -1,12 +1,15 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace StringDB.IO
 {
+	[PublicAPI]
 	public struct DatabaseItem : IEquatable<DatabaseItem>
 	{
-		public byte[] Key;
+		[NotNull] public byte[] Key;
 
 		public long DataPosition;
 

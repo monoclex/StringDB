@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using JetBrains.Annotations;
+
+using System.Collections.Generic;
 
 namespace StringDB.IO
 {
@@ -6,11 +8,16 @@ namespace StringDB.IO
 	/// <summary>
 	/// An <see cref="T:StringDB.IO.IDatabaseIODevice" /> that interfaces with <see cref="T:StringDB.IO.ILowlevelDatabaseIODevice" />
 	/// </summary>
+	[PublicAPI]
 	public sealed class DatabaseIODevice : IDatabaseIODevice
 	{
 		public ILowlevelDatabaseIODevice LowLevelDatabaseIODevice { get; }
 
-		public DatabaseIODevice(ILowlevelDatabaseIODevice lowlevelDBIOD) => LowLevelDatabaseIODevice = lowlevelDBIOD;
+		public DatabaseIODevice
+		(
+			[NotNull] ILowlevelDatabaseIODevice lowlevelDBIOD
+		)
+			=> LowLevelDatabaseIODevice = lowlevelDBIOD;
 
 		public void Reset() => LowLevelDatabaseIODevice.Reset();
 

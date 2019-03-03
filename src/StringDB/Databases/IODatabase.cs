@@ -1,4 +1,6 @@
-﻿using StringDB.IO;
+﻿using JetBrains.Annotations;
+
+using StringDB.IO;
 
 using System.Collections.Generic;
 
@@ -8,6 +10,7 @@ namespace StringDB.Databases
 	/// <summary>
 	/// A database for IO-based operations, using an IDatabaseIODevice.
 	/// </summary>
+	[PublicAPI]
 	public sealed class IODatabase : BaseDatabase<byte[], byte[]>
 	{
 		private sealed class IOLazyLoader : ILazyLoader<byte[]>
@@ -15,7 +18,7 @@ namespace StringDB.Databases
 			private readonly IDatabaseIODevice _dbIODevice;
 			private readonly long _position;
 
-			public IOLazyLoader(IDatabaseIODevice dbIODevice, long position)
+			public IOLazyLoader([PublicAPI] IDatabaseIODevice dbIODevice, long position)
 			{
 				_dbIODevice = dbIODevice;
 				_position = position;
@@ -30,7 +33,7 @@ namespace StringDB.Databases
 		/// Create an IODatabase with the IDatabaseIODevice specified.
 		/// </summary>
 		/// <param name="dbIODevice">The DatabaseIODevice to use under the hood.</param>
-		public IODatabase(IDatabaseIODevice dbIODevice) => _dbIODevice = dbIODevice;
+		public IODatabase([NotNull] IDatabaseIODevice dbIODevice) => _dbIODevice = dbIODevice;
 
 		/// <inheritdoc />
 		public override void InsertRange(KeyValuePair<byte[], byte[]>[] items) => _dbIODevice.Insert(items);

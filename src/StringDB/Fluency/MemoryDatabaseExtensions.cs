@@ -1,4 +1,6 @@
-﻿using StringDB.Databases;
+﻿using JetBrains.Annotations;
+
+using StringDB.Databases;
 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -8,6 +10,7 @@ namespace StringDB.Fluency
 	/// <summary>
 	/// Fluent extensions for a <see cref="MemoryDatabase{TKey,TValue}"/>
 	/// </summary>
+	[PublicAPI]
 	public static class MemoryDatabaseExtensions
 	{
 		/// <summary>
@@ -17,10 +20,11 @@ namespace StringDB.Fluency
 		/// <typeparam name="TValue">The type of value to use.</typeparam>
 		/// <param name="builder">The builder.</param>
 		/// <returns>A <see cref="MemoryDatabase{TKey,TValue}"/></returns>
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<TKey, TValue> UseMemoryDatabase<TKey, TValue>
 		(
-			this DatabaseBuilder builder
+			[CanBeNull] this DatabaseBuilder builder
 		)
 			=> builder.UseMemoryDatabase<TKey, TValue>(null);
 
@@ -32,11 +36,12 @@ namespace StringDB.Fluency
 		/// <param name="builder">The builder.</param>
 		/// <param name="data">The data to prefill it with.</param>
 		/// <returns>A <see cref="MemoryDatabase{TKey,TValue}"/></returns>
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<TKey, TValue> UseMemoryDatabase<TKey, TValue>
 		(
-			this DatabaseBuilder builder,
-			List<KeyValuePair<TKey, TValue>> data
+			[CanBeNull] this DatabaseBuilder builder,
+			[NotNull] List<KeyValuePair<TKey, TValue>> data
 		)
 			=> new MemoryDatabase<TKey, TValue>(data);
 	}
