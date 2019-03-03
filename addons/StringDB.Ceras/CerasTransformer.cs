@@ -1,6 +1,7 @@
 ﻿using Ceras;
 
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 
 namespace StringDB.Ceras
 {
@@ -8,6 +9,7 @@ namespace StringDB.Ceras
 	/// Use Ceras as a serializer and deserializer for byte arrays.
 	/// </summary>
 	/// <typeparam name="T">The type of object to store.</typeparam>
+	[PublicAPI]
 	public class CerasTransformer<T> : ITransformer<byte[], T>
 	{
 		private readonly CerasSerializer _ceras;
@@ -16,7 +18,7 @@ namespace StringDB.Ceras
 		/// Creates a new CerasTransformer.
 		/// </summary>
 		/// <param name="ceras">The serializer to use.</param>
-		public CerasTransformer(CerasSerializer ceras) => _ceras = ceras;
+		public CerasTransformer([NotNull] CerasSerializer ceras) => _ceras = ceras;
 
 		/// <inheritdoc />
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

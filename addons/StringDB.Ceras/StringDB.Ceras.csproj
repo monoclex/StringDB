@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ceras" Version="4.0.26" />
+    <PackageReference Include="JetBrains.Annotations" Version="2018.3.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
