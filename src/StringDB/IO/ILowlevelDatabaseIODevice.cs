@@ -23,9 +23,11 @@ namespace StringDB.IO
 
 		void Flush();
 
-		NextItemPeek Peek();
+		// peekResult is tightly coupled with ReadIndex
 
-		LowLevelDatabaseItem ReadIndex();
+		NextItemPeek Peek(out byte peekResult);
+
+		LowLevelDatabaseItem ReadIndex(byte peekResult);
 
 		[NotNull]
 		byte[] ReadValue(long dataPosition);

@@ -31,9 +31,9 @@ namespace StringDB.Tests
 
 			public void Flush() => throw new NotImplementedException();
 
-			public NextItemPeek Peek() => throw new NotImplementedException();
+			public NextItemPeek Peek(out byte peekResult) => throw new NotImplementedException();
 
-			public LowLevelDatabaseItem ReadIndex() => throw new NotImplementedException();
+			public LowLevelDatabaseItem ReadIndex(byte peekResult) => throw new NotImplementedException();
 
 			public long ReadJump() => throw new NotImplementedException();
 
@@ -203,26 +203,34 @@ namespace StringDB.Tests
 
 			public NextItemPeek PeekToReturn { get; set; } = NextItemPeek.Index;
 
-			public NextItemPeek Peek()
+			public NextItemPeek Peek(out byte peekResult)
 			{
-				if (ArrayIndex == Data.Length) return NextItemPeek.EOF;
+				if (ArrayIndex == Data.Length)
+				{
+					peekResult = 0x00;
+					return NextItemPeek.EOF;
+				}
 
 				if (PeekToReturn == NextItemPeek.Jump)
 				{
 					// we will jmp then back
 					PeekToReturn = NextItemPeek.Index;
 
+					peekResult = 0xFF;
 					return NextItemPeek.Jump;
 				}
 
+				peekResult = (byte)Data[ArrayIndex].Key.Length;
 				return PeekToReturn;
 			}
 
 			public int ArrayIndex { get; set; } = 0;
 
-			public LowLevelDatabaseItem ReadIndex()
+			public LowLevelDatabaseItem ReadIndex(byte peekResult)
 			{
 				var data = Data[ArrayIndex];
+
+				peekResult.Should().Be((byte)data.Key.Length);
 
 				var item = new LowLevelDatabaseItem
 				{

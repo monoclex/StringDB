@@ -89,7 +89,7 @@ namespace StringDB.Tests
 				Action throws = () => io.ReadJump();
 
 				throws.Should()
-					.ThrowExactly<NotSupportedException>();
+					.ThrowExactly<EndOfStreamException>();
 			}
 
 			[Fact]
@@ -108,7 +108,7 @@ namespace StringDB.Tests
 			{
 				var (ms, io) = Generate();
 
-				Action throws = () => io.ReadIndex();
+				Action throws = () => io.ReadIndex(0);
 
 				throws.Should()
 					.ThrowExactly<NotSupportedException>();
@@ -290,7 +290,10 @@ namespace StringDB.Tests
 
 					io.Reset();
 
-					var index = io.ReadIndex();
+					io.Peek(out var peekResult)
+						.Should().Be(NextItemPeek.Index);
+
+					var index = io.ReadIndex(peekResult);
 
 					index.Index
 						.Should().BeEquivalentTo(Encoding.UTF8.GetBytes("key"));
@@ -326,14 +329,18 @@ namespace StringDB.Tests
 					{
 						var (ms, io) = Generate();
 
-						io.Peek()
+						io.Peek(out var peekResult1)
 							.Should().Be(NextItemPeek.EOF);
+
+						peekResult1.Should().Be(0x00);
 
 						ms.Write(new byte[88]);
 						io.Reset();
 
-						io.Peek()
+						io.Peek(out var peekResult2)
 							.Should().Be(NextItemPeek.EOF);
+
+						peekResult2.Should().Be(0x00);
 					}
 				}
 
@@ -347,9 +354,11 @@ namespace StringDB.Tests
 						io.WriteJump(1337);
 						io.Reset();
 
-						io.Peek().Should().Be(NextItemPeek.Jump);
+						io.Peek(out var peekResult).Should().Be(NextItemPeek.Jump);
 
 						io.ReadJump().Should().Be(1337);
+
+						peekResult.Should().Be(0xFF);
 					}
 				}
 
@@ -363,8 +372,10 @@ namespace StringDB.Tests
 						ms.WriteByte(0x12);
 						io.Reset();
 
-						io.Peek()
+						io.Peek(out var peekResult)
 							.Should().Be(NextItemPeek.Index);
+
+						peekResult.Should().Be(0x12);
 					}
 				}
 			}
@@ -460,14 +471,16 @@ namespace StringDB.Tests
 				var (ms, io) = Generate();
 				ms.Write(new byte[100]);
 
-				ms.Position = 20;
-				io.Reset();
+				io.Seek(20);
+				ms.Position.Should().Be(20);
 
 				io.GetPosition()
 					.Should()
 					.Be(20);
 
-				ms.Position = 40;
+				io.Seek(40);
+				ms.Position.Should().Be(40);
+
 				io.GetPosition()
 					.Should()
 					.Be(40);

@@ -39,9 +39,14 @@ namespace StringDB.IO
 		public DatabaseItem ReadNext()
 		{
 			// handle EOFs/Jumps
-			var peek = LowLevelDatabaseIODevice.Peek();
+			var peek = LowLevelDatabaseIODevice.Peek(out var peekResult);
 
-			ExecuteJumps(ref peek);
+			ExecuteJumps(ref peek, out var jmpPeekResult);
+
+			if (jmpPeekResult != 0x00)
+			{
+				peekResult = jmpPeekResult;
+			}
 
 			if (peek == NextItemPeek.EOF)
 			{
@@ -53,7 +58,7 @@ namespace StringDB.IO
 
 			// peek HAS to be an Index at this point
 
-			var item = LowLevelDatabaseIODevice.ReadIndex();
+			var item = LowLevelDatabaseIODevice.ReadIndex(peekResult);
 
 			return new DatabaseItem
 			{
@@ -63,13 +68,15 @@ namespace StringDB.IO
 			};
 		}
 
-		private void ExecuteJumps(ref NextItemPeek peek)
+		private void ExecuteJumps(ref NextItemPeek peek, out byte peekResult)
 		{
+			peekResult = 0x00;
+
 			while (peek == NextItemPeek.Jump)
 			{
 				var jump = LowLevelDatabaseIODevice.ReadJump();
 				LowLevelDatabaseIODevice.Seek(jump);
-				peek = LowLevelDatabaseIODevice.Peek();
+				peek = LowLevelDatabaseIODevice.Peek(out peekResult);
 			}
 		}
 

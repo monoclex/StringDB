@@ -12,6 +12,7 @@ namespace StringDB.IO.Compatibility
 		private static class Constants
 		{
 			public const byte IndexSeparator = 0xFF;
+			public const byte EOF = 0x00;
 		}
 
 		private readonly StreamCacheMonitor _stream;
@@ -76,15 +77,18 @@ namespace StringDB.IO.Compatibility
 			_stream.Flush();
 		}
 
-		public NextItemPeek Peek()
+		public NextItemPeek Peek(out byte peekResult)
 		{
-			switch (PeekByte())
+			var result = PeekByte();
+			peekResult = result;
+
+			switch (result)
 			{
+				case Constants.EOF:
+					return NextItemPeek.EOF;
+
 				case Constants.IndexSeparator:
 					return NextItemPeek.Jump;
-
-				case 0x00:
-					return NextItemPeek.EOF;
 
 				default:
 					return NextItemPeek.Index;
@@ -95,22 +99,21 @@ namespace StringDB.IO.Compatibility
 		{
 			if (EOF)
 			{
-				return 0x00;
+				return Constants.EOF;
 			}
 
 			var peek = _br.ReadByte();
-			_stream.Position--;
 			return peek;
 		}
 
-		public LowLevelDatabaseItem ReadIndex()
+		public LowLevelDatabaseItem ReadIndex(byte peekResult)
 		{
 			if (EOF)
 			{
 				throw new NotSupportedException("Cannot read past EOF.");
 			}
 
-			var length = ReadIndexLength();
+			var length = peekResult;
 			var dataPosition = ReadDownsizedLong();
 			var index = _br.ReadBytes(length);
 
@@ -142,14 +145,6 @@ namespace StringDB.IO.Compatibility
 
 		public long ReadJump()
 		{
-			var separator = _br.ReadByte();
-
-			if (separator != Constants.IndexSeparator)
-			{
-				throw new NotSupportedException(
-					$"Expected to read a {Constants.IndexSeparator}, but got {separator:x2} instead.");
-			}
-
 			return ReadDownsizedLong();
 		}
 

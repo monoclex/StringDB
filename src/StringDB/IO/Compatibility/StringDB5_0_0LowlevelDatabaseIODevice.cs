@@ -26,7 +26,7 @@ namespace StringDB.IO.Compatibility
 			public const byte ByteArrayTypeHandler = 0x01;
 		}
 
-		private readonly Stream _stream;
+		private readonly StreamCacheMonitor _stream;
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
 
@@ -36,9 +36,9 @@ namespace StringDB.IO.Compatibility
 			bool leaveStreamOpen = false
 		)
 		{
-			_stream = stream;
-			_br = new BinaryReader(stream, Encoding.UTF8, leaveStreamOpen);
-			_bw = new BinaryWriter(stream, Encoding.UTF8, leaveStreamOpen);
+			_stream = new StreamCacheMonitor(stream);
+			_br = new BinaryReader(_stream, Encoding.UTF8, leaveStreamOpen);
+			_bw = new BinaryWriter(_stream, Encoding.UTF8, leaveStreamOpen);
 
 			if (_stream.Length < 8)
 			{
@@ -52,11 +52,17 @@ namespace StringDB.IO.Compatibility
 			if (JumpPos > 0) JumpPos--;
 		}
 
+		private bool EOF => GetPosition() >= _stream.Length;
+
 		public long JumpPos { get; set; }
 
 		public long GetPosition() => _stream.Position;
 
-		public void Reset() => Seek(8);
+		public void Reset()
+		{
+			_stream.UpdateCache();
+			Seek(8);
+		}
 
 		public void SeekEnd() => _stream.Seek(0, SeekOrigin.End);
 
@@ -68,29 +74,24 @@ namespace StringDB.IO.Compatibility
 			_stream.Flush();
 		}
 
-		// unfortunate :v
-		private int PeekByte()
+		private byte PeekByte()
 		{
-			var peek = -1;
-
-			if (_stream.Length - 1 == _stream.Position)
+			if (EOF)
 			{
-				return peek;
+				return 0x00;
 			}
 
-			peek = _br.ReadByte();
-			_stream.Position--;
-
+			var peek = _br.ReadByte();
 			return peek;
 		}
 
-		public NextItemPeek Peek()
+		public NextItemPeek Peek(out byte peekResult)
 		{
-			var peek = PeekByte();
+			var result = PeekByte();
+			peekResult = result;
 
-			switch (peek)
+			switch (result)
 			{
-				case -1:
 				case Consts.NoIndex:
 					return NextItemPeek.EOF;
 
@@ -102,9 +103,9 @@ namespace StringDB.IO.Compatibility
 			}
 		}
 
-		public LowLevelDatabaseItem ReadIndex()
+		public LowLevelDatabaseItem ReadIndex(byte peekByte)
 		{
-			var indexLength = _br.ReadByte();
+			var indexLength = peekByte;
 			var dataPosition = _br.ReadInt64();
 
 			_br.ReadByte(); // backwards compatibility - not used
@@ -135,9 +136,6 @@ namespace StringDB.IO.Compatibility
 
 		public long ReadJump()
 		{
-			// 0xFF
-			_br.ReadByte();
-
 			return _br.ReadInt64();
 		}
 
