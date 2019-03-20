@@ -14,7 +14,7 @@ namespace StringDB.IO.Compatibility
 			public const byte IndexSeparator = 0xFF;
 		}
 
-		private readonly Stream _stream;
+		private readonly StreamCacheMonitor _stream;
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
 
@@ -24,7 +24,12 @@ namespace StringDB.IO.Compatibility
 			bool leaveStreamOpen = false
 		)
 		{
-			_stream = stream;
+			// We wrap the stream in this so that lookups to Position and Length are quick and snappy.
+			// This is to prevent a performance concern regarding EOF using excessive amounts of time.
+			// This has the issue of being cached, but calling IODevice.Reset should fix it right up.
+			// Of course, this has bad implications and might be reverted later, but it definitely
+			// fixes the performance gap without making the code ugly.
+			_stream = new StreamCacheMonitor(stream);
 			_br = new BinaryReader(_stream, Encoding.UTF8, leaveStreamOpen);
 			_bw = new BinaryWriter(_stream, Encoding.UTF8, leaveStreamOpen);
 
@@ -53,7 +58,11 @@ namespace StringDB.IO.Compatibility
 		public long GetPosition() => _stream.Position;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Reset() => Seek(sizeof(long));
+		public void Reset()
+		{
+			_stream.UpdateCache();
+			Seek(sizeof(long));
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Seek(long position) => _stream.Seek(position, SeekOrigin.Begin);
@@ -112,7 +121,11 @@ namespace StringDB.IO.Compatibility
 			};
 		}
 
-		private bool EOF => GetPosition() == _stream.Length;
+		// As it turns out, this is a major performance concern
+		// when using a FileStream.
+		// Thus, the chosen solution was to wrap the given Stream into a StreamCacheMonitor.
+		// This makes these lookups quick and snappy.
+		private bool EOF => GetPosition() >= _stream.Length;
 
 		public byte[] ReadValue(long dataPosition)
 		{

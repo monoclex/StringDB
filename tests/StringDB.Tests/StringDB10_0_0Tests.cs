@@ -461,6 +461,7 @@ namespace StringDB.Tests
 				ms.Write(new byte[100]);
 
 				ms.Position = 20;
+				io.Reset();
 
 				io.GetPosition()
 					.Should()
