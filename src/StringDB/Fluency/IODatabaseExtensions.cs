@@ -43,5 +43,22 @@ namespace StringDB.Fluency
 			[NotNull] Func<DatabaseIODeviceBuilder, IDatabaseIODevice> databaseIODevice
 		)
 			=> builder.UseIODatabase(databaseIODevice(new DatabaseIODeviceBuilder()));
+
+		/// <summary>
+		/// Creates a new IODatabase using StringDB.
+		/// </summary>
+		/// <param name="builder">The builder.</param>
+		/// <param name="version">The version of StringDB to use.</param>
+		/// <param name="file">The file to read from.</param>
+		/// <returns>An <see cref="IODatabase"/>.</returns>
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IDatabase<byte[], byte[]> UseIODatabase
+		(
+			[CanBeNull] this DatabaseBuilder builder,
+			StringDBVersions version,
+			[NotNull] string file
+		)
+			=> builder.UseIODatabase(databaseIODeviceBuilder => databaseIODeviceBuilder.UseStringDB(version, file));
 	}
 }
