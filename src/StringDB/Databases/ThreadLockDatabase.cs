@@ -96,18 +96,25 @@ namespace StringDB.Databases
 			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		}
 
-		private readonly IDatabase<TKey, TValue> _db;
-		private readonly object _lock;
+		[NotNull] private readonly IDatabase<TKey, TValue> _db;
+		[NotNull] private readonly object _lock = new object();
 
 		/// <summary>
 		/// Creates a new <see cref="ThreadLockDatabase{TKey,TValue}"/> around a database.
 		/// </summary>
 		/// <param name="database">The database to intelligently lock on.</param>
-		public ThreadLockDatabase(IDatabase<TKey, TValue> database)
+		public ThreadLockDatabase([NotNull] IDatabase<TKey, TValue> database)
+			: this(database, EqualityComparer<TKey>.Default)
 		{
-			_lock = new object();
-			_db = database;
 		}
+
+		/// <summary>
+		/// Creates a new <see cref="ThreadLockDatabase{TKey,TValue}"/> around a database.
+		/// </summary>
+		/// <param name="database">The database to intelligently lock on.</param>
+		/// <param name="comparer">The equality comparer to use for keys.</param>
+		public ThreadLockDatabase([NotNull] IDatabase<TKey, TValue> database, [NotNull] EqualityComparer<TKey> comparer)
+			=> _db = database;
 
 		/// <inheritdoc />
 		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)

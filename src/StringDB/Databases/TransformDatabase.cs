@@ -57,6 +57,25 @@ namespace StringDB.Databases
 			[NotNull] ITransformer<TPreKey, TPostKey> keyTransformer,
 			[NotNull] ITransformer<TPreValue, TPostValue> valueTransformer
 		)
+			: this(db, keyTransformer, valueTransformer, EqualityComparer<TPostKey>.Default)
+		{
+		}
+
+		/// <summary>
+		/// Create a new transform database.
+		/// </summary>
+		/// <param name="db">The underlying database to convert.</param>
+		/// <param name="keyTransformer">The transformer for the key.</param>
+		/// <param name="valueTransformer">The transformer for the value.</param>
+		/// <param name="comparer">The equality comparer to use for keys.</param>
+		public TransformDatabase
+		(
+			[NotNull] IDatabase<TPreKey, TPreValue> db,
+			[NotNull] ITransformer<TPreKey, TPostKey> keyTransformer,
+			[NotNull] ITransformer<TPreValue, TPostValue> valueTransformer,
+			[NotNull] EqualityComparer<TPostKey> comparer
+		)
+			: base(comparer)
 		{
 			_db = db;
 			_keyTransformer = keyTransformer;

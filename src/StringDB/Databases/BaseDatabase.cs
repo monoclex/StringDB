@@ -18,8 +18,13 @@ namespace StringDB.Databases
 	{
 		private readonly EqualityComparer<TKey> _keyComparer;
 
+		protected BaseDatabase(EqualityComparer<TKey> keyComparer)
+			=> _keyComparer = keyComparer;
+
 		protected BaseDatabase()
-			=> _keyComparer = EqualityComparer<TKey>.Default;
+			: this(EqualityComparer<TKey>.Default)
+		{
+		}
 
 		/// <inheritdoc />
 		public abstract void InsertRange(KeyValuePair<TKey, TValue>[] items);

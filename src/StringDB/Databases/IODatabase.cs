@@ -32,8 +32,20 @@ namespace StringDB.Databases
 		/// <summary>
 		/// Create an IODatabase with the IDatabaseIODevice specified.
 		/// </summary>
+		/// <param name="dbIODevice">The DatabaseIODevice to use.</param>
+		public IODatabase([NotNull] IDatabaseIODevice dbIODevice)
+			: this(dbIODevice, EqualityComparer<byte[]>.Default)
+		{
+		}
+
+		/// <summary>
+		/// Create an IODatabase with the IDatabaseIODevice specified.
+		/// </summary>
 		/// <param name="dbIODevice">The DatabaseIODevice to use under the hood.</param>
-		public IODatabase([NotNull] IDatabaseIODevice dbIODevice) => _dbIODevice = dbIODevice;
+		/// <param name="comparer">The equality comparer to use for the key.</param>
+		public IODatabase([NotNull] IDatabaseIODevice dbIODevice, [NotNull] EqualityComparer<byte[]> comparer)
+			: base(comparer)
+			=> _dbIODevice = dbIODevice;
 
 		/// <inheritdoc />
 		public override void InsertRange(KeyValuePair<byte[], byte[]>[] items) => _dbIODevice.Insert(items);

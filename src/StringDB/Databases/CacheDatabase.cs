@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StringDB.Databases
 {
@@ -56,6 +57,17 @@ namespace StringDB.Databases
 		/// </summary>
 		/// <param name="database">The database to cache.</param>
 		public CacheDatabase([NotNull] IDatabase<TKey, TValue> database)
+			: this(database, EqualityComparer<TKey>.Default)
+		{
+		}
+
+		/// <summary>
+		/// Create a new <see cref="CacheDatabase{TKey,TValue}"/>.
+		/// </summary>
+		/// <param name="database">The database to cache.</param>
+		/// <param name="comparer">The equality comparer for the key.</param>
+		public CacheDatabase([NotNull] IDatabase<TKey, TValue> database, [NotNull] EqualityComparer<TKey> comparer)
+			: base(comparer)
 		{
 			_cache = new List<KeyValuePair<TKey, CacheLazyLoader>>();
 			_database = database;
@@ -70,26 +82,27 @@ namespace StringDB.Databases
 		/// <inheritdoc />
 		protected override IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate()
 		{
-			var counter = 0;
-
-			foreach (var item in _database)
+			// first enumerate to however much we have in memory
+			for (var i = 0; i < _cache.Count; i++)
 			{
-				if (_cache.Count <= counter)
-				{
-					_cache.Add
-					(
-						new KeyValuePair<TKey, CacheLazyLoader>
-						(
-							item.Key,
-							new CacheLazyLoader(item.Value)
-						)
-					);
-				}
-
-				var current = _cache[counter];
+				var current = _cache[i];
 				yield return new KeyValuePair<TKey, ILazyLoader<TValue>>(current.Key, current.Value);
+			}
 
-				counter++;
+			// start reading and adding more as we go along
+			foreach (var item in _database.Skip(_cache.Count))
+			{
+				var currentCache = new KeyValuePair<TKey, CacheLazyLoader>
+				(
+					item.Key,
+					new CacheLazyLoader(item.Value)
+				);
+
+				_cache.Add(currentCache);
+
+				var current = currentCache;
+
+				yield return new KeyValuePair<TKey, ILazyLoader<TValue>>(current.Key, current.Value);
 			}
 		}
 
