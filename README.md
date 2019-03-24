@@ -14,7 +14,29 @@ StringDB embodies 2 things:
  - [Tiny][section_tiny]
  - [Modularity][section_modular]
 
+## Get Started Right Now (for skimmers)
 
+Skimming? Here's what you need to know:
+
+| Feature   |   Description |
+| ---  |  --- |
+| new DatabaseBuilder() | Empty class that has extension methods built onto it to fluently create databases. |
+| StringDatabase | Generally useless. Static class with helper methods to create string key/value DBs. |
+
+Here's a code sample to get you started immedietly.
+```cs
+var transformer = new StringTransformer();
+using (var db = new DatabaseBuilder()
+	.UseIODatabase(builder => builder.UseStringDB
+		(
+			StringDBVersions.Latest,
+			File.Open("my-db.db", FileMode.OpenOrCreate, FileAccess.ReadWrite)
+		))
+	.WithTransform(transformer, transformer))
+{
+	db.Insert("test", "value");
+}
+```
 
 ## Tiny ![icon_tiny]
 
@@ -45,6 +67,15 @@ This chart shows the size of a StringDB file after a single insert range with th
 StringDB was made to be *modular*. Pick up features and use them as you need them, *when* you need them.
 
 By chaining database types to extend functionality, you become freed and can easily add and extend functionality without sacrificing cleanliness or testability.
+
+```cs
+using (var db = new DatabaseBuilder()
+	.UseMemoryDatabase<string, string>()
+	.WithThreadLock()
+	.WithCache())
+{
+}
+```
 
 ## Addons
 
