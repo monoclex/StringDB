@@ -5,8 +5,6 @@
 
 [![AppVeyor Build Status][badge_appveyor_build_image]][badge_appveyor_build_page]
 
-[Getting Started][wiki_tutorials]
-
 [```Install-Package StringDB```][link_nuget]
 
 StringDB embodies 2 things:
@@ -80,6 +78,19 @@ using (var db = new DatabaseBuilder()
 ## Addons
 
 StringDB will officially maintain support for integration with some libraries. [View them here.][link_addons]
+
+## We welcome issues!
+
+Don't be afraid to make an issue about anything and everything!
+
+- Is there something weird with how databases are created? Submit an issue!
+- Is there something that you wish you could do but can't? Submit an issue!
+- Is this library not suitable for your purposes? Submit an isssue!
+- Want it to do something? Submit an issue!
+
+I'd be more then happy to see someone actually using my library, and by fixing that issue I can help satisfy users in the future in addition to yourself!
+
+Need immediate assistence? [Join the discord!](https://discord.gg/wVcnkKJ)
 
 [icon_banner_ad]: ./icons/banner_ad.png
 [icon_modular]: ./icons/modular.png
