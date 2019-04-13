@@ -1,9 +1,0 @@
-site_name: StringDB
-site_author: SirJosh3917
-repo_url: https://github.com/SirJosh3917/StringDB
-edit_uri: "edit/gh-docs/"
-nav:
-    - Home: "index.md"
-    - User Guide:
-        - "Test": "test/tes.md"
-theme: 
