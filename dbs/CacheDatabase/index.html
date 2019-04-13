@@ -7,11 +7,11 @@
         
         <meta name="author" content="SirJosh3917">
         
-        <link rel="shortcut icon" href="/img/favicon.ico">
-        <title>StringDB</title>
-        <link href="/css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="/css/font-awesome.min.css" rel="stylesheet">
-        <link href="/css/base.css" rel="stylesheet">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Cache Database - StringDB</title>
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -19,8 +19,8 @@
             <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
 
-        <script src="/js/jquery-1.10.2.min.js" defer></script>
-        <script src="/js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap-3.0.3.min.js" defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
         <script>hljs.initHighlightingOnLoad();</script> 
     </head>
@@ -39,7 +39,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/.">StringDB</a>
+                    <a class="navbar-brand" href="../..">StringDB</a>
                 </div>
 
                 <!-- Expanded navigation -->
@@ -47,30 +47,30 @@
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
                             <li >
-                                <a href="/.">Home</a>
+                                <a href="../..">Home</a>
                             </li>
-                            <li class="dropdown">
+                            <li class="dropdown active">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Database Documentation <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
 <li >
-    <a href="/dbs/IDatabase/">IDatabase Interface</a>
+    <a href="../IDatabase/">IDatabase Interface</a>
 </li>
                                     
 <li >
-    <a href="/dbs/BaseDatabase/">Base Database</a>
+    <a href="../BaseDatabase/">Base Database</a>
+</li>
+                                    
+<li class="active">
+    <a href="./">Cache Database</a>
 </li>
                                     
 <li >
-    <a href="/dbs/CacheDatabase/">Cache Database</a>
+    <a href="../MemoryDatabase/">Memory Database</a>
 </li>
                                     
 <li >
-    <a href="/dbs/MemoryDatabase/">Memory Database</a>
-</li>
-                                    
-<li >
-    <a href="/dbs/ThreadLockDatabase/">Thread Lock Database</a>
+    <a href="../ThreadLockDatabase/">Thread Lock Database</a>
 </li>
                                     
   <li class="dropdown-submenu">
@@ -78,7 +78,7 @@
     <ul class="dropdown-menu">
             
 <li >
-    <a href="/dbs/IODatabase/IODatabase/">IO Database</a>
+    <a href="../IODatabase/IODatabase/">IO Database</a>
 </li>
             
   <li class="dropdown-submenu">
@@ -86,11 +86,11 @@
     <ul class="dropdown-menu">
             
 <li >
-    <a href="/dbs/IODatabase/DatabaseIODevice/IDatabaseIODevice/">IDatabaseIODevice Interface</a>
+    <a href="../IODatabase/DatabaseIODevice/IDatabaseIODevice/">IDatabaseIODevice Interface</a>
 </li>
             
 <li >
-    <a href="/dbs/IODatabase/DatabaseIODevice/DatabaseIODevice/">Database IO Device</a>
+    <a href="../IODatabase/DatabaseIODevice/DatabaseIODevice/">Database IO Device</a>
 </li>
             
   <li class="dropdown-submenu">
@@ -98,7 +98,7 @@
     <ul class="dropdown-menu">
             
 <li >
-    <a href="/dbs/IODatabase/DatabaseIODevice/DatabaseIODevices/StoneVaultIODevice/">StoneVault IO Device</a>
+    <a href="../IODatabase/DatabaseIODevice/DatabaseIODevices/StoneVaultIODevice/">StoneVault IO Device</a>
 </li>
     </ul>
   </li>
@@ -108,15 +108,15 @@
     <ul class="dropdown-menu">
             
 <li >
-    <a href="/dbs/IODatabase/DatabaseIODevice/LowlevelDatabaseIODevices/ILowlevelDatabaseIODevice/">ILowlevelDatabaseIODevice Interface</a>
+    <a href="../IODatabase/DatabaseIODevice/LowlevelDatabaseIODevices/ILowlevelDatabaseIODevice/">ILowlevelDatabaseIODevice Interface</a>
 </li>
             
 <li >
-    <a href="/dbs/IODatabase/DatabaseIODevice/LowlevelDatabaseIODevices/StringDB5_0_0LowlevelDatabaseIODevice/">StringDB5_0_0LowlevelDatabaseIODevice</a>
+    <a href="../IODatabase/DatabaseIODevice/LowlevelDatabaseIODevices/StringDB5_0_0LowlevelDatabaseIODevice/">StringDB5_0_0LowlevelDatabaseIODevice</a>
 </li>
             
 <li >
-    <a href="/dbs/IODatabase/DatabaseIODevice/LowlevelDatabaseIODevices/StringDB10_0_0LowlevelDatabaseIODevice/">StringDB10_0_0LowlevelDatabaseIODevice</a>
+    <a href="../IODatabase/DatabaseIODevice/LowlevelDatabaseIODevices/StringDB10_0_0LowlevelDatabaseIODevice/">StringDB10_0_0LowlevelDatabaseIODevice</a>
 </li>
     </ul>
   </li>
@@ -130,7 +130,7 @@
     <ul class="dropdown-menu">
             
 <li >
-    <a href="/dbs/TransformDatabase/TransformDatabase/">Transform Database</a>
+    <a href="../TransformDatabase/TransformDatabase/">Transform Database</a>
 </li>
     </ul>
   </li>
@@ -144,8 +144,18 @@
                                 <i class="fa fa-search"></i> Search
                             </a>
                         </li>
+                            <li >
+                                <a rel="next" href="../BaseDatabase/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../MemoryDatabase/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
                             <li>
-                                <a href="https://github.com/SirJosh3917/StringDB/"><i class="fa fa-github"></i> GitHub</a>
+                                <a href="https://github.com/SirJosh3917/StringDB/blob/gh-pages/mkdocs-src/docs/dbs/CacheDatabase.md"><i class="fa fa-github"></i> Edit on GitHub</a>
                             </li>
                     </ul>
                 </div>
@@ -153,15 +163,13 @@
         </div>
 
         <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
 
-    <div class="row-fluid">
-      <div id="main-content" class="span12">
-        <h1 id="404-page-not-found" style="text-align: center">404</h1>
-        <p style="text-align: center"><strong>Page not found</strong></p>
-      </div>
-    </div>
-
-
+</div>
         </div>
 
         <footer class="col-md-12">
@@ -169,11 +177,11 @@
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
         <script>
-            var base_url = "/",
+            var base_url = "../..",
                 shortcuts = {"search": 83, "next": 78, "help": 191, "previous": 80};
         </script>
-        <script src="/js/base.js" defer></script>
-        <script src="/search/main.js" defer></script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
     <div class="modal-dialog">
