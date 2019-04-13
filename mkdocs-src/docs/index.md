@@ -1,21 +1,8 @@
-# Welcome to MkDocs
+# StringDB
 
-For full documentation visit [mkdocs.org](https://mkdocs.org).
+Thanks for taking interest in StringDB! I'm sure you'll find it useful in your light-weight archival database endeavors.
 
-## Commands
+Please see the navbar for documentation.
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs help` - Print this help message.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
-
-## aaaAAaAfD
-
-ecks dee
+# NOTE: this documentation site is entirely empty
+lmao

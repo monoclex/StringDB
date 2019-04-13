@@ -5,6 +5,11 @@ edit_uri: "blob/gh-pages/mkdocs-src/docs/"
 nav:
     - Home: "index.md"
     - Database Documentation:
+        - "IDatabase Interface": "dbs/IDatabase.md"
+        - "Base Database": "dbs/BaseDatabase.md"
+        - "Cache Database": "dbs/CacheDatabase.md"
+        - "Memory Database": "dbs/MemoryDatabase.md"
+        - "Thread Lock Database": "dbs/ThreadLockDatabase.md"
         - IODatabase:
             - "IO Database": "dbs/IODatabase/IODatabase.md"
             - Database IO Device:
@@ -18,9 +23,4 @@ nav:
                     - "StringDB10_0_0LowlevelDatabaseIODevice": "dbs/IODatabase/DatabaseIODevice/LowlevelDatabaseIODevices/StringDB10_0_0LowlevelDatabaseIODevice.md"
         - Transform Database:
             - "Transform Database": "dbs/TransformDatabase/TransformDatabase.md"
-        - "IDatabase Interface": "dbs/IDatabase.md"
-        - "Base Database": "dbs/BaseDatabase.md"
-        - "Cache Database": "dbs/CacheDatabase.md"
-        - "Memory Database": "dbs/MemoryDatabase.md"
-        - "Thread Lock Database": "dbs/ThreadLockDatabase.md"
 theme: 
