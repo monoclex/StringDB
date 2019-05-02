@@ -169,5 +169,40 @@ namespace StringDB.Tests
 				.Should()
 				.BeOfType<StringDB10_0_0LowlevelDatabaseIODevice>();
 		}
+
+		[Fact]
+		public void UseStringDB()
+		{
+			// just make sure that down the chain we initialized a file stream
+			var idbiod = new DatabaseIODeviceBuilder()
+				.UseStringDB(StringDBVersions.v10_0_0, "test.db");
+
+			idbiod
+				.Should()
+				.BeOfType<DatabaseIODevice>();
+
+			var dbiod = idbiod as DatabaseIODevice;
+
+			dbiod.LowLevelDatabaseIODevice
+				.Should()
+				.BeOfType<StringDB10_0_0LowlevelDatabaseIODevice>();
+
+			var ldbiod = dbiod.LowLevelDatabaseIODevice as StringDB10_0_0LowlevelDatabaseIODevice;
+
+			ldbiod.InnerStream
+				.Should()
+				.BeOfType<StreamCacheMonitor>();
+
+			var scm = ldbiod.InnerStream as StreamCacheMonitor;
+
+			scm.InnerStream
+				.Should()
+				.BeOfType<FileStream>();
+
+			var fs = scm.InnerStream as FileStream;
+
+			fs.CanRead.Should().BeTrue();
+			fs.CanWrite.Should().BeTrue();
+		}
 	}
 }
