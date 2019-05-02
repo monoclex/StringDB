@@ -11,13 +11,13 @@ namespace StringDB.IO
 	[PublicAPI]
 	public class StreamCacheMonitor : Stream
 	{
-		[NotNull] private readonly Stream _stream;
+		[NotNull] public Stream InnerStream { get; }
 
 		public StreamCacheMonitor([NotNull] Stream stream)
 		{
-			_stream = stream;
-			_pos = _stream.Position;
-			_len = _stream.Length;
+			InnerStream = stream;
+			_pos = InnerStream.Position;
+			_len = InnerStream.Length;
 		}
 
 		private long _pos;
@@ -25,11 +25,11 @@ namespace StringDB.IO
 		private long _len;
 
 		public override void Flush()
-			=> _stream.Flush();
+			=> InnerStream.Flush();
 
 		public override long Seek(long offset, SeekOrigin origin)
 		{
-			_pos = _stream.Seek(offset, origin);
+			_pos = InnerStream.Seek(offset, origin);
 
 			return _pos;
 		}
@@ -37,12 +37,12 @@ namespace StringDB.IO
 		public override void SetLength(long value)
 		{
 			_len = value;
-			_stream.SetLength(value);
+			InnerStream.SetLength(value);
 		}
 
 		public override int Read(byte[] buffer, int offset, int count)
 		{
-			var result = _stream.Read(buffer, offset, count);
+			var result = InnerStream.Read(buffer, offset, count);
 			_pos += result;
 
 			return result;
@@ -57,12 +57,12 @@ namespace StringDB.IO
 				_len = _pos;
 			}
 
-			_stream.Write(buffer, offset, count);
+			InnerStream.Write(buffer, offset, count);
 		}
 
-		public override bool CanRead => _stream.CanRead;
-		public override bool CanSeek => _stream.CanSeek;
-		public override bool CanWrite => _stream.CanWrite;
+		public override bool CanRead => InnerStream.CanRead;
+		public override bool CanSeek => InnerStream.CanSeek;
+		public override bool CanWrite => InnerStream.CanWrite;
 
 		public override long Length => _len;
 
@@ -72,19 +72,19 @@ namespace StringDB.IO
 			set
 			{
 				_pos = value;
-				_stream.Position = value;
+				InnerStream.Position = value;
 			}
 		}
 
 		public override void Close()
 		{
-			_stream.Close();
+			InnerStream.Close();
 		}
 
 		public void UpdateCache()
 		{
-			_pos = _stream.Position;
-			_len = _stream.Length;
+			_pos = InnerStream.Position;
+			_len = InnerStream.Length;
 		}
 	}
 }

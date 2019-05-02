@@ -27,7 +27,10 @@ namespace StringDB.Databases
 			public byte[] Load() => _dbIODevice.ReadValue(_position);
 		}
 
-		private readonly IDatabaseIODevice _dbIODevice;
+		/// <summary>
+		/// The DatabaseIODevice in use.
+		/// </summary>
+		public IDatabaseIODevice DatabaseIODevice { get; }
 
 		/// <summary>
 		/// Create an IODatabase with the IDatabaseIODevice specified.
@@ -45,29 +48,29 @@ namespace StringDB.Databases
 		/// <param name="comparer">The equality comparer to use for the key.</param>
 		public IODatabase([NotNull] IDatabaseIODevice dbIODevice, [NotNull] EqualityComparer<byte[]> comparer)
 			: base(comparer)
-			=> _dbIODevice = dbIODevice;
+			=> DatabaseIODevice = dbIODevice;
 
 		/// <inheritdoc />
-		public override void InsertRange(KeyValuePair<byte[], byte[]>[] items) => _dbIODevice.Insert(items);
+		public override void InsertRange(KeyValuePair<byte[], byte[]>[] items) => DatabaseIODevice.Insert(items);
 
 		/// <inheritdoc />
 		protected override IEnumerable<KeyValuePair<byte[], ILazyLoader<byte[]>>> Evaluate()
 		{
-			_dbIODevice.Reset();
+			DatabaseIODevice.Reset();
 
 			DatabaseItem dbItem;
 
-			while (!(dbItem = _dbIODevice.ReadNext()).EndOfItems)
+			while (!(dbItem = DatabaseIODevice.ReadNext()).EndOfItems)
 			{
 				yield return new KeyValuePair<byte[], ILazyLoader<byte[]>>
 				(
 					key: dbItem.Key,
-					value: new IOLazyLoader(_dbIODevice, dbItem.DataPosition)
+					value: new IOLazyLoader(DatabaseIODevice, dbItem.DataPosition)
 				);
 			}
 		}
 
 		/// <inheritdoc />
-		public override void Dispose() => _dbIODevice.Dispose();
+		public override void Dispose() => DatabaseIODevice.Dispose();
 	}
 }

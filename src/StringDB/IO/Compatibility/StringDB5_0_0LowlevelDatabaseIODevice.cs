@@ -30,6 +30,8 @@ namespace StringDB.IO.Compatibility
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
 
+		public Stream InnerStream => _stream;
+
 		public StringDB5_0_0LowlevelDatabaseIODevice
 		(
 			[NotNull] Stream stream,
