@@ -4,14 +4,25 @@ using StringDB.Databases;
 using StringDB.Fluency;
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Xunit;
 
 namespace StringDB.Tests
 {
+	/// <summary>
+	/// ensures that multiple threads can write to a thread unsafe database
+	/// </summary>
 	public class ThreadLockTests
 	{
+		private readonly MockDatabase _mockdb;
+		private readonly IDatabase<int, int> _db;
+		private readonly List<Task> _tasks;
+		private readonly ManualResetEventSlim _lock;
+
+		public const int IncrementPerLoop = 20;
+
 		public class MockDatabase : BaseDatabase<int, int>
 		{
 			public class LazyLoader : ILazyLoader<int>
@@ -38,7 +49,7 @@ namespace StringDB.Tests
 
 			protected override IEnumerable<KeyValuePair<int, ILazyLoader<int>>> Evaluate()
 			{
-				for (var i = 0; i < 10; i++)
+				for (var i = 0; i < IncrementPerLoop / 2; i++)
 				{
 					Counter++;
 					yield return new KeyValuePair<int, ILazyLoader<int>>(i, new LazyLoader(this, i));
@@ -50,58 +61,63 @@ namespace StringDB.Tests
 			}
 		}
 
+		public ThreadLockTests()
+		{
+			_mockdb = new MockDatabase();
+			_db = _mockdb.WithThreadLock();
+			_tasks = new List<Task>();
+			_lock = new ManualResetEventSlim();
+		}
+
+		/// <summary>
+		/// Tests multiple threads inserting into the database.
+		/// </summary>
 		[Fact]
 		public async Task MultipleThreadsInsertRange()
 		{
-			var mockdb = new MockDatabase();
+			const int threads = 10_000;
+			const int insertRanges = 1_000;
 
-			var db = mockdb.WithThreadLock();
-
-			var tasks = new List<Task>();
-
-			for (var i = 0; i < 10_000; i++)
+			for (var i = 0; i < threads; i++)
 			{
-				tasks.Add(Task.Run(() =>
+				_tasks.Add(Task.Run(() =>
 				{
-					for (var j = 0; j < 100; j++)
+					_lock.Wait();
+					for (var j = 0; j < insertRanges; j++)
 					{
-						db.InsertRange(new KeyValuePair<int, int>[0]);
+						_db.InsertRange(new KeyValuePair<int, int>[0]);
 					}
 				}));
 			}
 
-			await Task.WhenAll(tasks).ConfigureAwait(false);
+			_lock.Set();
+			await Task.WhenAll(_tasks).ConfigureAwait(false);
 
-			// 100 inserts, 10,000 threads
-			// 100 * 10,000 = 1,000,000
-
-			mockdb.Counter
+			_mockdb.Counter
 				.Should()
-				.Be(1_000_000);
+				.Be(threads * insertRanges);
 		}
 
 		[Fact]
 		public async Task MultipleThreadsForeachOver()
 		{
-			var mockdb = new MockDatabase();
+			const int threads = 10_000;
 
-			var db = mockdb.WithThreadLock();
-
-			var tasks = new List<Task>();
-
-			for (var i = 0; i < 10_000; i++)
+			for (var i = 0; i < threads; i++)
 			{
-				tasks.Add(Task.Run(action: () => Parallel.ForEach(db, j => j.Value.Load())));
+				_tasks.Add(Task.Run(action: () =>
+				{
+					_lock.Wait();
+					Parallel.ForEach(_db, j => j.Value.Load());
+				}));
 			}
 
-			await Task.WhenAll(tasks).ConfigureAwait(false);
+			_lock.Set();
+			await Task.WhenAll(_tasks).ConfigureAwait(false);
 
-			// 10,000 threads, 10 items each with 1 load
-			// 10,000 * (10 * (1 + 1)) = 10,000 * 20 = 200,000
-
-			mockdb.Counter
+			_mockdb.Counter
 				.Should()
-				.Be(200_000);
+				.Be(threads * IncrementPerLoop);
 		}
 	}
 }
