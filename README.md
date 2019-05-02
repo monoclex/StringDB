@@ -1,41 +1,75 @@
 # StringDB
-<p align="center">
+<div align="center">
     <img src="https://rawcdn.githack.com/SirJosh3917/StringDB/master/icons/banner_ad.png" alt="StringDB" />
-</p>
 
 [![Build Status][badge_appveyor_build_image]][badge_appveyor_build_page]
 [![Test Status][badge_tests_image]][badge_appveyor_build_page]
 [![Nuget Version][badge_nuget_version_image]][link_nuget]
 [![Nuget Downloads][badge_nuget_downloads_image]][link_nuget]
 
+</div>
+
 [```Install-Package StringDB```][link_nuget]
 
-StringDB embodies 2 things:
+## Introduction
 
- - [Tiny][section_tiny]
- - [Modularity][section_modular]
+StringDB is a key/value pair store with a friendly API to use as little RAM and space as possible.
 
-## Get Started Right Now (for skimmers)
+Verify the claims for yourself:
 
-Skimming? Here's what you need to know:
+- [Api][section_api]
+- [Tiny][section_tiny]
 
-| Feature   |   Description |
-| ---  |  --- |
-| new DatabaseBuilder() | Empty class that has extension methods built onto it to fluently create databases. |
-| StringDatabase | Generally useless. Static class with helper methods to create string key/value DBs. |
+## Api
 
-Here's a code sample to get you started immedietly.
+Use fluent extensions to create a database:
+
 ```cs
-var transformer = new StringTransformer();
-using (var db = new DatabaseBuilder()
-	.UseIODatabase(builder => builder.UseStringDB
-		(
-			StringDBVersions.Latest,
-			File.Open("my-db.db", FileMode.OpenOrCreate, FileAccess.ReadWrite)
-		))
-	.WithTransform(transformer, transformer))
+using IDatabase<string, string> db = new DatabaseBuilder()
+    .UseIODatabase(StringDBVersions.Latest, "database.db")
+    .ApplyStringTransformation();
+
+using IDatabase<int, string> memDb = new DatabaseBuilder()
+    .UseMemoryDatabase<int, string>();
+```
+
+Use the IDatabase interface to interface with databases
+
+```cs
+void InsertGreeting(IDatabase<string, string> database, string user)
 {
-	db.Insert("test", "value");
+    database.Insert(user, $"Greetings, {user}!");
+}
+```
+
+And inherit BaseDatabase to create your own IDatabases with minimal effort
+
+```cs
+public class TestDatabase : BaseDatabase<int, string>
+{
+    private class LazyValue : ILazyLoader<string>
+    {
+        private readonly string _value;
+        public LazyValue(int value) => _value = value.ToString();
+        public string Load() => _value;
+        public void Dispose() {}
+    }
+
+    protected override void InsertRange(KeyValuePair<int, string>[] items)
+    {
+        foreach(var item in items)
+        {
+            Console.WriteLine($"{item.Key}: {item.Value}");
+        }
+    }
+
+    protected override IEnumerable<KeyValuePair<int, ILazyLoader<string>>> Evaluate()
+    {
+        for(var i = 0; i < int.MaxValue)
+        {
+            yield return KeyValuePair.Create(i, new LazyValue(i));
+        }
+    }
 }
 ```
 
@@ -43,7 +77,7 @@ using (var db = new DatabaseBuilder()
 
 StringDB is *tiny*. Use *tiny* amounts of RAM, and *tiny* amounts of space.
 
-### [StringDB 10.0.0 file size after single inserts with 128 length keys and 1024 length values][source_insert_test]
+### [StringDB 10.0.0 file size: single inserts, 128 byte keys, 1024 byte values][source_insert_test]
 
 | Inserts | Size (in KB, 1000 bytes) | Absolute Minimum Size Possible | StringDB Overhead Percentage |
 | --- | --- | --- | --- |
@@ -53,7 +87,7 @@ StringDB is *tiny*. Use *tiny* amounts of RAM, and *tiny* amounts of space.
 
 This chart shows the size of a StringDB file after multiple *single inserts*. Every key is 128 bytes long, and every value is 1024 bytes long. By doing single inserts, file size is dramatically affected due to the additional overhead for the index chain.
 
-### [StringDB 10.0.0 file size after an insert range with 128 length keys and 1024 length values][source_insertrange_test]
+### [StringDB 10.0.0 file size: insert range, 128 byte keys, 1024 byte values][source_insertrange_test]
 
 | Elements in Insert Range | Size (in KB, 1000 bytes) | Absolute Minimum Size Possible | StringDB Overhead Percentage |
 | --- | --- | --- | --- |
@@ -63,24 +97,9 @@ This chart shows the size of a StringDB file after multiple *single inserts*. Ev
 
 This chart shows the size of a StringDB file after a single insert range with the amount of items specified.
 
-## Modular ![icon_modular]
-
-StringDB was made to be *modular*. Pick up features and use them as you need them, *when* you need them.
-
-By chaining database types to extend functionality, you become freed and can easily add and extend functionality without sacrificing cleanliness or testability.
-
-```cs
-using (var db = new DatabaseBuilder()
-	.UseMemoryDatabase<string, string>()
-	.WithThreadLock()
-	.WithCache())
-{
-}
-```
-
 ## Addons
 
-StringDB will officially maintain support for integration with some libraries. [View them here.][link_addons]
+Official addon support will be maintained for [these libraries.][link_addons]
 
 ## We welcome issues!
 
@@ -91,14 +110,12 @@ Don't be afraid to make an issue about anything and everything!
 - Is this library not suitable for your purposes? Submit an isssue!
 - Want it to do something? Submit an issue!
 
-I'd be more then happy to see someone actually using my library, and by fixing that issue I can help satisfy users in the future in addition to yourself!
+It's an honour to have you use this library, and feedback is needed to make this the greatest it can be.
 
-Need immediate assistence? [Join the discord!](https://discord.gg/wVcnkKJ)
+Need immediate assistence? [Join the discord!](discord)
 
 [icon_banner_ad]: ./icons/banner_ad.png
-[icon_modular]: ./icons/modular.png
 [icon_tiny]: ./icons/tiny.png
-[icon_understand]: ./icons/understand.png
 
 [badge_appveyor_build_image]: https://img.shields.io/appveyor/ci/SirJosh3917/StringDB/master.svg?style=flat-square
 [badge_tests_image]: https://img.shields.io/codecov/c/github/SirJosh3917/StringDB/master.svg?style=flat-square
@@ -110,13 +127,10 @@ Need immediate assistence? [Join the discord!](https://discord.gg/wVcnkKJ)
 [link_nuget]: https://www.nuget.org/packages/StringDB
 [link_addons]: ./addons/addons.md
 
-[section_modular]: #modular-
 [section_tiny]: #tiny-
-[section_understandable]: #understandable-
-[section_simple]: #simple-
+[section_api]: #api-
 
 [source_insert_test]: ./src/StringDB.PerformanceNumbers/SingleInsertFileSize.cs
 [source_insertrange_test]: ./src/StringDB.PerformanceNumbers/InsertRangeFileSize.cs
 
-[wiki_stringdb_format]: https://github.com/SirJosh3917/StringDB/wiki/StringDB-10.0.0-Format
-[wiki_tutorials]: https://github.com/SirJosh3917/StringDB/wiki/Getting-Started
+[discord]: https://discord.gg/wVcnkKJ
