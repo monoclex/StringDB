@@ -3,7 +3,10 @@
     <img src="https://rawcdn.githack.com/SirJosh3917/StringDB/master/icons/banner_ad.png" alt="StringDB" />
 </p>
 
-[![AppVeyor Build Status][badge_appveyor_build_image]][badge_appveyor_build_page]
+[![Build Status][badge_appveyor_build_image]][badge_appveyor_build_page]
+[![Test Status][badge_tests_image]][badge_appveyor_build_page]
+[![Nuget Version][badge_nuget_version_image]][link_nuget]
+[![Nuget Downloads][badge_nuget_downloads_image]][link_nuget]
 
 [```Install-Package StringDB```][link_nuget]
 
@@ -97,7 +100,11 @@ Need immediate assistence? [Join the discord!](https://discord.gg/wVcnkKJ)
 [icon_tiny]: ./icons/tiny.png
 [icon_understand]: ./icons/understand.png
 
-[badge_appveyor_build_image]: https://ci.appveyor.com/api/projects/status/github/SirJosh3917/StringDB?svg=true
+[badge_appveyor_build_image]: https://img.shields.io/appveyor/ci/SirJosh3917/StringDB/master.svg?style=flat-square
+[badge_tests_image]: https://img.shields.io/codecov/c/github/SirJosh3917/StringDB/master.svg?style=flat-square
+[badge_nuget_version_image]: https://img.shields.io/nuget/v/StringDB.svg?style=flat-square
+[badge_nuget_downloads_image]: https://img.shields.io/nuget/dt/StringDB.svg?style=flat-square
+
 [badge_appveyor_build_page]: https://ci.appveyor.com/project/sirjosh3917/stringdb
 
 [link_nuget]: https://www.nuget.org/packages/StringDB

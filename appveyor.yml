@@ -1,20 +1,38 @@
-version: '5.0.{build}'
-image: Visual Studio 2017
+os: Visual Studio 2019
 clone_depth: 1
 deploy: off
+
 branches:
   only:
-  - master
+    - master
+
+assembly_info:
+    assembly_informational_version: "{version} - CI (AppVeyor, branch: {branch})"
+
+configuration:
+    - Release
+
 init:
   - cmd: git config --global core.autocrlf true
+
+before_build:
+  - dotnet restore
+  - nuget install OpenCover -Version 4.6.519 -OutputDirectory packages
+  - nuget install Codecov -Version 1.0.3 -OutputDirectory packages
+
 build_script:
-  - cmd: dotnet --version
-  - cmd: dotnet restore -v q
-  - cmd: dotnet build -c Release -f net45 "src\StringDB\StringDB.csproj"
-  - cmd: dotnet build -c Release -f netstandard2.0 "src\StringDB\StringDB.csproj"
-  - cmd: cd ..
+  - cmd: dotnet build -c %CONFIGURATION% -f net45 "src\StringDB\StringDB.csproj"
+  - cmd: dotnet build -c %CONFIGURATION% -f netstandard2.0 "src\StringDB\StringDB.csproj"
+
+test_script:
+    - ps: |
+        if ($env:CONFIGURATION -eq 'Release')
+        {
+          dotnet test src\StringDB.Tests\ /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          
+          packages\Codecov.1.0.3\tools\codecov.exe -f "src\StringDB.Tests\coverage.opencover.xml"
+        }
+
 artifacts:
- - path: 'src\StringDB\bin\Release\netstandard2.0\'
-   name: StringDB_netstandard2.0
- - path: 'src\StringDB\bin\Release\net45\'
-   name: StringDB_net45
+  - path: 'src\StringDB\bin\%CONFIGURATION%\*.nupkg'
+    name: StringDB.zip
