@@ -40,7 +40,7 @@ namespace StringDB.Databases
 		/// <param name="data">The data to pre-fill it with.</param>
 		/// <param name="comparer">The equality comparer to use.</param>
 		public MemoryDatabase([CanBeNull] List<KeyValuePair<TKey, TValue>> data, [NotNull] EqualityComparer<TKey> comparer)
-			: base (comparer)
+			: base(comparer)
 			=> _data = data ?? new List<KeyValuePair<TKey, TValue>>();
 
 		/// <inheritdoc />

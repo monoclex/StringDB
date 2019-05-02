@@ -98,6 +98,9 @@ namespace StringDB.Tests
 				.Be(threads * insertRanges);
 		}
 
+		/// <summary>
+		/// Tests if multiple threads looping over it causes it to fail
+		/// </summary>
 		[Fact]
 		public async Task MultipleThreadsForeachOver()
 		{

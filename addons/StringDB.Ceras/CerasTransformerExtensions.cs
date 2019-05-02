@@ -1,10 +1,11 @@
 ﻿using Ceras;
 
+using JetBrains.Annotations;
+
 using StringDB.Databases;
 using StringDB.Fluency;
 
 using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
 
 namespace StringDB.Ceras
 {

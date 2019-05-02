@@ -1,7 +1,8 @@
 ﻿using Ceras;
 
-using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
+
+using System.Runtime.CompilerServices;
 
 namespace StringDB.Ceras
 {
