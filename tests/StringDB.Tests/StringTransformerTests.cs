@@ -8,28 +8,39 @@ using Xunit;
 
 namespace StringDB.Tests
 {
+	/// <summary>
+	/// <see cref="StringTransformer"/> tests.
+	/// </summary>
 	public class StringTransformerTests
 	{
-		[Fact]
-		public void StringIntoByte()
-		{
-			var t = new StringTransformer();
+		private readonly StringTransformer _transformer;
+		private readonly string _testingString;
+		private readonly byte[] _testingBytes;
 
-			t.TransformPost("test")
-				.Should()
-				.BeEquivalentTo(Encoding.UTF8.GetBytes("test"));
+		public StringTransformerTests()
+		{
+			_transformer = new StringTransformer();
+
+			_testingString = "test";
+			_testingBytes = Encoding.UTF8.GetBytes(_testingString);
 		}
 
+		/// <summary>
+		/// The TransformPost method should transform the string into the correct bytes.
+		/// </summary>
 		[Fact]
-		public void ByteIntoString()
-		{
-			var t = new StringTransformer();
+		public void TransformPostTest()
+			=> _transformer.TransformPost(_testingString)
+			.Should()
+			.BeEquivalentTo(_testingBytes);
 
-			var bytes = Encoding.UTF8.GetBytes("test");
-
-			t.TransformPre(bytes)
-				.Should()
-				.BeEquivalentTo("test");
-		}
+		/// <summary>
+		/// The TransformPre method should transform the bytes into the correct string.
+		/// </summary>
+		[Fact]
+		public void TransformPreTest()
+			=> _transformer.TransformPre(_testingBytes)
+			.Should()
+			.BeEquivalentTo(_testingString);
 	}
 }
