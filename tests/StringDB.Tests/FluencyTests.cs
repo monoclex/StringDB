@@ -151,7 +151,7 @@ namespace StringDB.Tests
 			// verify that the DBIODevice was created correctly
 
 			var db = new DatabaseBuilder()
-				.UseIODatabase(StringDBVersions.v10_0_0, "test.db");
+				.UseIODatabase(StringDBVersions.v10_0_0, "test1.db");
 
 			db
 				.Should()
@@ -175,7 +175,7 @@ namespace StringDB.Tests
 		{
 			// just make sure that down the chain we initialized a file stream
 			var idbiod = new DatabaseIODeviceBuilder()
-				.UseStringDB(StringDBVersions.v10_0_0, "test.db");
+				.UseStringDB(StringDBVersions.v10_0_0, "test2.db");
 
 			idbiod
 				.Should()
