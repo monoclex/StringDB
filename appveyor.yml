@@ -30,7 +30,7 @@ test_script:
         {
           dotnet test tests\StringDB.Tests\ /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
           
-          packages\Codecov.1.0.3\tools\codecov.exe -f "src\StringDB.Tests\coverage.opencover.xml"
+          packages\Codecov.1.0.3\tools\codecov.exe -f "tests\StringDB.Tests\coverage.opencover.xml"
         }
 
 artifacts:
