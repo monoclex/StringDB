@@ -101,7 +101,7 @@ This chart shows the size of a StringDB file after a single insert range with th
 
 Official addon support will be maintained for [these libraries.][link_addons]
 
-## We welcome issues!
+## Issues welcomed!
 
 Don't be afraid to make an issue about anything and everything!
 
