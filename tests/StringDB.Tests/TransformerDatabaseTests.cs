@@ -4,73 +4,81 @@ using StringDB.Databases;
 using StringDB.Transformers;
 
 using System.Collections.Generic;
-
+using System.Linq;
 using Xunit;
 
 namespace StringDB.Tests
 {
+	/// <summary>
+	/// Tests for a <see cref="TransformDatabase{TPreKey, TPreValue, TPostKey, TPostValue}"/>
+	/// </summary>
 	public class TransformerDatabaseTests
 	{
+		private readonly MemoryDatabase<string, int> _memoryDatabase;
+		private readonly MockTransformer _keyTransformer;
+		private readonly MockTransformer _valueTransformer;
+		private readonly TransformDatabase<string, int, int, string> _transformDatabase;
+		private readonly KeyValuePair<int, string>[] _values;
+		private readonly KeyValuePair<string, int>[] _expectValues;
+
+		public TransformerDatabaseTests()
+		{
+			_memoryDatabase = new MemoryDatabase<string, int>();
+			_keyTransformer = new MockTransformer();
+			_valueTransformer = new MockTransformer();
+
+			_transformDatabase = new TransformDatabase<string, int, int, string>
+			(
+				db: _memoryDatabase,
+				keyTransformer: _keyTransformer.Reverse(),
+				valueTransformer: _valueTransformer
+			);
+
+			_values = new[]
+			{
+				KeyValuePair.Create(1, "a"),
+				KeyValuePair.Create(2, "b"),
+				KeyValuePair.Create(3, "c"),
+			};
+
+			_expectValues = _values
+				 .Select
+				 (
+					 x => KeyValuePair.Create
+					 (
+						 _keyTransformer.TransformPre(x.Key),
+						 _valueTransformer.TransformPost(x.Value)
+					 )
+				 )
+				 .ToArray();
+		}
+
+		/// <summary>
+		/// Ensures that when we insert a range of entries, it transforms the entries back.
+		/// </summary>
 		[Fact]
 		public void InsertRange()
 		{
-			var db = new MemoryDatabase<string, int>();
-			var kt = new MockTransformer();
-			var vt = new MockTransformer();
+			_transformDatabase.InsertRange(_values);
 
-			var tdb = new TransformDatabase<string, int, int, string>
-			(
-				db: db,
-				keyTransformer: new ReverseTransformer<string, int>(kt),
-				valueTransformer: vt
-			);
-
-			tdb.InsertRange(new KeyValuePair<int, string>[]
-			{
-				new KeyValuePair<int, string>(1, "a"),
-				new KeyValuePair<int, string>(2, "b"),
-				new KeyValuePair<int, string>(3, "c"),
-			});
-
-			db.EnumerateAggressively(3)
+			// now the memory db should have the transformed values in them
+			_memoryDatabase.AsEnumerable()
 				.Should()
-				.BeEquivalentTo(new KeyValuePair<string, int>[]
-				{
-					new KeyValuePair<string, int>(kt.TransformPre(1), vt.TransformPost("a")),
-					new KeyValuePair<string, int>(kt.TransformPre(2), vt.TransformPost("b")),
-					new KeyValuePair<string, int>(kt.TransformPre(3), vt.TransformPost("c")),
-				});
+				.BeEquivalentTo(_expectValues, "Inserting values into a transform database should insert the transformed values into the underlying database.");
 		}
 
+		/// <summary>
+		/// Enumerates over the transform database - tests integration between the memdb & tdb
+		/// </summary>
 		[Fact]
 		public void Enumerate()
 		{
-			var db = new MemoryDatabase<string, int>();
-			var kt = new MockTransformer();
-			var vt = new MockTransformer();
+			_transformDatabase.InsertRange(_values);
 
-			var tdb = new TransformDatabase<string, int, int, string>
-			(
-				db: db,
-				keyTransformer: new ReverseTransformer<string, int>(kt),
-				valueTransformer: vt
-			);
-
-			tdb.InsertRange(new KeyValuePair<int, string>[]
-			{
-				new KeyValuePair<int, string>(1, "a"),
-				new KeyValuePair<int, string>(2, "b"),
-				new KeyValuePair<int, string>(3, "c"),
-			});
-
-			tdb.EnumerateAggressively(3)
+			// make sure enumeration is fine
+			_transformDatabase.AsEnumerable()
 				.Should()
-				.BeEquivalentTo(new KeyValuePair<int, string>[]
-				{
-					new KeyValuePair<int, string>(1, "a"),
-					new KeyValuePair<int, string>(2, "b"),
-					new KeyValuePair<int, string>(3, "c"),
-				});
+				.BeEquivalentTo(_values);
 		}
 	}
 }
