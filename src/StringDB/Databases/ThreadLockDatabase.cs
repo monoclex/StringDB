@@ -13,7 +13,8 @@ namespace StringDB.Databases
 	/// <typeparam name="TKey">The type of key.</typeparam>
 	/// <typeparam name="TValue">The type of value.</typeparam>
 	[PublicAPI]
-	public sealed class ThreadLockDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
+	public sealed class ThreadLockDatabase<TKey, TValue>
+		: BaseDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
 		private sealed class ThreadLoackLazyLoader : ILazyLoader<TValue>
 		{
@@ -96,8 +97,10 @@ namespace StringDB.Databases
 			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		}
 
-		[NotNull] private readonly IDatabase<TKey, TValue> _db;
 		[NotNull] private readonly object _lock = new object();
+
+		/// <inheritdoc />
+		[NotNull] public IDatabase<TKey, TValue> InnerDatabase { get; }
 
 		/// <summary>
 		/// Creates a new <see cref="ThreadLockDatabase{TKey,TValue}"/> around a database.
@@ -114,27 +117,27 @@ namespace StringDB.Databases
 		/// <param name="database">The database to intelligently lock on.</param>
 		/// <param name="comparer">The equality comparer to use for keys.</param>
 		public ThreadLockDatabase([NotNull] IDatabase<TKey, TValue> database, [NotNull] EqualityComparer<TKey> comparer)
-			=> _db = database;
+			=> InnerDatabase = database;
 
 		/// <inheritdoc />
 		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)
 		{
 			lock (_lock)
 			{
-				_db.InsertRange(items);
+				InnerDatabase.InsertRange(items);
 			}
 		}
 
 		/// <inheritdoc />
 		protected override IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate()
-			=> new ThinDatabaseIEnumeratorWrapper(_lock, _db);
+			=> new ThinDatabaseIEnumeratorWrapper(_lock, InnerDatabase);
 
 		/// <inheritdoc />
 		public override void Dispose()
 		{
 			lock (_lock)
 			{
-				_db.Dispose();
+				InnerDatabase.Dispose();
 			}
 		}
 	}

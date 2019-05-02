@@ -16,7 +16,7 @@ namespace StringDB.Databases
 	/// <typeparam name="TPostValue">The value type after transformation</typeparam>
 	[PublicAPI]
 	public sealed class TransformDatabase<TPreKey, TPreValue, TPostKey, TPostValue>
-		: BaseDatabase<TPostKey, TPostValue>
+		: BaseDatabase<TPostKey, TPostValue>, IDatabaseLayer<TPreKey, TPreValue>
 	{
 		private sealed class TransformLazyLoader : ILazyLoader<TPostValue>
 		{
@@ -41,9 +41,11 @@ namespace StringDB.Databases
 			}
 		}
 
-		private readonly IDatabase<TPreKey, TPreValue> _db;
 		private readonly ITransformer<TPreKey, TPostKey> _keyTransformer;
 		private readonly ITransformer<TPreValue, TPostValue> _valueTransformer;
+
+		/// <inheritdoc />
+		public IDatabase<TPreKey, TPreValue> InnerDatabase { get; }
 
 		/// <summary>
 		/// Create a new transform database.
@@ -77,7 +79,7 @@ namespace StringDB.Databases
 		)
 			: base(comparer)
 		{
-			_db = db;
+			InnerDatabase = db;
 			_keyTransformer = keyTransformer;
 			_valueTransformer = valueTransformer;
 		}
@@ -98,12 +100,12 @@ namespace StringDB.Databases
 				);
 			}
 
-			_db.InsertRange(pre);
+			InnerDatabase.InsertRange(pre);
 		}
 
 		/// <inheritdoc />
 		protected override IEnumerable<KeyValuePair<TPostKey, ILazyLoader<TPostValue>>> Evaluate()
-			=> _db
+			=> InnerDatabase
 			.Select
 			(
 				x => new KeyValuePair<TPostKey, ILazyLoader<TPostValue>>
@@ -114,6 +116,6 @@ namespace StringDB.Databases
 			);
 
 		/// <inheritdoc />
-		public override void Dispose() => _db.Dispose();
+		public override void Dispose() => InnerDatabase.Dispose();
 	}
 }

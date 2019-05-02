@@ -15,7 +15,8 @@ namespace StringDB.Databases
 	/// <typeparam name="TKey">The type of key.</typeparam>
 	/// <typeparam name="TValue">The type of value.</typeparam>
 	[PublicAPI]
-	public sealed class CacheDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
+	public sealed class CacheDatabase<TKey, TValue>
+		: BaseDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
 		private sealed class CacheLazyLoader : ILazyLoader<TValue>, IDisposable
 		{
@@ -49,8 +50,10 @@ namespace StringDB.Databases
 			}
 		}
 
-		private readonly List<KeyValuePair<TKey, CacheLazyLoader>> _cache;
-		private readonly IDatabase<TKey, TValue> _database;
+		[NotNull] private readonly List<KeyValuePair<TKey, CacheLazyLoader>> _cache;
+
+		/// <inheritdoc />
+		[NotNull] public IDatabase<TKey, TValue> InnerDatabase { get; }
 
 		/// <summary>
 		/// Create a new <see cref="CacheDatabase{TKey,TValue}"/>.
@@ -70,14 +73,14 @@ namespace StringDB.Databases
 			: base(comparer)
 		{
 			_cache = new List<KeyValuePair<TKey, CacheLazyLoader>>();
-			_database = database;
+			InnerDatabase = database;
 		}
 
 		/// <inheritdoc />
 		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)
 
 			// we can't add it to our cache otherwise it might change the order of things
-			=> _database.InsertRange(items);
+			=> InnerDatabase.InsertRange(items);
 
 		/// <inheritdoc />
 		protected override IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate()
@@ -90,7 +93,7 @@ namespace StringDB.Databases
 			}
 
 			// start reading and adding more as we go along
-			foreach (var item in _database.Skip(_cache.Count))
+			foreach (var item in InnerDatabase.Skip(_cache.Count))
 			{
 				var currentCache = new KeyValuePair<TKey, CacheLazyLoader>
 				(
@@ -120,7 +123,7 @@ namespace StringDB.Databases
 			}
 
 			_cache.Clear();
-			_database.Dispose();
+			InnerDatabase.Dispose();
 		}
 	}
 }
