@@ -144,5 +144,30 @@ namespace StringDB.Tests
 				.Should()
 				.BeOfType<StoneVaultIODevice>();
 		}
+
+		[Fact]
+		public void UseIODatabaseWithVersionAndFile()
+		{
+			// verify that the DBIODevice was created correctly
+
+			var db = new DatabaseBuilder()
+				.UseIODatabase(StringDBVersions.v10_0_0, "test.db");
+
+			db
+				.Should()
+				.BeOfType<IODatabase>();
+
+			var iodb = db as IODatabase;
+
+			iodb.DatabaseIODevice
+				.Should()
+				.BeOfType<DatabaseIODevice>();
+
+			var dbiod = iodb.DatabaseIODevice as DatabaseIODevice;
+
+			dbiod.LowLevelDatabaseIODevice
+				.Should()
+				.BeOfType<StringDB10_0_0LowlevelDatabaseIODevice>();
+		}
 	}
 }
