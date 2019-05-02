@@ -62,7 +62,7 @@ namespace StringDB.Tests
 			_transformDatabase.InsertRange(_values);
 
 			// now the memory db should have the transformed values in them
-			_memoryDatabase.AsEnumerable()
+			_memoryDatabase.EnumerateAggressively(3)
 				.Should()
 				.BeEquivalentTo(_expectValues, "Inserting values into a transform database should insert the transformed values into the underlying database.");
 		}
@@ -76,7 +76,7 @@ namespace StringDB.Tests
 			_transformDatabase.InsertRange(_values);
 
 			// make sure enumeration is fine
-			_transformDatabase.AsEnumerable()
+			_transformDatabase.EnumerateAggressively(3)
 				.Should()
 				.BeEquivalentTo(_values);
 		}
