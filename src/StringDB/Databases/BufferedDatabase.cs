@@ -49,19 +49,26 @@ namespace StringDB.Databases
 		/// <returns>True if the buffer is filled, false if it is not.</returns>
 		private bool FillBuffer([NotNull] KeyValuePair<TKey, TValue>[] fillAmt, ref int used)
 		{
-			// an overflow will occur
-			var willFill = _bufferPos + fillAmt.Length > _buffer.Length;
-
 			// the amount we can fill,
 			// it's either the amount of space remaning in the buffer,
 			// or the array length
 			var amountCanFill = Math.Min(_buffer.Length - _bufferPos, fillAmt.Length);
 
+			// if we can't fill anything, say that the buffer's full
+			if (amountCanFill <= 0)
+			{
+				return true;
+			}
+
+			// an overflow will occur
+			var willFill = _bufferPos + fillAmt.Length > _buffer.Length;
+
 			// copy from the src to the buffer
 			Array.Copy(fillAmt, used, _buffer, _bufferPos, amountCanFill);
 
-			// increment the number
+			// increment respective variables
 			used += amountCanFill;
+			_bufferPos += amountCanFill;
 
 			return willFill;
 		}
