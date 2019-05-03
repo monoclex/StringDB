@@ -6,7 +6,6 @@ using StringDB.IO;
 using StringDB.IO.Compatibility;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,47 +14,10 @@ using Xunit;
 
 namespace StringDB.Tests
 {
+	// lmao messy code
+	// TODO: clean
 	public static class StringDB10_0_0Tests
 	{
-		public class IntegrationTests
-		{
-			[Fact]
-			public void IntegrationTest()
-			{
-				if (File.Exists("stringdb.db"))
-					File.Delete("stringdb.db");
-
-				using (var db = StringDatabase.Create(File.Open("stringdb.db", FileMode.OpenOrCreate)))
-				{
-					db.Insert("test", "value");
-					db.Insert("test", "value2");
-					db.Insert("test", "value3");
-
-					db.EnumerateAggressively(3)
-						.Should().BeEquivalentTo(new[]
-						{
-							new KeyValuePair<string, string>("test", "value"),
-							new KeyValuePair<string, string>("test", "value2"),
-							new KeyValuePair<string, string>("test", "value3"),
-						});
-				}
-
-				using (var db = StringDatabase.Create(File.Open("stringdb.db", FileMode.OpenOrCreate)))
-				{
-					db.Insert("test", "value4");
-
-					db.EnumerateAggressively(3)
-						.Should().BeEquivalentTo(new[]
-						{
-							new KeyValuePair<string, string>("test", "value"),
-							new KeyValuePair<string, string>("test", "value2"),
-							new KeyValuePair<string, string>("test", "value3"),
-							new KeyValuePair<string, string>("test", "value4")
-						});
-				}
-			}
-		}
-
 		public static (MemoryStream ms, StringDB10_0_0LowlevelDatabaseIODevice io) Generate()
 		{
 			var ms = new MemoryStream();
