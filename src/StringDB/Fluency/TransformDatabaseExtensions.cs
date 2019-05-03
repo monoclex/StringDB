@@ -22,6 +22,7 @@ namespace StringDB.Fluency
 		/// <param name="database">The database to transform.</param>
 		/// <param name="keyTransformer">A transformer for the keys.</param>
 		/// <param name="valueTransformer">A transformer for the values.</param>
+		/// <param name="disposeDatabase">If the underlying database should be disposed on dispose.</param>
 		/// <returns>A <see cref="TransformDatabase{TPreTransformKey,TPreTransformValue,TPostTransformKey,TPostTransformValue}"/>.</returns>
 		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -29,13 +30,15 @@ namespace StringDB.Fluency
 		(
 			[NotNull] this IDatabase<TPreKey, TPreValue> database,
 			[NotNull] ITransformer<TPreKey, TPostKey> keyTransformer,
-			[NotNull] ITransformer<TPreValue, TPostValue> valueTransformer
+			[NotNull] ITransformer<TPreValue, TPostValue> valueTransformer,
+			bool disposeDatabase = true
 		)
 			=> new TransformDatabase<TPreKey, TPreValue, TPostKey, TPostValue>
 			(
 				database,
 				keyTransformer,
-				valueTransformer
+				valueTransformer,
+				disposeDatabase
 			);
 	}
 }

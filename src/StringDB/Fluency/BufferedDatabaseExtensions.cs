@@ -17,12 +17,14 @@ namespace StringDB.Fluency
 		/// <typeparam name="TValue">The type of value.</typeparam>
 		/// <param name="database">The database to buffer.</param>
 		/// <param name="bufferSize">The size of the buffer.</param>
+		/// <param name="disposeDatabase">If the underlying database should be disposed on dispose.</param>
 		/// <returns>A buffered database.</returns>
 		public static IDatabase<TKey, TValue> WithBuffer<TKey, TValue>
 		(
 			[NotNull] this IDatabase<TKey, TValue> database,
-			int bufferSize = 0x1000
+			int bufferSize = 0x1000,
+			bool disposeDatabase = true
 		)
-			=> new BufferedDatabase<TKey, TValue>(database, bufferSize);
+			=> new BufferedDatabase<TKey, TValue>(database, bufferSize, disposeDatabase);
 	}
 }
