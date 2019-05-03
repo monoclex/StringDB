@@ -74,7 +74,7 @@ namespace StringDB.Tests
 			}
 
 			_mockDb.Inserts
-				.Should().Be(0);
+				.Should().Be(1);
 
 			_db.Insert(BufferSize, 0);
 
@@ -104,7 +104,7 @@ namespace StringDB.Tests
 			}
 
 			_mockDb.Inserts
-				.Should().Be(0);
+				.Should().Be(1);
 
 			_db.InsertRange(new[] { KeyValuePair.Create(BufferSize, 0) });
 

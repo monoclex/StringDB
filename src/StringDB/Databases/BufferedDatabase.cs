@@ -50,10 +50,17 @@ namespace StringDB.Databases
 		/// <returns>True if the buffer is filled, false if it is not.</returns>
 		private bool FillBuffer([NotNull] KeyValuePair<TKey, TValue>[] fillAmt, ref int used)
 		{
+			var needFill = fillAmt.Length - used;
+
+			if (needFill == 0)
+			{
+				return false;
+			}
+
 			// the amount we can fill,
 			// it's either the amount of space remaning in the buffer,
 			// or the array length
-			var amountCanFill = Math.Min(_buffer.Length - _bufferPos, fillAmt.Length);
+			var amountCanFill = Math.Min(_buffer.Length - _bufferPos, needFill);
 
 			// if we can't fill anything, say that the buffer's full
 			if (amountCanFill <= 0)
@@ -62,7 +69,7 @@ namespace StringDB.Databases
 			}
 
 			// an overflow will occur
-			var willFill = _bufferPos + fillAmt.Length > _buffer.Length;
+			var willFill = _bufferPos + needFill >= _buffer.Length;
 
 			// copy from the src to the buffer
 			Array.Copy(fillAmt, used, _buffer, _bufferPos, amountCanFill);
@@ -72,6 +79,19 @@ namespace StringDB.Databases
 			_bufferPos += amountCanFill;
 
 			return willFill;
+		}
+
+		private bool FillBufferSingle(KeyValuePair<TKey, TValue> entry)
+		{
+			if (_bufferPos == _buffer.Length)
+			{
+				// no room to insert anything
+				return true;
+			}
+
+			_buffer[_bufferPos++] = entry;
+
+			return _bufferPos == _buffer.Length;
 		}
 
 		/// <summary>
@@ -107,6 +127,17 @@ namespace StringDB.Databases
 		{
 			WriteBuffer();
 			InnerDatabase.Dispose();
+		}
+
+		/// <inheritdoc/>
+		public override void Insert(TKey key, TValue value)
+		{
+			var pair = new KeyValuePair<TKey, TValue>(key, value);
+
+			while (FillBufferSingle(pair))
+			{
+				WriteBuffer();
+			}
 		}
 
 		/// <inheritdoc/>
