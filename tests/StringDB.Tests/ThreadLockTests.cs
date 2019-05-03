@@ -45,7 +45,7 @@ namespace StringDB.Tests
 
 			public int Counter;
 
-			public override void InsertRange(KeyValuePair<int, int>[] items) => Counter++;
+			public override void InsertRange(params KeyValuePair<int, int>[] items) => Counter++;
 
 			protected override IEnumerable<KeyValuePair<int, ILazyLoader<int>>> Evaluate()
 			{

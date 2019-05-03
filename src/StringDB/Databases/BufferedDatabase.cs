@@ -141,7 +141,7 @@ namespace StringDB.Databases
 		}
 
 		/// <inheritdoc/>
-		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)
+		public override void InsertRange(params KeyValuePair<TKey, TValue>[] items)
 		{
 			int used = 0;
 

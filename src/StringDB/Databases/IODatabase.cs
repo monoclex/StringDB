@@ -51,7 +51,7 @@ namespace StringDB.Databases
 			=> DatabaseIODevice = dbIODevice;
 
 		/// <inheritdoc />
-		public override void InsertRange(KeyValuePair<byte[], byte[]>[] items) => DatabaseIODevice.Insert(items);
+		public override void InsertRange(params KeyValuePair<byte[], byte[]>[] items) => DatabaseIODevice.Insert(items);
 
 		/// <inheritdoc />
 		protected override IEnumerable<KeyValuePair<byte[], ILazyLoader<byte[]>>> Evaluate()

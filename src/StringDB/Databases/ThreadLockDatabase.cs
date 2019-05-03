@@ -120,7 +120,7 @@ namespace StringDB.Databases
 			=> InnerDatabase = database;
 
 		/// <inheritdoc />
-		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)
+		public override void InsertRange(params KeyValuePair<TKey, TValue>[] items)
 		{
 			lock (_lock)
 			{

@@ -35,7 +35,7 @@ namespace StringDB.Tests
 
 			public int InsertRanges { get; set; }
 
-			public override void InsertRange(KeyValuePair<string, int>[] items)
+			public override void InsertRange(params KeyValuePair<string, int>[] items)
 			{
 				InsertRanges++;
 				_db.InsertRange(items);

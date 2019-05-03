@@ -44,7 +44,7 @@ namespace StringDB.Databases
 			=> _data = data ?? new List<KeyValuePair<TKey, TValue>>();
 
 		/// <inheritdoc />
-		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)
+		public override void InsertRange(params KeyValuePair<TKey, TValue>[] items)
 			=> _data.AddRange(items);
 
 		/// <inheritdoc />

@@ -22,7 +22,7 @@ namespace StringDB.Tests
 
 			public override void Dispose() => Disposed = true;
 
-			public override void InsertRange(KeyValuePair<int, int>[] items)
+			public override void InsertRange(params KeyValuePair<int, int>[] items)
 			{
 				Inserts++;
 				InsertedData.InsertRange(InsertedData.Count, items.Select(x => x.Key).ToArray());

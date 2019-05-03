@@ -85,7 +85,7 @@ namespace StringDB.Databases
 		}
 
 		/// <inheritdoc />
-		public override void InsertRange(KeyValuePair<TPostKey, TPostValue>[] items)
+		public override void InsertRange(params KeyValuePair<TPostKey, TPostValue>[] items)
 		{
 			var pre = new KeyValuePair<TPreKey, TPreValue>[items.Length];
 

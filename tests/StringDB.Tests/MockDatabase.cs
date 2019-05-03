@@ -49,7 +49,7 @@ namespace StringDB.Tests
 
 		public void Insert(string key, int value) => Data.Add(new KeyValuePair<string, LazyItem<int>>(key, new LazyItem<int>(value)));
 
-		public void InsertRange(KeyValuePair<string, int>[] items)
+		public void InsertRange(params KeyValuePair<string, int>[] items)
 		{
 			foreach (var item in items)
 			{

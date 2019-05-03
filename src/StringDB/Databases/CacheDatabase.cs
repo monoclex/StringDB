@@ -77,7 +77,7 @@ namespace StringDB.Databases
 		}
 
 		/// <inheritdoc />
-		public override void InsertRange(KeyValuePair<TKey, TValue>[] items)
+		public override void InsertRange(params KeyValuePair<TKey, TValue>[] items)
 
 			// we can't add it to our cache otherwise it might change the order of things
 			=> InnerDatabase.InsertRange(items);

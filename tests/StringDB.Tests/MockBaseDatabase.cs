@@ -12,7 +12,7 @@ namespace StringDB.Tests
 
 		public KeyValuePair<string, int>[] Inserted { get; set; }
 
-		public override void InsertRange(KeyValuePair<string, int>[] items) => Inserted = items;
+		public override void InsertRange(params KeyValuePair<string, int>[] items) => Inserted = items;
 
 		protected override IEnumerable<KeyValuePair<string, ILazyLoader<int>>> Evaluate()
 			=> Data.Select(x => new KeyValuePair<string, ILazyLoader<int>>(x.Key, x.Value));

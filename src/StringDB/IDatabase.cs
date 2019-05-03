@@ -47,6 +47,6 @@ namespace StringDB
 		/// Inserts a range of items into the database.
 		/// </summary>
 		/// <param name="items">The items to insert.</param>
-		void InsertRange([NotNull] KeyValuePair<TKey, TValue>[] items);
+		void InsertRange([NotNull] params KeyValuePair<TKey, TValue>[] items);
 	}
 }

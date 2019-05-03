@@ -27,7 +27,7 @@ namespace StringDB.Databases
 		}
 
 		/// <inheritdoc />
-		public abstract void InsertRange(KeyValuePair<TKey, TValue>[] items);
+		public abstract void InsertRange(params KeyValuePair<TKey, TValue>[] items);
 
 		/// <summary>
 		/// Enumerates over all the items in the database.
@@ -63,7 +63,7 @@ namespace StringDB.Databases
 		}
 
 		public virtual void Insert(TKey key, TValue value)
-			=> InsertRange(new[] { new KeyValuePair<TKey, TValue>(key, value) });
+			=> InsertRange(new KeyValuePair<TKey, TValue>(key, value));
 
 		public virtual IEnumerable<ILazyLoader<TValue>> GetAll(TKey key)
 			=> Evaluate()
