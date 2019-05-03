@@ -38,7 +38,7 @@ namespace StringDB.Databases
 
 		/// <inheritdoc />
 		/// <exception cref="T:System.Collections.Generic.KeyNotFoundException">When the key is unable to be found.</exception>
-		public TValue Get(TKey key)
+		public virtual TValue Get(TKey key)
 		{
 			var success = TryGet(key, out var value);
 
@@ -50,7 +50,7 @@ namespace StringDB.Databases
 			throw new KeyNotFoundException($"Unable to find {key} in the database.");
 		}
 
-		public bool TryGet(TKey key, out TValue value)
+		public virtual bool TryGet(TKey key, out TValue value)
 		{
 			foreach (var result in GetAll(key))
 			{
@@ -62,15 +62,15 @@ namespace StringDB.Databases
 			return false;
 		}
 
-		public void Insert(TKey key, TValue value)
+		public virtual void Insert(TKey key, TValue value)
 			=> InsertRange(new[] { new KeyValuePair<TKey, TValue>(key, value) });
 
-		public IEnumerable<ILazyLoader<TValue>> GetAll(TKey key)
+		public virtual IEnumerable<ILazyLoader<TValue>> GetAll(TKey key)
 			=> Evaluate()
 			.Where(item => _keyComparer.Equals(key, item.Key))
 			.Select(item => item.Value);
 
-		public IEnumerator<KeyValuePair<TKey, ILazyLoader<TValue>>> GetEnumerator() => Evaluate().GetEnumerator();
+		public virtual IEnumerator<KeyValuePair<TKey, ILazyLoader<TValue>>> GetEnumerator() => Evaluate().GetEnumerator();
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
