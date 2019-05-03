@@ -16,14 +16,32 @@ namespace StringDB.Databases
 	[PublicAPI]
 	public abstract class BaseDatabase<TKey, TValue> : IDatabase<TKey, TValue>
 	{
-		private readonly EqualityComparer<TKey> _keyComparer;
-
-		protected BaseDatabase(EqualityComparer<TKey> keyComparer)
-			=> _keyComparer = keyComparer;
+		private readonly IEqualityComparer<TKey> _keyComparer;
+		private readonly IEqualityComparer<TValue> _valueComparer;
 
 		protected BaseDatabase()
-			: this(EqualityComparer<TKey>.Default)
+			: this(EqualityComparer<TKey>.Default, EqualityComparer<TValue>.Default)
 		{
+		}
+
+		protected BaseDatabase([NotNull] IEqualityComparer<TKey> keyComparer)
+			: this(keyComparer, EqualityComparer<TValue>.Default)
+		{
+		}
+
+		protected BaseDatabase([NotNull] IEqualityComparer<TValue> valueComparer)
+			: this(EqualityComparer<TKey>.Default, valueComparer)
+		{
+		}
+
+		protected BaseDatabase
+		(
+			[NotNull] IEqualityComparer<TKey> keyComparer,
+			[NotNull] IEqualityComparer<TValue> valueComparer
+		)
+		{
+			_keyComparer = keyComparer;
+			_valueComparer = valueComparer;
 		}
 
 		/// <inheritdoc />
@@ -42,7 +60,7 @@ namespace StringDB.Databases
 		{
 			var success = TryGet(key, out var value);
 
-			if (success && !EqualityComparer<TValue>.Equals(value, null))
+			if (success && !_valueComparer.Equals(value, default))
 			{
 				return value;
 			}
