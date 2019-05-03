@@ -1,9 +1,11 @@
 ﻿using FluentAssertions;
+
 using StringDB.Databases;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
 using Xunit;
 
 namespace StringDB.Tests
@@ -64,7 +66,7 @@ namespace StringDB.Tests
 		}
 
 		[Fact]
-		public void FillBuffer()
+		public void FillBufferWithInsert()
 		{
 			for (var i = 0; i < BufferSize; i++)
 			{
@@ -75,6 +77,36 @@ namespace StringDB.Tests
 				.Should().Be(0);
 
 			_db.Insert(BufferSize, 0);
+
+			_mockDb.Inserts
+				.Should().Be(1);
+
+			_mockDb.InsertedData
+				.Should()
+				.BeEquivalentTo(Enumerable.Range(0, BufferSize));
+		}
+
+		[Fact]
+		public void SingleInsertRangeCallsNoInserts()
+		{
+			_db.InsertRange(new[] { KeyValuePair.Create(0, 0) });
+
+			_mockDb.Inserts
+				.Should().Be(0);
+		}
+
+		[Fact]
+		public void FillBufferWithInsertRange()
+		{
+			for (var i = 0; i < BufferSize; i++)
+			{
+				_db.InsertRange(new[] { KeyValuePair.Create(i, 0) });
+			}
+
+			_mockDb.Inserts
+				.Should().Be(0);
+
+			_db.InsertRange(new[] { KeyValuePair.Create(BufferSize, 0) });
 
 			_mockDb.Inserts
 				.Should().Be(1);
