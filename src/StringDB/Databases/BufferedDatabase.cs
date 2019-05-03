@@ -9,6 +9,7 @@ namespace StringDB.Databases
 	/// Buffers writes to a database,
 	/// coagulating multiple inserts until the buffer is full.
 	/// </summary>
+	[PublicAPI]
 	public class BufferedDatabase<TKey, TValue>
 		: BaseDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
