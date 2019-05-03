@@ -43,14 +43,12 @@ namespace StringDB.Tests
 
 			using (var db = _openDb())
 			{
-				_insert(db);
-
 				db.EnumerateAggressively(3)
 					.Should().BeEquivalentTo(new[]
 					{
-							new KeyValuePair<string, string>("test", "value"),
-							new KeyValuePair<string, string>("test", "value2"),
-							new KeyValuePair<string, string>("test", "value3"),
+							new KeyValuePair<string, string>("a", "d"),
+							new KeyValuePair<string, string>("b", "e"),
+							new KeyValuePair<string, string>("c", "f"),
 					});
 			}
 		}
