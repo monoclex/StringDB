@@ -98,6 +98,7 @@ namespace StringDB.Databases
 		}
 
 		[NotNull] private readonly object _lock = new object();
+		private readonly bool _disposeDatabase;
 
 		/// <inheritdoc />
 		[NotNull] public IDatabase<TKey, TValue> InnerDatabase { get; }
@@ -106,8 +107,8 @@ namespace StringDB.Databases
 		/// Creates a new <see cref="ThreadLockDatabase{TKey,TValue}"/> around a database.
 		/// </summary>
 		/// <param name="database">The database to intelligently lock on.</param>
-		public ThreadLockDatabase([NotNull] IDatabase<TKey, TValue> database)
-			: this(database, EqualityComparer<TKey>.Default)
+		public ThreadLockDatabase([NotNull] IDatabase<TKey, TValue> database, bool disposeDatabase = true)
+			: this(database, EqualityComparer<TKey>.Default, disposeDatabase)
 		{
 		}
 
@@ -116,8 +117,17 @@ namespace StringDB.Databases
 		/// </summary>
 		/// <param name="database">The database to intelligently lock on.</param>
 		/// <param name="comparer">The equality comparer to use for keys.</param>
-		public ThreadLockDatabase([NotNull] IDatabase<TKey, TValue> database, [NotNull] EqualityComparer<TKey> comparer)
-			=> InnerDatabase = database;
+		public ThreadLockDatabase
+		(
+			[NotNull] IDatabase<TKey, TValue> database,
+			[NotNull] IEqualityComparer<TKey> comparer,
+			bool disposeDatabase = true
+		)
+			: base(comparer)
+		{
+			InnerDatabase = database;
+			_disposeDatabase = disposeDatabase;
+		}
 
 		/// <inheritdoc />
 		public override void InsertRange(params KeyValuePair<TKey, TValue>[] items)
@@ -135,9 +145,12 @@ namespace StringDB.Databases
 		/// <inheritdoc />
 		public override void Dispose()
 		{
-			lock (_lock)
+			if (_disposeDatabase)
 			{
-				InnerDatabase.Dispose();
+				lock (_lock)
+				{
+					InnerDatabase.Dispose();
+				}
 			}
 		}
 	}

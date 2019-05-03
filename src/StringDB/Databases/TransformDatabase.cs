@@ -43,6 +43,7 @@ namespace StringDB.Databases
 
 		private readonly ITransformer<TPreKey, TPostKey> _keyTransformer;
 		private readonly ITransformer<TPreValue, TPostValue> _valueTransformer;
+		private readonly bool _disposeDatabase;
 
 		/// <inheritdoc />
 		public IDatabase<TPreKey, TPreValue> InnerDatabase { get; }
@@ -57,9 +58,10 @@ namespace StringDB.Databases
 		(
 			[NotNull] IDatabase<TPreKey, TPreValue> db,
 			[NotNull] ITransformer<TPreKey, TPostKey> keyTransformer,
-			[NotNull] ITransformer<TPreValue, TPostValue> valueTransformer
+			[NotNull] ITransformer<TPreValue, TPostValue> valueTransformer,
+			bool disposeDatabase = true
 		)
-			: this(db, keyTransformer, valueTransformer, EqualityComparer<TPostKey>.Default)
+			: this(db, keyTransformer, valueTransformer, EqualityComparer<TPostKey>.Default, disposeDatabase)
 		{
 		}
 
@@ -75,13 +77,15 @@ namespace StringDB.Databases
 			[NotNull] IDatabase<TPreKey, TPreValue> db,
 			[NotNull] ITransformer<TPreKey, TPostKey> keyTransformer,
 			[NotNull] ITransformer<TPreValue, TPostValue> valueTransformer,
-			[NotNull] EqualityComparer<TPostKey> comparer
+			[NotNull] IEqualityComparer<TPostKey> comparer,
+			bool disposeDatabase = true
 		)
 			: base(comparer)
 		{
 			InnerDatabase = db;
 			_keyTransformer = keyTransformer;
 			_valueTransformer = valueTransformer;
+			_disposeDatabase = disposeDatabase;
 		}
 
 		/// <inheritdoc />
@@ -116,6 +120,12 @@ namespace StringDB.Databases
 			);
 
 		/// <inheritdoc />
-		public override void Dispose() => InnerDatabase.Dispose();
+		public override void Dispose()
+		{
+			if (_disposeDatabase)
+			{
+				InnerDatabase.Dispose();
+			}
+		}
 	}
 }

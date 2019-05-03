@@ -46,8 +46,8 @@ namespace StringDB.Databases
 		/// </summary>
 		/// <param name="dbIODevice">The DatabaseIODevice to use under the hood.</param>
 		/// <param name="comparer">The equality comparer to use for the key.</param>
-		public IODatabase([NotNull] IDatabaseIODevice dbIODevice, [NotNull] EqualityComparer<byte[]> comparer)
-			: base(comparer)
+		public IODatabase([NotNull] IDatabaseIODevice dbIODevice, [NotNull] IEqualityComparer<byte[]> comparer)
+			: base(keyComparer: comparer)
 			=> DatabaseIODevice = dbIODevice;
 
 		/// <inheritdoc />

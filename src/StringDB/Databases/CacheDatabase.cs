@@ -51,6 +51,7 @@ namespace StringDB.Databases
 		}
 
 		[NotNull] private readonly List<KeyValuePair<TKey, CacheLazyLoader>> _cache;
+		private readonly bool _disposeDatabase;
 
 		/// <inheritdoc />
 		[NotNull] public IDatabase<TKey, TValue> InnerDatabase { get; }
@@ -59,8 +60,12 @@ namespace StringDB.Databases
 		/// Create a new <see cref="CacheDatabase{TKey,TValue}"/>.
 		/// </summary>
 		/// <param name="database">The database to cache.</param>
-		public CacheDatabase([NotNull] IDatabase<TKey, TValue> database)
-			: this(database, EqualityComparer<TKey>.Default)
+		public CacheDatabase
+		(
+			[NotNull] IDatabase<TKey, TValue> database,
+			bool disposeDatabase = true
+		)
+			: this(database, EqualityComparer<TKey>.Default, disposeDatabase)
 		{
 		}
 
@@ -69,11 +74,17 @@ namespace StringDB.Databases
 		/// </summary>
 		/// <param name="database">The database to cache.</param>
 		/// <param name="comparer">The equality comparer for the key.</param>
-		public CacheDatabase([NotNull] IDatabase<TKey, TValue> database, [NotNull] EqualityComparer<TKey> comparer)
+		public CacheDatabase
+		(
+			[NotNull] IDatabase<TKey, TValue> database,
+			[NotNull] IEqualityComparer<TKey> comparer,
+			bool disposeDatabase = true
+		)
 			: base(comparer)
 		{
 			_cache = new List<KeyValuePair<TKey, CacheLazyLoader>>();
 			InnerDatabase = database;
+			_disposeDatabase = disposeDatabase;
 		}
 
 		/// <inheritdoc />
@@ -123,7 +134,11 @@ namespace StringDB.Databases
 			}
 
 			_cache.Clear();
-			InnerDatabase.Dispose();
+
+			if (_disposeDatabase)
+			{
+				InnerDatabase.Dispose();
+			}
 		}
 	}
 }

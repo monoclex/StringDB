@@ -23,7 +23,8 @@ namespace StringDB.Databases
 		public BufferedDatabase
 		(
 			[NotNull] IDatabase<TKey, TValue> database,
-			int bufferSize = 0x1000
+			int bufferSize = 0x1000,
+			bool disposeDatabase = true
 		)
 		{
 			if (bufferSize < MinimumBufferSize)
@@ -32,12 +33,13 @@ namespace StringDB.Databases
 			}
 
 			InnerDatabase = database;
-
+			_disposeDatabase = disposeDatabase;
 			_buffer = new KeyValuePair<TKey, TValue>[bufferSize];
 			_bufferPos = 0;
 		}
 
 		[NotNull] private readonly KeyValuePair<TKey, TValue>[] _buffer;
+		private readonly bool _disposeDatabase;
 		private int _bufferPos = 0;
 
 		public IDatabase<TKey, TValue> InnerDatabase { get; }
@@ -126,7 +128,11 @@ namespace StringDB.Databases
 		public override void Dispose()
 		{
 			WriteBuffer();
-			InnerDatabase.Dispose();
+
+			if (_disposeDatabase)
+			{
+				InnerDatabase.Dispose();
+			}
 		}
 
 		/// <inheritdoc/>
