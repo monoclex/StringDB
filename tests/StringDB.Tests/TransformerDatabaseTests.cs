@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 
 using StringDB.Databases;
+using StringDB.Tests.Mocks;
 using StringDB.Transformers;
 
 using System.Collections.Generic;

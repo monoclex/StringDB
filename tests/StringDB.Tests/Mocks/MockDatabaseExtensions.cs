@@ -2,7 +2,7 @@
 
 using System.Linq;
 
-namespace StringDB.Tests
+namespace StringDB.Tests.Mocks
 {
 	public static class MockDatabaseExtensions
 	{

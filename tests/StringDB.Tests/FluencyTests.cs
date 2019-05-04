@@ -4,6 +4,7 @@ using StringDB.Databases;
 using StringDB.Fluency;
 using StringDB.IO;
 using StringDB.IO.Compatibility;
+using StringDB.Tests.Mocks;
 using StringDB.Transformers;
 
 using System;

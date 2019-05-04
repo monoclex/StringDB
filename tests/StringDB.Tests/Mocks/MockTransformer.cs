@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StringDB.Tests
+namespace StringDB.Tests.Mocks
 {
 	public class MockTransformer : ITransformer<int, string>
 	{

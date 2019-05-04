@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace StringDB.Tests
+namespace StringDB.Tests.Mocks
 {
 	public class MockBaseDatabase : BaseDatabase<string, int>, IMockDatabase<string, int>
 	{
