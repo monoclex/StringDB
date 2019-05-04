@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
 
+using StringDB.LazyLoaders;
+
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,15 +16,6 @@ namespace StringDB.Databases
 	[PublicAPI]
 	public sealed class MemoryDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
 	{
-		private sealed class MemoryLazyLoader : ILazyLoader<TValue>
-		{
-			private readonly TValue _value;
-
-			public MemoryLazyLoader([NotNull] TValue value) => _value = value;
-
-			public TValue Load() => _value;
-		}
-
 		private readonly List<KeyValuePair<TKey, TValue>> _data;
 
 		/// <summary>
@@ -55,7 +48,7 @@ namespace StringDB.Databases
 				item => new KeyValuePair<TKey, ILazyLoader<TValue>>
 				(
 					key: item.Key,
-					value: new MemoryLazyLoader(item.Value)
+					value: new ValueLoader<TValue>(item.Value)
 				)
 			);
 

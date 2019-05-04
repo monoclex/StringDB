@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
 
+using StringDB.LazyLoaders;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,13 +16,6 @@ namespace StringDB.Databases
 	public class BufferedDatabase<TKey, TValue>
 		: BaseDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
-		private class ValueLoader : ILazyLoader<TValue>
-		{
-			private readonly TValue _value;
-			public ValueLoader(TValue value) => _value = value;
-			public TValue Load() => _value;
-		}
-
 		public const int MinimumBufferSize = 16;
 
 		/// <summary>
@@ -174,7 +169,7 @@ namespace StringDB.Databases
 			(
 				_buffer
 					.Take(_bufferPos)
-					.Select(x => new KeyValuePair<TKey, ILazyLoader<TValue>>(x.Key, new ValueLoader(x.Value)))
+					.Select(x => new KeyValuePair<TKey, ILazyLoader<TValue>>(x.Key, new ValueLoader<TValue>(x.Value)))
 			);
 	}
 }

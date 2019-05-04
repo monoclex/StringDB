@@ -13,20 +13,6 @@ namespace StringDB.Databases
 	[PublicAPI]
 	public sealed class IODatabase : BaseDatabase<byte[], byte[]>
 	{
-		private sealed class IOLazyLoader : ILazyLoader<byte[]>
-		{
-			private readonly IDatabaseIODevice _dbIODevice;
-			private readonly long _position;
-
-			public IOLazyLoader([PublicAPI] IDatabaseIODevice dbIODevice, long position)
-			{
-				_dbIODevice = dbIODevice;
-				_position = position;
-			}
-
-			public byte[] Load() => _dbIODevice.ReadValue(_position);
-		}
-
 		/// <summary>
 		/// The DatabaseIODevice in use.
 		/// </summary>

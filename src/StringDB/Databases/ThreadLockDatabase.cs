@@ -16,26 +16,6 @@ namespace StringDB.Databases
 	public sealed class ThreadLockDatabase<TKey, TValue>
 		: BaseDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
-		private sealed class ThreadLoackLazyLoader : ILazyLoader<TValue>
-		{
-			private readonly object _lock;
-			private readonly ILazyLoader<TValue> _inner;
-
-			public ThreadLoackLazyLoader([NotNull] object @lock, [NotNull] ILazyLoader<TValue> inner)
-			{
-				_lock = @lock;
-				_inner = inner;
-			}
-
-			public TValue Load()
-			{
-				lock (_lock)
-				{
-					return _inner.Load();
-				}
-			}
-		}
-
 		private sealed class ThinDatabaseIEnumeratorWrapper : IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>>, IEnumerator<KeyValuePair<TKey, ILazyLoader<TValue>>>
 		{
 			private readonly object _lock;
@@ -65,7 +45,7 @@ namespace StringDB.Databases
 					_current = new KeyValuePair<TKey, ILazyLoader<TValue>>
 					(
 						current.Key,
-						new ThreadLoackLazyLoader(_lock, current.Value)
+						new ThreadLockLoader(_lock, current.Value)
 					);
 
 					return true;

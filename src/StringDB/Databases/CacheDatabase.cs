@@ -18,38 +18,6 @@ namespace StringDB.Databases
 	public sealed class CacheDatabase<TKey, TValue>
 		: BaseDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
-		private sealed class CacheLazyLoader : ILazyLoader<TValue>, IDisposable
-		{
-			private readonly ILazyLoader<TValue> _inner;
-
-			private bool _loaded;
-			private TValue _value;
-
-			public CacheLazyLoader([NotNull] ILazyLoader<TValue> inner)
-				=> _inner = inner;
-
-			public TValue Load()
-			{
-				if (!_loaded)
-				{
-					_value = _inner.Load();
-					_loaded = true;
-				}
-
-				return _value;
-			}
-
-			public void Dispose()
-			{
-				if (_value is IDisposable disposable)
-				{
-					disposable.Dispose();
-				}
-
-				_value = default;
-			}
-		}
-
 		[NotNull] private readonly List<KeyValuePair<TKey, CacheLazyLoader>> _cache;
 		private readonly bool _disposeDatabase;
 

@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
 
+using StringDB.LazyLoaders;
+
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,29 +20,6 @@ namespace StringDB.Databases
 	public sealed class TransformDatabase<TPreKey, TPreValue, TPostKey, TPostValue>
 		: BaseDatabase<TPostKey, TPostValue>, IDatabaseLayer<TPreKey, TPreValue>
 	{
-		private sealed class TransformLazyLoader : ILazyLoader<TPostValue>
-		{
-			private readonly ITransformer<TPreValue, TPostValue> _transformer;
-			private readonly ILazyLoader<TPreValue> _pre;
-
-			public TransformLazyLoader
-			(
-				[NotNull] ILazyLoader<TPreValue> pre,
-				[NotNull] ITransformer<TPreValue, TPostValue> transformer
-			)
-			{
-				_pre = pre;
-				_transformer = transformer;
-			}
-
-			public TPostValue Load()
-			{
-				var loaded = _pre.Load();
-
-				return _transformer.TransformPre(loaded);
-			}
-		}
-
 		private readonly ITransformer<TPreKey, TPostKey> _keyTransformer;
 		private readonly ITransformer<TPreValue, TPostValue> _valueTransformer;
 		private readonly bool _disposeDatabase;
@@ -115,7 +94,7 @@ namespace StringDB.Databases
 				x => new KeyValuePair<TPostKey, ILazyLoader<TPostValue>>
 				(
 					key: _keyTransformer.TransformPre(x.Key),
-					value: new TransformLazyLoader(x.Value, _valueTransformer)
+					value: new TransformLazyLoader<TPreValue, TPostValue>(x.Value, _valueTransformer)
 				)
 			);
 
