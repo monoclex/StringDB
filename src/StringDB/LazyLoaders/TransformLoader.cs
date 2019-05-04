@@ -15,6 +15,11 @@ namespace StringDB.LazyLoaders
 		private readonly ITransformer<TPre, TPost> _transformer;
 		private readonly ILazyLoader<TPre> _pre;
 
+		/// <summary>
+		/// Creates a new <see cref="TransformLazyLoader{TPre, TPost}"/>.
+		/// </summary>
+		/// <param name="pre">The lazy loader with the value.</param>
+		/// <param name="transformer">The transformer to transform the value.</param>
 		public TransformLazyLoader
 		(
 			[NotNull] ILazyLoader<TPre> pre,
@@ -25,6 +30,7 @@ namespace StringDB.LazyLoaders
 			_transformer = transformer;
 		}
 
+		/// <inheritdoc />
 		public TPost Load()
 		{
 			var loaded = _pre.Load();

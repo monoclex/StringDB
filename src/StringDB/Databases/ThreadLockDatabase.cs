@@ -47,7 +47,7 @@ namespace StringDB.Databases
 					_current = new KeyValuePair<TKey, ILazyLoader<TValue>>
 					(
 						current.Key,
-						new ThreadLockLoader<TValue>(_lock, current.Value)
+						new ThreadLockLoader<TValue>(current.Value, _lock)
 					);
 
 					return true;

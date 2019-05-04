@@ -9,7 +9,7 @@ namespace StringDB.Databases
 {
 	/// <inheritdoc />
 	/// <summary>
-	/// A database that uses <see cref="T:StringDB.ITransformer`2" />s to transform
+	/// A database that uses <see cref="ITransformer{TPre, TPost}"/>s to transform
 	/// keys and values to/from the underlying database.
 	/// </summary>
 	/// <typeparam name="TPreKey">The key type before transformation.</typeparam>

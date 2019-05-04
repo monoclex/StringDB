@@ -15,9 +15,14 @@ namespace StringDB.LazyLoaders
 		private bool _loaded;
 		private T _value;
 
+		/// <summary>
+		/// Creates a new <see cref="CachedLoader{T}"/>.
+		/// </summary>
+		/// <param name="inner">The inner lazy loader to cache the result of.</param>
 		public CachedLoader([NotNull] ILazyLoader<T> inner)
 			=> _inner = inner;
 
+		/// <inheritdoc />
 		public T Load()
 		{
 			if (!_loaded)
@@ -29,6 +34,7 @@ namespace StringDB.LazyLoaders
 			return _value;
 		}
 
+		/// <inheritdoc />
 		public void Dispose()
 		{
 			if (_value is IDisposable disposable)

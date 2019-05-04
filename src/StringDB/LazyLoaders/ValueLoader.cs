@@ -10,7 +10,10 @@ namespace StringDB.LazyLoaders
 	{
 		private readonly T _value;
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Create a new <see cref="ValueLoader{T}"/>.
+		/// </summary>
+		/// <param name="value">The value to immedietly return upon calling <see cref="Load"/>.</param>
 		public ValueLoader(T value) => _value = value;
 
 		/// <inheritdoc />

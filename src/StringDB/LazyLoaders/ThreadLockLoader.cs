@@ -14,12 +14,22 @@ namespace StringDB.LazyLoaders
 		private readonly object _lock;
 		private readonly ILazyLoader<T> _inner;
 
-		public ThreadLockLoader([NotNull] object @lock, [NotNull] ILazyLoader<T> inner)
+		/// <summary>
+		/// Create a new <see cref="ThreadLockLoader{T}"/>.
+		/// </summary>
+		/// <param name="inner">The lazy loader to wrap in a lock when calling.</param>
+		/// <param name="lock">The object to lock on.</param>
+		public ThreadLockLoader
+		(
+			[NotNull] ILazyLoader<T> inner,
+			[NotNull] object @lock
+		)
 		{
 			_lock = @lock;
 			_inner = inner;
 		}
 
+		/// <inheritdoc />
 		public T Load()
 		{
 			lock (_lock)
