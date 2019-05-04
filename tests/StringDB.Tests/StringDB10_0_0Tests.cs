@@ -14,6 +14,9 @@ using Xunit;
 
 namespace StringDB.Tests
 {
+	// literally a final boss lmao
+	// will come back to this later :eyes:
+
 	// lmao messy code
 	// TODO: clean
 	public static class StringDB10_0_0Tests

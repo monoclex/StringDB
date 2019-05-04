@@ -7,6 +7,9 @@ using Xunit;
 
 namespace StringDB.Tests
 {
+	/// <summary>
+	/// Tests the integration of all DB components
+	/// </summary>
 	public class IntegrationTests : IDisposable
 	{
 		private readonly MemoryStream _ms;
@@ -33,6 +36,9 @@ namespace StringDB.Tests
 
 		public void Dispose() => _ms.Dispose();
 
+		/// <summary>
+		/// Assures that inserting and enumeration work properly.
+		/// </summary>
 		[Fact]
 		public void IntegrationTest()
 		{
