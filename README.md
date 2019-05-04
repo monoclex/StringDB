@@ -3,7 +3,7 @@
     <img src="https://rawcdn.githack.com/SirJosh3917/StringDB/master/icons/banner_ad.png" alt="StringDB" />
 
 [![Build Status][badge_appveyor_build_image]][badge_appveyor_build_page]
-[![Test Status][badge_tests_image]][badge_appveyor_build_page]
+[![Test Status][badge_tests_image]][link_codecov]
 [![Nuget Version][badge_nuget_version_image]][link_nuget]
 [![Nuget Downloads][badge_nuget_downloads_image]][link_nuget]
 
@@ -126,6 +126,7 @@ Need immediate assistence? [Join the discord!](discord)
 
 [link_nuget]: https://www.nuget.org/packages/StringDB
 [link_addons]: ./addons/addons.md
+[link_codecov]: https://codecov.io/gh/SirJosh3917/StringDB
 
 [section_tiny]: #tiny-
 [section_api]: #api-
