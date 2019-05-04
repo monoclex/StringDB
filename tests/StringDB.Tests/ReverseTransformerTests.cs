@@ -8,8 +8,12 @@ using Xunit;
 
 namespace StringDB.Tests
 {
+	/// <summary>
+	/// Tests for a <see cref="ReverseTransformer{TPost, TPre}"/>.
+	/// </summary>
 	public class ReverseTransformerTests
 	{
+		// class setup
 		public class A
 		{
 			public int Value { get; set; }
@@ -27,6 +31,10 @@ namespace StringDB.Tests
 			public A TransformPost(B post) => new A { Value = post.OtherValue };
 		}
 
+		/// <summary>
+		/// Tests that the reverse transformer performs the exact same transformations
+		/// as a regular transformer, but reverses the position of stuff.
+		/// </summary>
 		[Fact]
 		public void Reverses()
 		{
@@ -34,17 +42,22 @@ namespace StringDB.Tests
 
 			var reverse = new ReverseTransformer<B, A>(new SimpleTransformer());
 
+			// in SimpleTransformer this is TransformPost
 			reverse.TransformPre(new B { OtherValue = 3 })
 				.Value
 				.Should()
 				.Be(3, because);
 
+			// in SimpleTransformer this is TransformPre
 			reverse.TransformPost(new A { Value = 4 })
 				.OtherValue
 				.Should()
 				.Be(4, because);
 		}
 
+		/// <summary>
+		/// Test that the Reverse call reverses a transformer.
+		/// </summary>
 		[Fact]
 		public void ExtensionWorks()
 		{
