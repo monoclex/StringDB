@@ -13,7 +13,7 @@ namespace StringDB.Databases
 	/// coagulating multiple inserts until the buffer is full.
 	/// </summary>
 	[PublicAPI]
-	public class BufferedDatabase<TKey, TValue>
+	public sealed class BufferedDatabase<TKey, TValue>
 		: BaseDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
 		public const int MinimumBufferSize = 16;

@@ -8,6 +8,7 @@ namespace StringDB.LazyLoaders
 	/// The <see cref="ILazyLoader{T}"/> used in a <see cref="TransformDatabase{TPreKey, TPreValue, TPostKey, TPostValue}"/>
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
+	[PublicAPI]
 	public sealed class ThreadLockLoader<T> : ILazyLoader<T>
 	{
 		private readonly object _lock;

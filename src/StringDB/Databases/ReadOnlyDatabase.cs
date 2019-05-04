@@ -10,7 +10,7 @@ namespace StringDB.Databases
 	/// A database which can only be read from.
 	/// </summary>
 	[PublicAPI]
-	public class ReadOnlyDatabase<TKey, TValue>
+	public sealed class ReadOnlyDatabase<TKey, TValue>
 		: IDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
 		private readonly bool _disposeDatabase;

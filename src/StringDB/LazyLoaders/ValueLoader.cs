@@ -6,7 +6,7 @@ namespace StringDB.LazyLoaders
 	/// A lazy loader that only returns the value given to it.
 	/// </summary>
 	[PublicAPI]
-	public class ValueLoader<T> : ILazyLoader<T>
+	public sealed class ValueLoader<T> : ILazyLoader<T>
 	{
 		private readonly T _value;
 

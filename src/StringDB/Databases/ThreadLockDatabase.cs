@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
 
+using StringDB.LazyLoaders;
+
 using System.Collections;
 using System.Collections.Generic;
 
@@ -45,7 +47,7 @@ namespace StringDB.Databases
 					_current = new KeyValuePair<TKey, ILazyLoader<TValue>>
 					(
 						current.Key,
-						new ThreadLockLoader(_lock, current.Value)
+						new ThreadLockLoader<TValue>(_lock, current.Value)
 					);
 
 					return true;

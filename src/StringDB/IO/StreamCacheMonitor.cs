@@ -9,7 +9,7 @@ namespace StringDB.IO
 	/// to make position and length lookups quick and snappy.
 	/// </summary>
 	[PublicAPI]
-	public class StreamCacheMonitor : Stream
+	public sealed class StreamCacheMonitor : Stream
 	{
 		[NotNull] public Stream InnerStream { get; }
 

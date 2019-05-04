@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
 
+using StringDB.LazyLoaders;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +20,7 @@ namespace StringDB.Databases
 	public sealed class CacheDatabase<TKey, TValue>
 		: BaseDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
-		[NotNull] private readonly List<KeyValuePair<TKey, CacheLazyLoader>> _cache;
+		[NotNull] private readonly List<KeyValuePair<TKey, CachedLoader<TValue>>> _cache;
 		private readonly bool _disposeDatabase;
 
 		/// <inheritdoc />
@@ -50,7 +52,7 @@ namespace StringDB.Databases
 		)
 			: base(comparer)
 		{
-			_cache = new List<KeyValuePair<TKey, CacheLazyLoader>>();
+			_cache = new List<KeyValuePair<TKey, CachedLoader<TValue>>>();
 			InnerDatabase = database;
 			_disposeDatabase = disposeDatabase;
 		}
@@ -74,10 +76,10 @@ namespace StringDB.Databases
 			// start reading and adding more as we go along
 			foreach (var item in InnerDatabase.Skip(_cache.Count))
 			{
-				var currentCache = new KeyValuePair<TKey, CacheLazyLoader>
+				var currentCache = new KeyValuePair<TKey, CachedLoader<TValue>>
 				(
 					item.Key,
-					new CacheLazyLoader(item.Value)
+					new CachedLoader<TValue>(item.Value)
 				);
 
 				_cache.Add(currentCache);

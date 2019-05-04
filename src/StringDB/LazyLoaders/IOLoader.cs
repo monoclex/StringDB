@@ -9,12 +9,12 @@ namespace StringDB.LazyLoaders
 	/// The <see cref="ILazyLoader{T}"/> used for <see cref="IODatabase"/>s.
 	/// </summary>
 	[PublicAPI]
-	public sealed class IOLazyLoader : ILazyLoader<byte[]>
+	public sealed class IOLoader : ILazyLoader<byte[]>
 	{
 		private readonly IDatabaseIODevice _dbIODevice;
 		private readonly long _position;
 
-		public IOLazyLoader([PublicAPI] IDatabaseIODevice dbIODevice, long position)
+		public IOLoader([PublicAPI] IDatabaseIODevice dbIODevice, long position)
 		{
 			_dbIODevice = dbIODevice;
 			_position = position;

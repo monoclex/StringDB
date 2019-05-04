@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 
 using StringDB.IO;
+using StringDB.LazyLoaders;
 
 using System.Collections.Generic;
 
@@ -51,7 +52,7 @@ namespace StringDB.Databases
 				yield return new KeyValuePair<byte[], ILazyLoader<byte[]>>
 				(
 					key: dbItem.Key,
-					value: new IOLazyLoader(DatabaseIODevice, dbItem.DataPosition)
+					value: new IOLoader(DatabaseIODevice, dbItem.DataPosition)
 				);
 			}
 		}
