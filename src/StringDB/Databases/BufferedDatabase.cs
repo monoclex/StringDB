@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StringDB.Databases
 {
@@ -13,6 +14,13 @@ namespace StringDB.Databases
 	public class BufferedDatabase<TKey, TValue>
 		: BaseDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
+		private class ValueLoader : ILazyLoader<TValue>
+		{
+			private readonly TValue _value;
+			public ValueLoader(TValue value) => _value = value;
+			public TValue Load() => _value;
+		}
+
 		public const int MinimumBufferSize = 16;
 
 		/// <summary>
@@ -160,6 +168,13 @@ namespace StringDB.Databases
 		}
 
 		/// <inheritdoc/>
-		protected override IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate() => InnerDatabase;
+		protected override IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate()
+			=> InnerDatabase
+			.Concat
+			(
+				_buffer
+					.Take(_bufferPos)
+					.Select(x => new KeyValuePair<TKey, ILazyLoader<TValue>>(x.Key, new ValueLoader(x.Value)))
+			);
 	}
 }

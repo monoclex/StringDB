@@ -46,14 +46,20 @@ namespace StringDB.Tests
 		}
 
 		[Fact]
-		public void EvaluationIsSameAsMock()
+		public void EvaluationIncludesBufferedItems()
 		{
-			_db.GetEnumerator()
-				.Should()
-				.BeOfType(_mockDb.GetEnumerator().GetType());
+			_db.Insert(0, 1337);
+			_mockDb.Inserts
+				.Should().Be(0);
 
-			// pass Dispose test
-			_db.Insert(0, 0);
+			// assures us that the buffered database evaluation
+			// includes buffered entries
+			_db.Count()
+				.Should().Be(1);
+
+			// the buffered db should also evaluate the inner database
+			_mockDb.Evaluations
+				.Should().Be(1);
 		}
 
 		[Fact]
