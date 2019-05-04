@@ -19,7 +19,9 @@ namespace StringDB.Databases
 		/// Creates a new <see cref="BufferedDatabase{TKey, TValue}"/>
 		/// with the specified buffer.
 		/// </summary>
+		/// <param name="database">The database to buffer.</param>
 		/// <param name="bufferSize">The size of the buffer.</param>
+		/// <param name="disposeDatabase">If the underlying database should be disposed on dispose.</param>
 		public BufferedDatabase
 		(
 			[NotNull] IDatabase<TKey, TValue> database,

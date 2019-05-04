@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace StringDB.Databases
@@ -9,9 +10,9 @@ namespace StringDB.Databases
 	/// A database which can only be read from.
 	/// </summary>
 	[PublicAPI]
-	public class WriteOnlyDatabase<TKey, TValue> : BaseDatabase<TKey, TValue>
+	public class WriteOnlyDatabase<TKey, TValue>
+		: IDatabase<TKey, TValue>, IDatabaseLayer<TKey, TValue>
 	{
-		[NotNull] private readonly IDatabase<TKey, TValue> _database;
 		private readonly bool _disposeDatabase;
 
 		/// <summary>
@@ -22,24 +23,42 @@ namespace StringDB.Databases
 		public WriteOnlyDatabase([NotNull] IDatabase<TKey, TValue> database, bool disposeDatabase = true)
 		{
 			_disposeDatabase = disposeDatabase;
-			_database = database;
+			InnerDatabase = database;
 		}
 
 		/// <inheritdoc/>
-		public override void Dispose()
+		[NotNull] public IDatabase<TKey, TValue> InnerDatabase { get; }
+
+		/// <inheritdoc/>
+		public void Dispose()
 		{
 			if (_disposeDatabase)
 			{
-				_database.Dispose();
+				InnerDatabase.Dispose();
 			}
 		}
 
-		/// <inheritdoc/>
-		public override void InsertRange(params KeyValuePair<TKey, TValue>[] items)
-			=> _database.InsertRange(items);
+		private const string Error = "Reading is not supported.";
 
 		/// <inheritdoc/>
-		protected override IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate()
-			=> throw new NotSupportedException($"Reading is not supported.");
+		public TValue Get([NotNull] TKey key) => throw new NotSupportedException(Error);
+
+		/// <inheritdoc/>
+		public bool TryGet([NotNull] TKey key, [CanBeNull] out TValue value) => throw new NotSupportedException(Error);
+
+		/// <inheritdoc/>
+		public IEnumerable<ILazyLoader<TValue>> GetAll([NotNull] TKey key) => throw new NotSupportedException(Error);
+
+		/// <inheritdoc/>
+		public IEnumerator<KeyValuePair<TKey, ILazyLoader<TValue>>> GetEnumerator() => throw new NotSupportedException(Error);
+
+		/// <inheritdoc/>
+		public void Insert([NotNull] TKey key, [NotNull] TValue value) => InnerDatabase.Insert(key, value);
+
+		/// <inheritdoc/>
+		public void InsertRange([NotNull] params KeyValuePair<TKey, TValue>[] items) => InnerDatabase.InsertRange(items);
+
+		/// <inheritdoc/>
+		IEnumerator IEnumerable.GetEnumerator() => InnerDatabase.GetEnumerator();
 	}
 }
