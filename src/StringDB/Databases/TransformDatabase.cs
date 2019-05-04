@@ -91,11 +91,8 @@ namespace StringDB.Databases
 			=> InnerDatabase
 			.Select
 			(
-				x => new KeyValuePair<TPostKey, ILazyLoader<TPostValue>>
-				(
-					key: _keyTransformer.TransformPre(x.Key),
-					value: new TransformLazyLoader<TPreValue, TPostValue>(x.Value, _valueTransformer)
-				)
+				x => new TransformLazyLoader<TPreValue, TPostValue>(x.Value, _valueTransformer)
+					.ToKeyValuePair(_keyTransformer.TransformPre(x.Key))
 			);
 
 		/// <inheritdoc />

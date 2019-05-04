@@ -70,7 +70,7 @@ namespace StringDB.Databases
 			for (var i = 0; i < _cache.Count; i++)
 			{
 				var current = _cache[i];
-				yield return new KeyValuePair<TKey, ILazyLoader<TValue>>(current.Key, current.Value);
+				yield return current.Value.ToKeyValuePair(current.Key);
 			}
 
 			// start reading and adding more as we go along
@@ -86,7 +86,7 @@ namespace StringDB.Databases
 
 				var current = currentCache;
 
-				yield return new KeyValuePair<TKey, ILazyLoader<TValue>>(current.Key, current.Value);
+				yield return current.Value.ToKeyValuePair(current.Key);
 			}
 		}
 

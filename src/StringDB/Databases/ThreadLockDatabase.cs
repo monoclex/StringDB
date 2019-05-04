@@ -44,11 +44,8 @@ namespace StringDB.Databases
 
 					var current = _enumerator.Current;
 
-					_current = new KeyValuePair<TKey, ILazyLoader<TValue>>
-					(
-						current.Key,
-						new ThreadLockLoader<TValue>(current.Value, _lock)
-					);
+					_current = new ThreadLockLoader<TValue>(current.Value, _lock)
+						.ToKeyValuePair(current.Key);
 
 					return true;
 				}

@@ -169,7 +169,7 @@ namespace StringDB.Databases
 			(
 				_buffer
 					.Take(_bufferPos)
-					.Select(x => new KeyValuePair<TKey, ILazyLoader<TValue>>(x.Key, new ValueLoader<TValue>(x.Value)))
+					.Select(x => new ValueLoader<TValue>(x.Value).ToKeyValuePair(x.Key))
 			);
 	}
 }

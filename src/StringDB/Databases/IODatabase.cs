@@ -49,11 +49,8 @@ namespace StringDB.Databases
 
 			while (!(dbItem = DatabaseIODevice.ReadNext()).EndOfItems)
 			{
-				yield return new KeyValuePair<byte[], ILazyLoader<byte[]>>
-				(
-					key: dbItem.Key,
-					value: new IOLoader(DatabaseIODevice, dbItem.DataPosition)
-				);
+				yield return new IOLoader(DatabaseIODevice, dbItem.DataPosition)
+					.ToKeyValuePair(dbItem.Key);
 			}
 		}
 

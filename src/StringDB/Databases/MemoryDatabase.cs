@@ -45,11 +45,8 @@ namespace StringDB.Databases
 			=> _data
 			.Select
 			(
-				item => new KeyValuePair<TKey, ILazyLoader<TValue>>
-				(
-					key: item.Key,
-					value: new ValueLoader<TValue>(item.Value)
-				)
+				item => new ValueLoader<TValue>(item.Value)
+					.ToKeyValuePair(item.Key)
 			);
 
 		/// <inheritdoc />
