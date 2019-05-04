@@ -143,7 +143,7 @@ namespace StringDB.Tests
 			_sviod.ReadValue(pos);
 
 			_sviod.ReadNext()
-				.Should().BeEquivalentTo(keys[2]);
+				.Should().BeEquivalentTo(keys[1]);
 
 			byte[] Bytes(string str) => Encoding.UTF8.GetBytes(str);
 		}
