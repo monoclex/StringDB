@@ -2,17 +2,18 @@
 
   <PropertyGroup>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-    <Version>10.0.1.1</Version>
+    <Version>10.0.2</Version>
     <Authors>SirJosh3917</Authors>
     <Description>Integrate StringDB with Ceras easier.</Description>
-    <Copyright>MIT License 2019</Copyright>
+    <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/SirJosh3917/StringDB/tree/master/src/StringDB.Ceras</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/SirJosh3917/StringDB/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageIconUrl>https://rawcdn.githack.com/SirJosh3917/StringDB/master/icons/banner_ad.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/SirJosh3917/StringDB/</RepositoryUrl>
     <PackageTags>Ceras, StringDB</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageReleaseNotes>Updated Ceras to 4.0.26</PackageReleaseNotes>
+    <PackageReleaseNotes>Updated Ceras to 4.0.38 &amp; use StringDB 10.0.2</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
