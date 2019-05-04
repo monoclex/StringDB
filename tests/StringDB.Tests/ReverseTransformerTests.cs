@@ -66,5 +66,18 @@ namespace StringDB.Tests
 				.Should()
 				.BeOfType<ReverseTransformer<B, A>>("A reversed SimpleTransformer");
 		}
+
+		/// <summary>
+		/// When reversing a transformer twice, the original transformer should be returned.
+		/// </summary>
+		[Fact]
+		public void TwoReversesShouldReturnOriginalTransformer()
+		{
+			new SimpleTransformer()
+				.Reverse()
+				.Reverse()
+				.Should()
+				.BeOfType<SimpleTransformer>("Reversing a transformer twice should result in the original transformer.");
+		}
 	}
 }
