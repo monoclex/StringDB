@@ -14,10 +14,18 @@ namespace StringDB.Transformers
 		/// <param name="transformer">The transformer to reverse.</param>
 		/// <returns>A reversed transformer.</returns>
 		[NotNull]
-		public static ReverseTransformer<TPost, TPre> Reverse<TPre, TPost>
+		public static ITransformer<TPost, TPre> Reverse<TPre, TPost>
 		(
 			[NotNull] this ITransformer<TPre, TPost> transformer
 		)
-			=> new ReverseTransformer<TPost, TPre>(transformer);
+		{
+			// if we do Reverse() twice, we don't want to wrap ourselves in layers of ReverseTransformer.
+			if (transformer is ReverseTransformer<TPre, TPost> reverseTransformer)
+			{
+				return reverseTransformer.Transformer;
+			}
+
+			return new ReverseTransformer<TPost, TPre>(transformer);
+		}
 	}
 }

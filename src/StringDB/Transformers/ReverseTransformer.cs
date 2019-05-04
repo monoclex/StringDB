@@ -13,20 +13,23 @@ namespace StringDB.Transformers
 	[PublicAPI]
 	public sealed class ReverseTransformer<TPost, TPre> : ITransformer<TPost, TPre>
 	{
-		private readonly ITransformer<TPre, TPost> _transformer;
+		/// <summary>
+		/// The transformer being used under the hood.
+		/// </summary>
+		public ITransformer<TPre, TPost> Transformer { get; }
 
 		/// <summary>
 		/// Create a reverse transformer.
 		/// </summary>
 		/// <param name="transformer">The transformer to reverse.</param>
-		public ReverseTransformer(ITransformer<TPre, TPost> transformer) => _transformer = transformer;
+		public ReverseTransformer(ITransformer<TPre, TPost> transformer) => Transformer = transformer;
 
 		/// <inheritdoc />
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public TPre TransformPre(TPost pre) => _transformer.TransformPost(pre);
+		public TPre TransformPre(TPost pre) => Transformer.TransformPost(pre);
 
 		/// <inheritdoc />
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public TPost TransformPost(TPre post) => _transformer.TransformPre(post);
+		public TPost TransformPost(TPre post) => Transformer.TransformPre(post);
 	}
 }
