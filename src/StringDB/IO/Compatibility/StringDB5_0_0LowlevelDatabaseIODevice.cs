@@ -180,6 +180,11 @@ namespace StringDB.IO.Compatibility
 
 		public int JumpOffsetSize { get; } = sizeof(byte) + sizeof(long);
 
+		~StringDB5_0_0LowlevelDatabaseIODevice()
+		{
+			Dispose();
+		}
+
 		public void Dispose()
 		{
 			Seek(0);

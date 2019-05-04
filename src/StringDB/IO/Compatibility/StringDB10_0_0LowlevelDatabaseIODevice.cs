@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 
 namespace StringDB.IO.Compatibility
@@ -281,6 +282,11 @@ namespace StringDB.IO.Compatibility
 			while (currentValue != 0);
 
 			return result;
+		}
+
+		~StringDB10_0_0LowlevelDatabaseIODevice()
+		{
+			Dispose();
 		}
 
 		public void Dispose()
