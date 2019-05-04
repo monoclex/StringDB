@@ -11,116 +11,141 @@ using Xunit;
 
 namespace StringDB.Tests
 {
+	/// <summary>
+	/// Tests that a StoneVaultIODevice writes the correct bytes.
+	/// </summary>
 	public class StoneVaultIODeviceTests
 	{
+		private readonly MemoryStream _ms;
+		private readonly StoneVaultIODevice _sviod;
+
+		public StoneVaultIODeviceTests()
+		{
+			_ms = new MemoryStream();
+			_sviod = new StoneVaultIODevice(_ms);
+		}
+
+		/// <summary>
+		/// Tests that inserts work.
+		/// </summary>
 		[Fact]
 		public void InsertWorks()
 		{
-			var ms = new MemoryStream();
-			var sviod = new StoneVaultIODevice(ms, false);
-
-			sviod.Insert(new KeyValuePair<byte[], byte[]>[]
+			// insert key/value
+			_sviod.Insert(new KeyValuePair<byte[], byte[]>[]
 			{
 				new KeyValuePair<byte[], byte[]>(Encoding.UTF8.GetBytes("key"), Encoding.UTF8.GetBytes("value"))
 			});
 
-			ms.ToArray()
+			// tests file format
+			_ms.ToArray()
 				.Should()
-				.BeEquivalentTo(new byte[]
-				{
-					0x00, // DATA_GOOD
-					3, 0, 0, 0, 0, 0, 0, 0, // 3
-				}
-				.Concat(Encoding.UTF8.GetBytes("key"))
-				.Concat(new byte[]
-				{
-					0x00, // DATA_GOOD
-					5, 0, 0, 0, 0, 0, 0, 0, // 5
-				})
-				.Concat(Encoding.UTF8.GetBytes("value"))
-				.Concat(new byte[]
-				{
-					0xFF // DATA_BAD
-				}));
+				.BeEquivalentTo(TestKeyValue().Concat(DataBad()));
 
-			sviod.Insert(new KeyValuePair<byte[], byte[]>[]
+			_sviod.Insert(new KeyValuePair<byte[], byte[]>[]
 			{
 				new KeyValuePair<byte[], byte[]>(Encoding.UTF8.GetBytes("a"), Encoding.UTF8.GetBytes("a"))
 			});
 
-			ms.ToArray()
+			_ms.ToArray()
 				.Should()
-				.BeEquivalentTo(new byte[]
-				{
+				.BeEquivalentTo(TestKeyValue().Concat(TestAA()).Concat(DataBad()));
+
+			IEnumerable<byte> TestKeyValue()
+			{
+				return new byte[]
+				   {
 					0x00, // DATA_GOOD
 					3, 0, 0, 0, 0, 0, 0, 0, // 3
-				}
-				.Concat(Encoding.UTF8.GetBytes("key"))
-				.Concat(new byte[]
-				{
+				   }
+				   .Concat(Encoding.UTF8.GetBytes("key"))
+				   .Concat(new byte[]
+				   {
 					0x00, // DATA_GOOD
 					5, 0, 0, 0, 0, 0, 0, 0, // 5
-				})
-				.Concat(Encoding.UTF8.GetBytes("value"))
-				.Concat(new byte[]
+				   })
+				   .Concat(Encoding.UTF8.GetBytes("value"));
+			}
+
+			IEnumerable<byte> TestAA()
+			{
+				return new byte[]
 				{
 					0x00, // DATA_GOOD
 					1, 0, 0, 0, 0, 0, 0, 0, // 1
-				})
+				}
 				.Concat(Encoding.UTF8.GetBytes("a"))
 				.Concat(new byte[]
 				{
 					0x00, // DATA_GOOD
 					1, 0, 0, 0, 0, 0, 0, 0, // 1
 				})
-				.Concat(Encoding.UTF8.GetBytes("a"))
-				.Concat(new byte[]
+				.Concat(Encoding.UTF8.GetBytes("a"));
+			}
+
+			IEnumerable<byte> DataBad()
+			{
+				return new byte[]
 				{
 					0xFF // DATA_BAD
-				}));
+				};
+			}
 		}
 
+		/// <summary>
+		/// Tests that reading works.
+		/// </summary>
 		[Fact]
 		public void CanRead()
 		{
-			var ms = new MemoryStream();
-			var sviod = new StoneVaultIODevice(ms, false);
-
-			sviod.Insert(new KeyValuePair<byte[], byte[]>[]
+			// insert two entries
+			_sviod.Insert(new KeyValuePair<byte[], byte[]>[]
 			{
-				new KeyValuePair<byte[], byte[]>(Encoding.UTF8.GetBytes("test"), Encoding.UTF8.GetBytes("value")),
-				new KeyValuePair<byte[], byte[]>(Encoding.UTF8.GetBytes("test2"), Encoding.UTF8.GetBytes("value2")),
+				new KeyValuePair<byte[], byte[]>(Bytes("test"), Bytes("value")),
+				new KeyValuePair<byte[], byte[]>(Bytes("test2"), Bytes("value2")),
 			});
 
-			sviod.Reset();
+			// reset the head
+			_sviod.Reset();
 
-			var key1 = sviod.ReadNext();
-			var key2 = sviod.ReadNext();
-			var key3 = sviod.ReadNext();
+			// read some keys
+			var keys = new[]
+			{
+				_sviod.ReadNext(),
+				_sviod.ReadNext(),
+				_sviod.ReadNext(),
+			};
 
-			// works fine
-			key1.EndOfItems.Should().BeFalse();
-			key2.EndOfItems.Should().BeFalse();
-			key3.EndOfItems.Should().BeTrue();
+			foreach (var key in keys.Take(2))
+			{
+				key.EndOfItems.Should().BeFalse();
+			}
 
-			key1.Key.Should().BeEquivalentTo(Encoding.UTF8.GetBytes("test"));
-			key2.Key.Should().BeEquivalentTo(Encoding.UTF8.GetBytes("test2"));
+			// TODO: use hat ^
+			keys[keys.Length - 1].EndOfItems.Should().BeTrue();
 
-			sviod.ReadValue(key1.DataPosition)
-				.Should().BeEquivalentTo(Encoding.UTF8.GetBytes("value"));
+			// now test reading key and value
+			keys[0].Key.Should().BeEquivalentTo(Bytes("test"));
+			keys[1].Key.Should().BeEquivalentTo(Bytes("test2"));
 
-			sviod.ReadValue(key2.DataPosition)
-				.Should().BeEquivalentTo(Encoding.UTF8.GetBytes("value2"));
+			_sviod.ReadValue(keys[0].DataPosition)
+				.Should().BeEquivalentTo(Bytes("value"));
 
-			sviod.Reset();
+			_sviod.ReadValue(keys[1].DataPosition)
+				.Should().BeEquivalentTo(Bytes("value2"));
+
+			_sviod.Reset();
 
 			// ensure that the stream seeks back to where we were reading when we read a value
-			var pos = sviod.ReadNext().DataPosition;
-			var value = sviod.ReadValue(pos);
-			var cloneOfKey2 = sviod.ReadNext();
+			var pos = _sviod.ReadNext().DataPosition;
 
-			cloneOfKey2
-				.Should().BeEquivalentTo(key2);
+			// when we read a value, the head should go to the value at 2 now
+			_sviod.ReadValue(pos);
+
+			_sviod.ReadNext()
+				.Should().BeEquivalentTo(keys[2]);
+
+			byte[] Bytes(string str) => Encoding.UTF8.GetBytes(str);
 		}
 	}
 }
