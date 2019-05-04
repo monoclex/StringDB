@@ -13,6 +13,12 @@ namespace StringDB.Ceras
 	[PublicAPI]
 	public class CerasTransformer<T> : ITransformer<byte[], T>
 	{
+		/// <summary>
+		/// A default, global instance of this kind of transformer
+		/// that uses the CerasSerializer at <see cref="CerasTransformerExtensions.CerasInstance"/>.
+		/// </summary>
+		public static CerasTransformer<T> Default { get; } = new CerasTransformer<T>(CerasTransformerExtensions.CerasInstance);
+
 		private readonly CerasSerializer _ceras;
 
 		/// <summary>

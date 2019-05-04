@@ -15,6 +15,9 @@ namespace StringDB.Ceras
 	[PublicAPI]
 	public static class CerasTransformerExtensions
 	{
+		/// <summary>
+		/// A global instance of a default CerasSerializer instance to use.
+		/// </summary>
 		public static CerasSerializer CerasInstance { get; } = new CerasSerializer();
 
 		/// <summary>
@@ -30,7 +33,11 @@ namespace StringDB.Ceras
 		(
 			[NotNull] this IDatabase<byte[], byte[]> database
 		)
-			=> database.WithCeras<TKey, TValue>(CerasInstance);
+			=> database.WithTransform
+			(
+				CerasTransformer<TKey>.Default,
+				CerasTransformer<TValue>.Default
+			);
 
 		/// <summary>
 		/// Use Ceras with a database.
