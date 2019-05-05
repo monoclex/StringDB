@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 
 using StringDB.Databases;
+using StringDB.Fluency;
 using StringDB.IO;
 using StringDB.IO.Compatibility;
 using StringDB.Transformers;
@@ -21,15 +22,12 @@ namespace StringDB.Tests.NotThoroughTests
 		[Fact]
 		public void WorksIGuess()
 		{
-			var st = new StringTransformer();
-
 			// using (var fs = File.Open("copy.db", FileMode.OpenOrCreate))
 			using (var ms = new MemoryStream())
 			{
-				using (var lowlevelDBIODevice = new StringDB5_0_0LowlevelDatabaseIODevice(ms, true))
-				using (var dbIODevice = new DatabaseIODevice(lowlevelDBIODevice))
-				using (var iodb = new IODatabase(dbIODevice))
-				using (var db = new TransformDatabase<byte[], byte[], string, string>(iodb, st, st))
+				using (var db = new DatabaseBuilder()
+					.UseIODatabase(builder => builder.UseStringDB(StringDBVersions.v5_0_0, ms, true))
+					.WithTransform(StringTransformer.Default, StringTransformer.Default))
 				{
 					db.Insert("test", "value");
 					db.InsertRange(new KeyValuePair<string, string>[]
@@ -37,8 +35,6 @@ namespace StringDB.Tests.NotThoroughTests
 						new KeyValuePair<string, string>("a,", "c,"),
 						new KeyValuePair<string, string>("b,", "d,"),
 					});
-
-					File.WriteAllBytes("sdb.db", ms.ToArray());
 
 					db.EnumerateAggressively(2)
 						.Should()

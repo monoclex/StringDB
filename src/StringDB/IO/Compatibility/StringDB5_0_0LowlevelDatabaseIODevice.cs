@@ -185,8 +185,16 @@ namespace StringDB.IO.Compatibility
 			Dispose();
 		}
 
+		private bool _disposed;
+
 		public void Dispose()
 		{
+			if (_disposed)
+			{
+				return;
+			}
+
+			_disposed = true;
 			Seek(0);
 
 			// inc/dec jumppos since we account for the 0xFF in our storage of it

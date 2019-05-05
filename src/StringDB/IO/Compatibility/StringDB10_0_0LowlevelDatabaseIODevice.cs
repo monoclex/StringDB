@@ -289,8 +289,17 @@ namespace StringDB.IO.Compatibility
 			Dispose();
 		}
 
+		private bool _disposed;
+
 		public void Dispose()
 		{
+			if (_disposed)
+			{
+				return;
+			}
+
+			_disposed = true;
+
 			Seek(0);
 
 			// write the jump position at the beginning
