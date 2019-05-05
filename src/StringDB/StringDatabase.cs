@@ -53,16 +53,6 @@ namespace StringDB
 		)
 			=> new DatabaseBuilder()
 				.UseIODatabase((builder) => builder.UseStringDB(version, stream, leaveStreamOpen))
-				.ApplyStringTransformation();
-
-		private static IDatabase<string, string> ApplyStringTransformation
-		(
-			[NotNull] this IDatabase<byte[], byte[]> database
-		)
-		{
-			var transformer = new StringTransformer();
-
-			return database.WithTransform(transformer, transformer);
-		}
+				.WithTransform(StringTransformer.Default, StringTransformer.Default);
 	}
 }
