@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
 
+using System.Runtime.CompilerServices;
+
 namespace StringDB.Transformers
 {
 	/// <inheritdoc/>
@@ -16,9 +18,11 @@ namespace StringDB.Transformers
 		public static NoneTransformer<T> Default { get; } = new NoneTransformer<T>();
 
 		/// <inheritdoc/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public T TransformPost(T post) => post;
 
 		/// <inheritdoc/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public T TransformPre(T pre) => pre;
 	}
 }
