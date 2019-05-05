@@ -12,6 +12,11 @@ namespace StringDB.Transformers
 	[PublicAPI]
 	public sealed class StringTransformer : ITransformer<byte[], string>
 	{
+		/// <summary>
+		/// A global, default instance of this <see cref="StringTransformer"/>.
+		/// </summary>
+		public static StringTransformer Default { get; } = new StringTransformer();
+
 		/// <inheritdoc />
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string TransformPre(byte[] pre) => Encoding.UTF8.GetString(pre);

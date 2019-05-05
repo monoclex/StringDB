@@ -10,6 +10,11 @@ namespace StringDB.Transformers
 	[PublicAPI]
 	public sealed class NoneTransformer<T> : ITransformer<T, T>
 	{
+		/// <summary>
+		/// A default, global instance of this <see cref="NoneTransformer{T}"/>.
+		/// </summary>
+		public static NoneTransformer<T> Default { get; } = new NoneTransformer<T>();
+
 		/// <inheritdoc/>
 		public T TransformPost(T post) => post;
 
