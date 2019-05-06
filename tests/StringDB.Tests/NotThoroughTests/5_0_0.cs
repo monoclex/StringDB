@@ -24,7 +24,7 @@ namespace StringDB.Tests.NotThoroughTests
 			using (var ms = new MemoryStream())
 			{
 				using (var db = new DatabaseBuilder()
-					.UseIODatabase(builder => builder.UseStringDB(StringDBVersions.v5_0_0, ms, true))
+					.UseIODatabase(builder => builder.UseStringDB(StringDBVersion.v5_0_0, ms, true))
 					.WithTransform(StringTransformer.Default, StringTransformer.Default))
 				{
 					db.Insert("test", "value");

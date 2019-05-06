@@ -28,7 +28,7 @@ namespace StringDB.Tests
 
 			// setup a db
 			using (var _db = new DatabaseBuilder()
-				.UseIODatabase(builder => builder.UseStringDB(StringDBVersions.v10_0_0, _ms, true))
+				.UseIODatabase(builder => builder.UseStringDB(StringDBVersion.v10_0_0, _ms, true))
 				.WithTransform(StringTransformer.Default, StringTransformer.Default))
 			{
 				_db.InsertRange(KeyValuePair.Create("one key", "one value"), KeyValuePair.Create("two key", "two value"));

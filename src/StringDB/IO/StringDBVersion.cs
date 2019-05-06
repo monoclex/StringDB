@@ -6,7 +6,7 @@ namespace StringDB.IO
 	/// The versions of StringDB that can be used.
 	/// </summary>
 	[PublicAPI]
-	public enum StringDBVersions
+	public enum StringDBVersion
 	{
 		/// <summary>
 		/// StringDB 5.0.0

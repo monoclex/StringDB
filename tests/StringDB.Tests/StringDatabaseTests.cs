@@ -57,9 +57,9 @@ namespace StringDB.Tests
 		/// </summary>
 		/// <param name="version">The version to use.</param>
 		[Theory]
-		[InlineData(StringDBVersions.v5_0_0)]
-		[InlineData(StringDBVersions.v10_0_0)]
-		public void CreateWithStreamAndVersion(StringDBVersions version)
+		[InlineData(StringDBVersion.v5_0_0)]
+		[InlineData(StringDBVersion.v10_0_0)]
+		public void CreateWithStreamAndVersion(StringDBVersion version)
 		{
 			using (var db = StringDatabase.Create(new MemoryStream(), version, false))
 			{

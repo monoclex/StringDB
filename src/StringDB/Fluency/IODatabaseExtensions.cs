@@ -95,7 +95,7 @@ namespace StringDB.Fluency
 		public static IDatabase<byte[], byte[]> UseIODatabase
 		(
 			[CanBeNull] this DatabaseBuilder builder,
-			StringDBVersions version,
+			StringDBVersion version,
 			[NotNull] string file
 		)
 			=> builder.UseIODatabase(version, file, out _);
@@ -112,7 +112,7 @@ namespace StringDB.Fluency
 		public static IDatabase<byte[], byte[]> UseIODatabase
 		(
 			[CanBeNull] this DatabaseBuilder builder,
-			StringDBVersions version,
+			StringDBVersion version,
 			[NotNull] string file,
 			[NotNull] out IOptimalTokenSource optimalTokenSource
 		)

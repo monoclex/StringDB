@@ -86,7 +86,7 @@ namespace StringDB.Tests
 		public void CreatesStringDB5_0_0LowlevelDatabaseIODevice()
 		{
 			var dbiod = new DatabaseIODeviceBuilder()
-				.UseStringDB(StringDBVersions.v5_0_0, new MemoryStream());
+				.UseStringDB(StringDBVersion.v5_0_0, new MemoryStream());
 
 			dbiod
 				.Should()
@@ -97,7 +97,7 @@ namespace StringDB.Tests
 		public void CreatesStringDB10_0_0LowlevelDatabaseIODevice()
 		{
 			var dbiod = new DatabaseIODeviceBuilder()
-				.UseStringDB(StringDBVersions.v10_0_0, new MemoryStream());
+				.UseStringDB(StringDBVersion.v10_0_0, new MemoryStream());
 
 			dbiod
 				.Should()
@@ -113,7 +113,7 @@ namespace StringDB.Tests
 		public void LatestIsJust10()
 		{
 			var dbiod = new DatabaseIODeviceBuilder()
-				.UseStringDB(StringDBVersions.Latest, new MemoryStream());
+				.UseStringDB(StringDBVersion.Latest, new MemoryStream());
 
 			dbiod
 				.Should()
@@ -129,7 +129,7 @@ namespace StringDB.Tests
 		public void ThrowsOnInvalidStringDBCreation()
 		{
 			Action throws = () => new DatabaseIODeviceBuilder()
-				.UseStringDB((StringDBVersions)1337, new MemoryStream());
+				.UseStringDB((StringDBVersion)1337, new MemoryStream());
 
 			throws.Should()
 				.ThrowExactly<NotSupportedException>();
@@ -152,7 +152,7 @@ namespace StringDB.Tests
 			// verify that the DBIODevice was created correctly
 
 			var db = new DatabaseBuilder()
-				.UseIODatabase(StringDBVersions.v10_0_0, "test1.db");
+				.UseIODatabase(StringDBVersion.v10_0_0, "test1.db");
 
 			db
 				.Should()
@@ -176,7 +176,7 @@ namespace StringDB.Tests
 		{
 			// just make sure that down the chain we initialized a file stream
 			using (var idbiod = new DatabaseIODeviceBuilder()
-				.UseStringDB(StringDBVersions.v10_0_0, "test2.db"))
+				.UseStringDB(StringDBVersion.v10_0_0, "test2.db"))
 			{
 				idbiod
 					.Should()

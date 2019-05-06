@@ -38,7 +38,7 @@ namespace StringDB
 			[NotNull] Stream stream,
 			bool leaveStreamOpen = false
 		)
-			=> Create(stream, StringDBVersions.Latest, leaveStreamOpen);
+			=> Create(stream, StringDBVersion.Latest, leaveStreamOpen);
 
 		/// <summary>
 		/// Creates a string database that saves to a stream, and specify the version.
@@ -52,7 +52,7 @@ namespace StringDB
 		public static IDatabase<string, string> Create
 		(
 			[NotNull] Stream stream,
-			StringDBVersions version,
+			StringDBVersion version,
 			bool leaveStreamOpen
 		)
 			=> new DatabaseBuilder()

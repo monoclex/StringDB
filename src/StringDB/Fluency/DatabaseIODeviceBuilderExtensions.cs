@@ -44,7 +44,7 @@ namespace StringDB.Fluency
 		public static IDatabaseIODevice UseStringDB
 		(
 			[CanBeNull] this DatabaseIODeviceBuilder builder,
-			StringDBVersions version,
+			StringDBVersion version,
 			[NotNull] string file
 		)
 			=> builder
@@ -72,7 +72,7 @@ namespace StringDB.Fluency
 		public static IDatabaseIODevice UseStringDB
 		(
 			[CanBeNull] this DatabaseIODeviceBuilder builder,
-			StringDBVersions version,
+			StringDBVersion version,
 			[NotNull] Stream stream,
 			bool leaveStreamOpen = false
 		)
@@ -84,15 +84,15 @@ namespace StringDB.Fluency
 		[NotNull]
 		private static ILowlevelDatabaseIODevice UseVersion
 		(
-			this StringDBVersions version,
+			this StringDBVersion version,
 			[NotNull] Stream stream,
 			bool leaveStreamOpen = false
 		)
 		{
 			switch (version)
 			{
-				case StringDBVersions.v5_0_0: return new StringDB5_0_0LowlevelDatabaseIODevice(stream, leaveStreamOpen);
-				case StringDBVersions.v10_0_0: return new StringDB10_0_0LowlevelDatabaseIODevice(stream, leaveStreamOpen);
+				case StringDBVersion.v5_0_0: return new StringDB5_0_0LowlevelDatabaseIODevice(stream, leaveStreamOpen);
+				case StringDBVersion.v10_0_0: return new StringDB10_0_0LowlevelDatabaseIODevice(stream, leaveStreamOpen);
 				default: throw new NotSupportedException($"Didn't expect a {version}");
 			}
 		}
