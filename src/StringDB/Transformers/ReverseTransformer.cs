@@ -16,6 +16,7 @@ namespace StringDB.Transformers
 		/// <summary>
 		/// The transformer being used under the hood.
 		/// </summary>
+		[NotNull]
 		public ITransformer<TPre, TPost> Transformer { get; }
 
 		/// <summary>

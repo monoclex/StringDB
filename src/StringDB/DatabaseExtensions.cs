@@ -19,7 +19,8 @@ namespace StringDB
 		/// <typeparam name="TValue">The type of value.</typeparam>
 		/// <param name="db">The database to fetch all the keys from.</param>
 		/// <returns>A <see cref="IEnumerable{T}"/> of keys.</returns>
-		[NotNull, MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<TKey> Keys<TKey, TValue>
 		(
 			[NotNull] this IDatabase<TKey, TValue> db
@@ -33,7 +34,8 @@ namespace StringDB
 		/// <typeparam name="TValue">The type of value.</typeparam>
 		/// <param name="db">The database to fetch all the values from.</param>
 		/// <returns>A <see cref="IEnumerable{T}"/> of values.</returns>
-		[NotNull, MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<ILazyLoader<TValue>> Values<TKey, TValue>
 		(
 			[NotNull] this IDatabase<TKey, TValue> db
@@ -47,7 +49,8 @@ namespace StringDB
 		/// <typeparam name="TValue">The type of value.</typeparam>
 		/// <param name="db">The database to fetch all the values from.</param>
 		/// <returns>A <see cref="IEnumerable{T}"/> of loaded values.</returns>
-		[NotNull, MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<TValue> ValuesAggressive<TKey, TValue>
 		(
 			[NotNull] this IDatabase<TKey, TValue> db
@@ -63,6 +66,7 @@ namespace StringDB
 		/// <param name="valueLoadAmount">The amount of values to load at a time.</param>
 		/// <returns>An <see cref="IEnumerator{T}"/> of <see cref="KeyValuePair{TKey,TValue}"/>s with the data.</returns>
 		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IEnumerable<KeyValuePair<TKey, TValue>> EnumerateAggressively<TKey, TValue>
 		(
 			[NotNull] this IDatabase<TKey, TValue> db,

@@ -15,13 +15,16 @@ namespace StringDB.Transformers
 		/// <summary>
 		/// A global, default instance of this <see cref="StringTransformer"/>.
 		/// </summary>
+		[NotNull]
 		public static StringTransformer Default { get; } = new StringTransformer();
 
 		/// <inheritdoc />
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string TransformPre(byte[] pre) => Encoding.UTF8.GetString(pre);
 
 		/// <inheritdoc />
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public byte[] TransformPost(string post) => Encoding.UTF8.GetBytes(post);
 	}

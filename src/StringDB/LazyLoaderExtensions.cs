@@ -16,6 +16,7 @@ namespace StringDB
 		/// </summary>
 		/// <typeparam name="T">The type of the value.</typeparam>
 		/// <param name="lazyLoader">The lazy loader to get an awaiter for.</param>
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static LazyLoaderAwaiter<T> GetAwaiter<T>(this ILazyLoader<T> lazyLoader)
 			=> new LazyLoaderAwaiter<T>
@@ -30,6 +31,7 @@ namespace StringDB
 		/// <typeparam name="TValue">The type of the value.</typeparam>
 		/// <param name="lazyLoader">The lazy loader.</param>
 		/// <param name="key">The key.</param>
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static KeyValuePair<TKey, ILazyLoader<TValue>> ToKeyValuePair<TKey, TValue>
 		(

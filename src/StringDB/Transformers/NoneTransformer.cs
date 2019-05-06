@@ -15,6 +15,7 @@ namespace StringDB.Transformers
 		/// <summary>
 		/// A default, global instance of this <see cref="NoneTransformer{T}"/>.
 		/// </summary>
+		[NotNull]
 		public static NoneTransformer<T> Default { get; } = new NoneTransformer<T>();
 
 		/// <inheritdoc/>

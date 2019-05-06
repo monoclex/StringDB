@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
 
+using System.Runtime.CompilerServices;
+
 namespace StringDB.Transformers
 {
 	/// <summary>
@@ -14,6 +16,7 @@ namespace StringDB.Transformers
 		/// <param name="transformer">The transformer to reverse.</param>
 		/// <returns>A reversed transformer.</returns>
 		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ITransformer<TPost, TPre> Reverse<TPre, TPost>
 		(
 			[NotNull] this ITransformer<TPre, TPost> transformer

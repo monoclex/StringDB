@@ -19,6 +19,7 @@ namespace StringDB
 		/// Creates a string database entirely in memory.
 		/// </summary>
 		/// <returns>A string database, located in memory.</returns>
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<string, string> Create()
 			=> new DatabaseBuilder()
@@ -30,6 +31,7 @@ namespace StringDB
 		/// <param name="stream">The stream to write/read data to/from.</param>
 		/// <param name="leaveStreamOpen">If the stream should be left open when the database is getting disposed.</param>
 		/// <returns>An IODatabase with a transform, using the latest version of StringDB.</returns>
+		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<string, string> Create
 		(
@@ -45,6 +47,8 @@ namespace StringDB
 		/// <param name="version">The version of StringDB.</param>
 		/// <param name="leaveStreamOpen">If the stream should be left open when the database is getting disposed.</param>
 		/// <returns>An IODatabase with a transform, using the specified version of StringDB.</returns>
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<string, string> Create
 		(
 			[NotNull] Stream stream,
