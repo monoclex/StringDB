@@ -11,15 +11,16 @@ namespace StringDB.IO.Compatibility
 	{
 		private static class Constants
 		{
-			public const byte IndexSeparator = 0xFF;
 			public const byte EOF = 0x00;
+			public const byte IndexSeparator = 0xFF;
 		}
 
-		private readonly StreamCacheMonitor _stream;
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
+		private readonly StreamCacheMonitor _stream;
 
-		public Stream InnerStream => _stream;
+		private readonly byte[] _buffer;
+		private bool _disposed;
 
 		public StringDB10_0_0LowlevelDatabaseIODevice
 		(
@@ -27,6 +28,11 @@ namespace StringDB.IO.Compatibility
 			bool leaveStreamOpen = false
 		)
 		{
+			// use a buffer when performing single byte writes since writing a single byte
+			// allocates a new byte array every time, and that's a very costly operation.
+			// the size of this buffer is artificial.
+			_buffer = new byte[16];
+
 			// We wrap the stream in this so that lookups to Position and Length are quick and snappy.
 			// This is to prevent a performance concern regarding EOF using excessive amounts of time.
 			// This has the issue of being cached, but calling IODevice.Reset should fix it right up.
@@ -39,45 +45,42 @@ namespace StringDB.IO.Compatibility
 			JumpPos = ReadBeginning();
 		}
 
-		private long ReadBeginning()
+		~StringDB10_0_0LowlevelDatabaseIODevice()
 		{
-			Seek(0);
+			Dispose();
+		}
 
-			if (_stream.Length >= 8)
+		public void Dispose()
+		{
+			if (_disposed)
 			{
-				return _br.ReadInt64();
+				return;
 			}
 
-			// we will create it if it doesn't exist
-			_bw.Write(0L);
-			return 0;
+			_disposed = true;
+
+			Seek(0);
+
+			// write the jump position at the beginning
+			_bw.Write(JumpPos);
+
+			Flush();
+
+			_bw.Dispose();
+			_br.Dispose();
 		}
+
+		public Stream InnerStream => _stream;
 
 		public int JumpOffsetSize { get; } = sizeof(byte) + sizeof(int);
 
 		public long JumpPos { get; set; }
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public long GetPosition() => _stream.Position;
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Reset()
-		{
-			_stream.UpdateCache();
-			Seek(sizeof(long));
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Seek(long position) => _stream.Seek(position, SeekOrigin.Begin);
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void SeekEnd() => _stream.Seek(0, SeekOrigin.End);
-
-		public void Flush()
-		{
-			_bw.Flush();
-			_stream.Flush();
-		}
+		// As it turns out, this is a major performance concern
+		// when using a FileStream.
+		// Thus, the chosen solution was to wrap the given Stream into a StreamCacheMonitor.
+		// This makes these lookups quick and snappy.
+		private bool EOF => GetPosition() >= _stream.Length;
 
 		public NextItemPeek Peek(out byte peekResult)
 		{
@@ -96,18 +99,6 @@ namespace StringDB.IO.Compatibility
 					return NextItemPeek.Index;
 			}
 		}
-
-		private byte PeekByte()
-		{
-			if (EOF)
-			{
-				return Constants.EOF;
-			}
-
-			var peek = _br.ReadByte();
-			return peek;
-		}
-
 		public LowLevelDatabaseItem ReadIndex(byte peekResult)
 		{
 			if (EOF)
@@ -126,11 +117,10 @@ namespace StringDB.IO.Compatibility
 			};
 		}
 
-		// As it turns out, this is a major performance concern
-		// when using a FileStream.
-		// Thus, the chosen solution was to wrap the given Stream into a StreamCacheMonitor.
-		// This makes these lookups quick and snappy.
-		private bool EOF => GetPosition() >= _stream.Length;
+		public long ReadJump()
+		{
+			return ReadDownsizedLong();
+		}
 
 		public byte[] ReadValue(long dataPosition)
 		{
@@ -145,22 +135,17 @@ namespace StringDB.IO.Compatibility
 			return _br.ReadBytes((int)length);
 		}
 
-		public long ReadJump()
-		{
-			return ReadDownsizedLong();
-		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public int CalculateIndexOffset(byte[] key)
+			=> sizeof(byte)
+			+ sizeof(int)
+			+ key.Length;
 
 		public void WriteIndex(byte[] key, long dataPosition)
 		{
 			_bw.Write(GetIndexSize(key.Length));
 			_bw.Write(GetJumpSize(dataPosition));
 			_bw.Write(key);
-		}
-
-		public void WriteValue(byte[] value)
-		{
-			WriteVariableLength((uint)value.Length);
-			_bw.Write(value);
 		}
 
 		public void WriteJump(long jumpTo)
@@ -173,20 +158,50 @@ namespace StringDB.IO.Compatibility
 			_bw.Write(jumpTo == 0 ? 0u : GetJumpSize(jumpTo));
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public int CalculateIndexOffset(byte[] key)
-			=> sizeof(byte)
-			+ sizeof(int)
-			+ key.Length;
+		public void WriteValue(byte[] value)
+		{
+			WriteVariableLength((uint)value.Length);
+			_bw.Write(value);
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CalculateValueOffset(byte[] value)
 			=> CalculateVariableSize((uint)value.Length)
 			+ value.Length;
 
-		private long ReadDownsizedLong() => GetPosition() + _br.ReadInt32();
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public long GetPosition() => _stream.Position;
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Reset()
+		{
+			_stream.UpdateCache();
+			Seek(sizeof(long));
+		}
 
-		private int ReadIndexLength() => _br.ReadByte();
+		public void Flush()
+		{
+			_bw.Flush();
+			_stream.Flush();
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Seek(long position) => _stream.Seek(position, SeekOrigin.Begin);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void SeekEnd() => _stream.Seek(0, SeekOrigin.End);
+		private int CalculateVariableSize(uint value)
+		{
+			var result = 0;
+			var currentValue = value;
+
+			do
+			{
+				currentValue >>= 7;
+				result++;
+			}
+			while (currentValue != 0);
+
+			return result;
+		}
 
 		private byte GetIndexSize(int length)
 		{
@@ -219,9 +234,31 @@ namespace StringDB.IO.Compatibility
 			return (uint)result;
 		}
 
-		// https://wiki.vg/Data_types#VarInt_and_VarLong
-		// the first bit tells us if we need to read more
-		// the other 7 are used to encode the value
+		private byte PeekByte()
+		{
+			if (EOF)
+			{
+				return Constants.EOF;
+			}
+
+			return _br.ReadByte();
+		}
+
+		private long ReadBeginning()
+		{
+			Seek(0);
+
+			if (_stream.Length >= 8)
+			{
+				return _br.ReadInt64();
+			}
+
+			// we will create it if it doesn't exist
+			_bw.Write(0L);
+			return 0;
+		}
+
+		private long ReadDownsizedLong() => GetPosition() + _br.ReadInt32();
 
 		private uint ReadVariableLength()
 		{
@@ -248,9 +285,13 @@ namespace StringDB.IO.Compatibility
 			return totalResult;
 		}
 
+		// https://wiki.vg/Data_types#VarInt_and_VarLong
+		// the first bit tells us if we need to read more
+		// the other 7 are used to encode the value
 		private void WriteVariableLength(uint value)
 		{
 			var currentValue = value;
+			int i = 0;
 
 			do
 			{
@@ -263,51 +304,11 @@ namespace StringDB.IO.Compatibility
 					read |= 0b10000000;
 				}
 
-				_bw.Write(read);
-			}
-			while (currentValue != 0);
-		}
-
-		private int CalculateVariableSize(uint value)
-		{
-			var result = 0;
-			var currentValue = value;
-
-			do
-			{
-				currentValue >>= 7;
-				result++;
+				_buffer[i++] = read;
 			}
 			while (currentValue != 0);
 
-			return result;
-		}
-
-		~StringDB10_0_0LowlevelDatabaseIODevice()
-		{
-			Dispose();
-		}
-
-		private bool _disposed;
-
-		public void Dispose()
-		{
-			if (_disposed)
-			{
-				return;
-			}
-
-			_disposed = true;
-
-			Seek(0);
-
-			// write the jump position at the beginning
-			_bw.Write(JumpPos);
-
-			Flush();
-
-			_bw.Dispose();
-			_br.Dispose();
+			_bw.Write(_buffer, 0, i);
 		}
 	}
 }
