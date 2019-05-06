@@ -1,12 +1,13 @@
 ﻿using FluentAssertions;
+
 using StringDB.Fluency;
 using StringDB.IO;
 using StringDB.IO.Compatibility;
 using StringDB.Transformers;
-using System;
+
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+
 using Xunit;
 
 namespace StringDB.Tests
@@ -16,14 +17,14 @@ namespace StringDB.Tests
 	/// </summary>
 	public class DatabaseIODeviceOptimalTokenTests
 	{
-		private readonly OptimalToken _token;
+		private readonly OptimalTokenSource _token;
 		private readonly MemoryStream _ms;
 		private readonly StringDB10_0_0LowlevelDatabaseIODevice _lldbiod;
 		private readonly DatabaseIODevice _dbiod;
 
 		public DatabaseIODeviceOptimalTokenTests()
 		{
-			_token = new OptimalToken();
+			_token = new OptimalTokenSource();
 			_ms = new MemoryStream();
 
 			// setup a db

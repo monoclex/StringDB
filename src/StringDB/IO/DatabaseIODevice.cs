@@ -20,7 +20,7 @@ namespace StringDB.IO
 		(
 			[NotNull] ILowlevelDatabaseIODevice lowlevelDBIOD
 		)
-			: this(lowlevelDBIOD, new OptimalToken())
+			: this(lowlevelDBIOD, new OptimalTokenSource())
 		{
 		}
 

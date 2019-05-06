@@ -7,7 +7,7 @@ using Xunit;
 namespace StringDB.Tests
 {
 	/// <summary>
-	/// Tests for an <see cref="OptimalToken"/>
+	/// Tests for an <see cref="OptimalTokenSource"/>
 	/// </summary>
 	public class OptimalTokenTests
 	{
@@ -17,7 +17,7 @@ namespace StringDB.Tests
 		[Fact]
 		public void SettingTokenStateWorks()
 		{
-			IOptimalTokenSource optimalToken = new OptimalToken();
+			IOptimalTokenSource optimalToken = new OptimalTokenSource();
 
 			optimalToken.OptimalReadingTime.Should().Be(false);
 

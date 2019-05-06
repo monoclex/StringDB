@@ -25,7 +25,7 @@ namespace StringDB.Tests
 				_value = value;
 			}
 
-			public OptimalToken OptimalToken { get; } = new OptimalToken();
+			public OptimalTokenSource OptimalToken { get; } = new OptimalTokenSource();
 			public bool EvaluateNext { get; set; } = true;
 
 			public override void Dispose()

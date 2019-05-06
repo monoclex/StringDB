@@ -31,7 +31,7 @@ namespace StringDB.IO
 			Stream stream,
 			bool leaveStreamOpen = false
 		)
-			: this(stream, new OptimalToken(), leaveStreamOpen)
+			: this(stream, new OptimalTokenSource(), leaveStreamOpen)
 		{
 		}
 

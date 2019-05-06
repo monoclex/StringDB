@@ -25,11 +25,11 @@ Verify the claims for yourself:
 Enumerate over a database and it's values, the fastest, by enumerating over it optimally
 ```cs
 using var db = new DatabaseBuilder()
-	.UseIODatabase(StringDBVersion.Latest, "database.db", out var optionalTokenSource)
+	.UseIODatabase(StringDBVersion.Latest, "database.db", out var optimalTokenSource)
 	.WithBuffer(1000)
 	.WithTranform(StringTransformation.Default, StringTransformation.Default);
 	
-foreach (var (key, value) in db.EnumerateOptimally(optionalTokenSource))
+foreach (var (key, value) in db.EnumerateOptimally(optimalTokenSource))
 {
 	// do something with the key and value
 }
