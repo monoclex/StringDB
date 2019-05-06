@@ -126,6 +126,13 @@ namespace StringDB.Databases
 				InnerDatabase.InsertRange(array);
 			}
 
+			// since we've written the buffer, clean it out
+			// this will remove all references to used objects to let GC do it's thing
+			for (int i = 0; i < _buffer.Length; i++)
+			{
+				_buffer[i] = default;
+			}
+
 			_bufferPos = 0;
 		}
 
