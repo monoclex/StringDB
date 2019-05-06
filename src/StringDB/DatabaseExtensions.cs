@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
 
+using StringDB.IO;
+
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -68,6 +70,55 @@ namespace StringDB
 			foreach (var entry in db)
 			{
 				yield return entry.Value.Load();
+			}
+		}
+
+		/// Enumerates over the database and loads values as soon as it's optimal to do so.
+		/// </summary>
+		/// <typeparam name="TKey">The type of key.</typeparam>
+		/// <typeparam name="TValue">The type of value.</typeparam>
+		/// <param name="db">The database to fetch all the values from.</param>
+		/// <param name="optimalToken">The token to use to determine when it is optimal to read values.</param>
+		/// <returns>An <see cref="IEnumerator{T}"/> of <see cref="KeyValuePair{TKey,TValue}"/>s with the data.</returns>
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IEnumerable<KeyValuePair<TKey, TValue>> EnumerateOptimally<TKey, TValue>
+		(
+			[NotNull] this IDatabase<TKey, TValue> db,
+			IOptimalToken optimalToken
+		)
+		{
+			var lazyList = new List<KeyValuePair<TKey, ILazyLoader<TValue>>>();
+
+			foreach (var entry in db)
+			{
+				lazyList.Add(entry);
+
+				if (!optimalToken.OptimalReadingTime)
+				{
+					continue;
+				}
+
+				foreach (var lazyEntry in lazyList)
+				{
+					yield return new KeyValuePair<TKey, TValue>(lazyEntry.Key, lazyEntry.Value.Load());
+				}
+
+				lazyList.Clear();
+			}
+
+			if (lazyList.Count == 0)
+			{
+				yield break;
+			}
+
+			// i really hate how this is duplicated, but we can't use local functions
+			// since those are delegates and that'd be a bit of a performance hit
+			// so copying and pasting is the ugliest, but fastest solution.
+			// i'm very open to PRs for this :p
+			foreach (var lazyEntry in lazyList)
+			{
+				yield return new KeyValuePair<TKey, TValue>(lazyEntry.Key, lazyEntry.Value.Load());
 			}
 		}
 
