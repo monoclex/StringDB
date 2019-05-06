@@ -24,12 +24,25 @@ namespace StringDB.IO
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
 
+		public IOptimalTokenSource OptimalTokenSource { get; }
+
 		public StoneVaultIODevice
 		(
 			Stream stream,
 			bool leaveStreamOpen = false
 		)
+			: this(stream, new OptimalToken(), leaveStreamOpen)
 		{
+		}
+
+		public StoneVaultIODevice
+		(
+			Stream stream,
+			IOptimalTokenSource optimalTokenSource,
+			bool leaveStreamOpen = false
+		)
+		{
+			OptimalTokenSource = optimalTokenSource;
 			_stream = stream;
 			_br = new BinaryReader(stream, Encoding.UTF8, leaveStreamOpen);
 			_bw = new BinaryWriter(stream, Encoding.UTF8, leaveStreamOpen);
@@ -54,6 +67,10 @@ namespace StringDB.IO
 
 			var valueLength = _br.ReadInt64();
 			_stream.Position += valueLength;
+
+			// the values are right after the index
+			// it is always a good time to read the value
+			OptimalTokenSource.SetOptimalReadingTime(true);
 
 			return new DatabaseItem
 			{

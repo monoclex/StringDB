@@ -26,6 +26,8 @@ namespace StringDB.Tests.Mocks
 		})
 		.ToList();
 
+		public IOptimalTokenSource OptimalTokenSource => throw new System.NotImplementedException();
+
 		public int ItemOn = -1;
 
 		public void Reset() => ItemOn = 0;

@@ -175,35 +175,36 @@ namespace StringDB.Tests
 		public void UseStringDB()
 		{
 			// just make sure that down the chain we initialized a file stream
-			var idbiod = new DatabaseIODeviceBuilder()
-				.UseStringDB(StringDBVersions.v10_0_0, "test2.db");
+			using (var idbiod = new DatabaseIODeviceBuilder()
+				.UseStringDB(StringDBVersions.v10_0_0, "test2.db"))
+			{
+				idbiod
+					.Should()
+					.BeOfType<DatabaseIODevice>();
 
-			idbiod
-				.Should()
-				.BeOfType<DatabaseIODevice>();
+				var dbiod = idbiod as DatabaseIODevice;
 
-			var dbiod = idbiod as DatabaseIODevice;
+				dbiod.LowLevelDatabaseIODevice
+					.Should()
+					.BeOfType<StringDB10_0_0LowlevelDatabaseIODevice>();
 
-			dbiod.LowLevelDatabaseIODevice
-				.Should()
-				.BeOfType<StringDB10_0_0LowlevelDatabaseIODevice>();
+				var ldbiod = dbiod.LowLevelDatabaseIODevice as StringDB10_0_0LowlevelDatabaseIODevice;
 
-			var ldbiod = dbiod.LowLevelDatabaseIODevice as StringDB10_0_0LowlevelDatabaseIODevice;
+				ldbiod.InnerStream
+					.Should()
+					.BeOfType<StreamCacheMonitor>();
 
-			ldbiod.InnerStream
-				.Should()
-				.BeOfType<StreamCacheMonitor>();
+				var scm = ldbiod.InnerStream as StreamCacheMonitor;
 
-			var scm = ldbiod.InnerStream as StreamCacheMonitor;
+				scm.InnerStream
+					.Should()
+					.BeOfType<FileStream>();
 
-			scm.InnerStream
-				.Should()
-				.BeOfType<FileStream>();
+				var fs = scm.InnerStream as FileStream;
 
-			var fs = scm.InnerStream as FileStream;
-
-			fs.CanRead.Should().BeTrue();
-			fs.CanWrite.Should().BeTrue();
+				fs.CanRead.Should().BeTrue();
+				fs.CanWrite.Should().BeTrue();
+			}
 		}
 	}
 }

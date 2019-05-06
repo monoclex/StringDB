@@ -13,11 +13,26 @@ namespace StringDB.IO
 	{
 		public ILowlevelDatabaseIODevice LowLevelDatabaseIODevice { get; }
 
+		/// <inheritdoc />
+		public IOptimalTokenSource OptimalTokenSource { get; }
+
 		public DatabaseIODevice
 		(
 			[NotNull] ILowlevelDatabaseIODevice lowlevelDBIOD
 		)
-			=> LowLevelDatabaseIODevice = lowlevelDBIOD;
+			: this(lowlevelDBIOD, new OptimalToken())
+		{
+		}
+
+		public DatabaseIODevice
+		(
+			[NotNull] ILowlevelDatabaseIODevice lowlevelDBIOD,
+			[NotNull] IOptimalTokenSource optimalTokenSource
+		)
+		{
+			LowLevelDatabaseIODevice = lowlevelDBIOD;
+			OptimalTokenSource = optimalTokenSource;
+		}
 
 		public void Reset() => LowLevelDatabaseIODevice.Reset();
 
@@ -38,6 +53,11 @@ namespace StringDB.IO
 		/// <inheritdoc />
 		public DatabaseItem ReadNext()
 		{
+			if (OptimalTokenSource.OptimalReadingTime)
+			{
+				OptimalTokenSource.SetOptimalReadingTime(false);
+			}
+
 			// handle EOFs/Jumps
 			var peek = LowLevelDatabaseIODevice.Peek(out var peekResult);
 
@@ -72,12 +92,20 @@ namespace StringDB.IO
 		{
 			peekResult = 0x00;
 
-			while (peek == NextItemPeek.Jump)
+			if (peek != NextItemPeek.Jump)
+			{
+				return;
+			}
+
+			do
 			{
 				var jump = LowLevelDatabaseIODevice.ReadJump();
 				LowLevelDatabaseIODevice.Seek(jump);
 				peek = LowLevelDatabaseIODevice.Peek(out peekResult);
 			}
+			while (peek == NextItemPeek.Jump);
+
+			OptimalTokenSource.SetOptimalReadingTime(true);
 		}
 
 		/// <inheritdoc />

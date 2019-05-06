@@ -36,5 +36,11 @@ namespace StringDB.IO
 		/// </summary>
 		/// <param name="items">The items to insert.</param>
 		void Insert([NotNull] KeyValuePair<byte[], byte[]>[] items);
+
+		/// <summary>
+		/// A token source that dictates the optimal time to start reading values.
+		/// </summary>
+		[NotNull]
+		IOptimalTokenSource OptimalTokenSource { get; }
 	}
 }
