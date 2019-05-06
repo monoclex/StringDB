@@ -27,7 +27,8 @@ Use fluent extensions to create a database:
 ```cs
 using IDatabase<string, string> db = new DatabaseBuilder()
     .UseIODatabase(StringDBVersions.Latest, "database.db")
-    .ApplyStringTransformation();
+    .WithBuffer(1000)
+    .WithTransform(StringTransformation.Default, StringTransformation.Default);
 
 using IDatabase<int, string> memDb = new DatabaseBuilder()
     .UseMemoryDatabase<int, string>();
@@ -54,6 +55,8 @@ public class TestDatabase : BaseDatabase<int, string>
         public string Load() => _value;
         public void Dispose() {}
     }
+	
+	public override void Dispose() {}
 
     protected override void InsertRange(KeyValuePair<int, string>[] items)
     {
