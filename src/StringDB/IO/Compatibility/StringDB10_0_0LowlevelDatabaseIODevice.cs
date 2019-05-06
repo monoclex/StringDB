@@ -133,7 +133,12 @@ namespace StringDB.IO.Compatibility
 		public void WriteIndex(byte[] key, long dataPosition)
 		{
 			_buffer[0] = GetIndexSize(key.Length);
-			WriteUInt(1, GetJumpSize(dataPosition));
+
+			// we add 1 to the data position since we expect to add the position
+			// to the current position in the stream, however since we're not advancing
+			// the stream at all (we're writing to a buffer) we need to artificially move
+			// the position where the data is being stored.
+			WriteUInt(1, GetJumpSize(dataPosition - 1));
 
 			_bw.Write(_buffer, 0, sizeof(byte) + sizeof(uint));
 			_bw.Write(key);
@@ -144,8 +149,10 @@ namespace StringDB.IO.Compatibility
 			_buffer[0] = Constants.IndexSeparator;
 
 			// this is to cope with the DatabaseIODevice
-			// it's pretty much a hacky workaround :v
-			WriteUInt(1, jumpTo == 0 ? 0u : GetJumpSize(jumpTo));
+			// it's pretty much a hacky workaround :v (the ternary operator)
+
+			// in addition, see the comment in WriteIndex for why we subtract 1 to GetJumpSize
+			WriteUInt(1, jumpTo == 0 ? 0u : GetJumpSize(jumpTo - 1));
 
 			_bw.Write(_buffer, 0, sizeof(byte) + sizeof(uint));
 		}
