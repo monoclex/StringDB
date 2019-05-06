@@ -18,8 +18,7 @@ namespace StringDB.IO.Compatibility
 
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
-		private readonly StreamCacheMonitor _cacheStream;
-		private readonly Stream _stream;
+		private readonly StreamCacheMonitor _stream;
 
 		private readonly byte[] _buffer;
 		private bool _disposed;
@@ -40,8 +39,7 @@ namespace StringDB.IO.Compatibility
 			// This has the issue of being cached, but calling IODevice.Reset should fix it right up.
 			// Of course, this has bad implications and might be reverted later, but it definitely
 			// fixes the performance gap without making the code ugly.
-			_cacheStream = new StreamCacheMonitor(stream);
-			_stream = _cacheStream;
+			_stream = new StreamCacheMonitor(stream);
 			_br = new BinaryReader(_stream, Encoding.UTF8, leaveStreamOpen);
 			_bw = new BinaryWriter(_stream, Encoding.UTF8, leaveStreamOpen);
 
@@ -174,7 +172,7 @@ namespace StringDB.IO.Compatibility
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Reset()
 		{
-			_cacheStream.UpdateCache();
+			_stream.UpdateCache();
 			Seek(sizeof(long));
 		}
 
