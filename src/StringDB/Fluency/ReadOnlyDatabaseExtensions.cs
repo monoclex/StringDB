@@ -2,6 +2,8 @@
 
 using StringDB.Databases;
 
+using System.Runtime.CompilerServices;
+
 namespace StringDB.Fluency
 {
 	/// <summary>
@@ -18,6 +20,8 @@ namespace StringDB.Fluency
 		/// <param name="database">The database to make read only.</param>
 		/// <param name="disposeDatabase">If the underlying database should be disposed on dispose.</param>
 		/// <returns>A read only database</returns>
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<TKey, TValue> AsReadOnly<TKey, TValue>
 		(
 			[NotNull] this IDatabase<TKey, TValue> database,

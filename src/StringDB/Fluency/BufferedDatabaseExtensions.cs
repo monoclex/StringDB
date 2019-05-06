@@ -2,6 +2,8 @@
 
 using StringDB.Databases;
 
+using System.Runtime.CompilerServices;
+
 namespace StringDB.Fluency
 {
 	/// <summary>
@@ -19,6 +21,8 @@ namespace StringDB.Fluency
 		/// <param name="bufferSize">The size of the buffer.</param>
 		/// <param name="disposeDatabase">If the underlying database should be disposed on dispose.</param>
 		/// <returns>A buffered database.</returns>
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IDatabase<TKey, TValue> WithBuffer<TKey, TValue>
 		(
 			[NotNull] this IDatabase<TKey, TValue> database,
