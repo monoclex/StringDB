@@ -73,6 +73,7 @@ namespace StringDB
 			}
 		}
 
+		/// <summary>
 		/// Enumerates over the database and loads values as soon as it's optimal to do so.
 		/// </summary>
 		/// <typeparam name="TKey">The type of key.</typeparam>
