@@ -29,6 +29,7 @@ namespace StringDB.IO.Compatibility
 		private readonly StreamCacheMonitor _stream;
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
+		private object _disposeLock = new object();
 
 		public Stream InnerStream => _stream;
 
@@ -189,12 +190,17 @@ namespace StringDB.IO.Compatibility
 
 		public void Dispose()
 		{
-			if (_disposed)
+			// see the StringDB10_0_0LowlevelDatabaseIODevice for why we lock here
+			lock (_disposeLock)
 			{
-				return;
+				if (_disposed)
+				{
+					return;
+				}
+
+				_disposed = true;
 			}
 
-			_disposed = true;
 			Seek(0);
 
 			// inc/dec jumppos since we account for the 0xFF in our storage of it

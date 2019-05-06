@@ -22,6 +22,7 @@ namespace StringDB.IO.Compatibility
 
 		private readonly byte[] _buffer;
 		private bool _disposed;
+		private object _disposeLock = new object();
 
 		public StringDB10_0_0LowlevelDatabaseIODevice
 		(
@@ -50,12 +51,18 @@ namespace StringDB.IO.Compatibility
 
 		public void Dispose()
 		{
-			if (_disposed)
+			// a race condition can occur
+			// if both the finalizer and dispose get called
+			// ( and it has happened once in testing, so... )
+			lock (_disposeLock)
 			{
-				return;
-			}
+				if (_disposed)
+				{
+					return;
+				}
 
-			_disposed = true;
+				_disposed = true;
+			}
 
 			Seek(0);
 
