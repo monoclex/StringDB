@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace StringDB
@@ -25,7 +24,12 @@ namespace StringDB
 		(
 			[NotNull] this IDatabase<TKey, TValue> db
 		)
-			=> db.Select(x => x.Key);
+		{
+			foreach (var entry in db)
+			{
+				yield return entry.Key;
+			}
+		}
 
 		/// <summary>
 		/// Returns every value of the database.
@@ -40,7 +44,12 @@ namespace StringDB
 		(
 			[NotNull] this IDatabase<TKey, TValue> db
 		)
-			=> db.Select(x => x.Value);
+		{
+			foreach (var entry in db)
+			{
+				yield return entry.Value;
+			}
+		}
 
 		/// <summary>
 		/// Loads every value, and returns the loaded value of the database.
@@ -55,7 +64,12 @@ namespace StringDB
 		(
 			[NotNull] this IDatabase<TKey, TValue> db
 		)
-			=> db.Values().Select(x => x.Load());
+		{
+			foreach (var entry in db)
+			{
+				yield return entry.Value.Load();
+			}
+		}
 
 		/// <summary>
 		/// Enumerates over the database and loads <param name="valueLoadAmount"></param> values at a time.
