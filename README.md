@@ -22,11 +22,24 @@ Verify the claims for yourself:
 
 ## Api
 
+Enumerate over a database and it's values, the fastest, by enumerating over it optimally
+```cs
+using var db = new DatabaseBuilder()
+	.UseIODatabase(StringDBVersion.Latest, "database.db", out var optionalTokenSource)
+	.WithBuffer(1000)
+	.WithTranform(StringTransformation.Default, StringTransformation.Default);
+	
+foreach (var (key, value) in db.EnumerateOptimally(optionalTokenSource))
+{
+	// do something with the key and value
+}
+```
+
 Use fluent extensions to create a database:
 
 ```cs
 using IDatabase<string, string> db = new DatabaseBuilder()
-    .UseIODatabase(StringDBVersions.Latest, "database.db")
+    .UseIODatabase(StringDBVersion.Latest, "database.db")
     .WithBuffer(1000)
     .WithTransform(StringTransformation.Default, StringTransformation.Default);
 
