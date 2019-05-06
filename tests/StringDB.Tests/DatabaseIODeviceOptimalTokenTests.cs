@@ -59,7 +59,7 @@ namespace StringDB.Tests
 			void TrueToken()
 			{
 				_dbiod.ReadNext();
-				_token.OptimalReadingTime.Should().BeFalse();
+				_token.OptimalReadingTime.Should().BeTrue();
 			}
 		}
 	}

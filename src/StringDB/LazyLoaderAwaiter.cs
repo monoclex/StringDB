@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 namespace StringDB
 {
 	// note: no [PublicAPI]
+	// note: can't be a struct otherwise the values don't update
 	/// <summary>
 	/// Used to allow an <see cref="ILazyLoader{T}"/> to be awaited.
 	/// </summary>
 	/// <typeparam name="T">The type of the value.</typeparam>
-	public struct LazyLoaderAwaiter<T> : INotifyCompletion
+	public class LazyLoaderAwaiter<T> : INotifyCompletion
 	{
 		public ILazyLoader<T> LazyLoader;
 		private T _result;
