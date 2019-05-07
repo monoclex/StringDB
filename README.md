@@ -95,6 +95,8 @@ StringDB is *tiny*. Use *tiny* amounts of RAM, and *tiny* amounts of space.
 
 ### [StringDB 10.0.0 file size: single inserts, 128 byte keys, 1024 byte values][source_insert_test]
 
+![Chart][icon_chart_single_inserts]
+
 | Inserts | Size (in KB, 1000 bytes) | Absolute Minimum Size Possible | StringDB Overhead Percentage |
 | --- | --- | --- | --- |
 | 1 | 1.172 KB | 1.152 KB | 1.706485% |
@@ -104,6 +106,8 @@ StringDB is *tiny*. Use *tiny* amounts of RAM, and *tiny* amounts of space.
 This chart shows the size of a StringDB file after multiple *single inserts*. Every key is 128 bytes long, and every value is 1024 bytes long. By doing single inserts, file size is dramatically affected due to the additional overhead for the index chain.
 
 ### [StringDB 10.0.0 file size: insert range, 128 byte keys, 1024 byte values][source_insertrange_test]
+
+![Chart][icon_chart_insert_range]
 
 | Elements in Insert Range | Size (in KB, 1000 bytes) | Absolute Minimum Size Possible | StringDB Overhead Percentage |
 | --- | --- | --- | --- |
@@ -132,6 +136,8 @@ Need immediate assistence? [Join the discord!](discord)
 
 [icon_banner_ad]: ./icons/banner_ad.png
 [icon_tiny]: ./icons/tiny.png
+[icon_chart_single_inserts]: ./icons/single_inserts.svg
+[icon_chart_insert_range]: ./icons/insert_range.svg
 
 [badge_appveyor_build_image]: https://img.shields.io/appveyor/ci/SirJosh3917/StringDB/master.svg?style=flat-square
 [badge_tests_image]: https://img.shields.io/codecov/c/github/SirJosh3917/StringDB/master.svg?style=flat-square
