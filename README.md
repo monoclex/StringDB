@@ -151,7 +151,7 @@ Need immediate assistence? [Join the discord!](discord)
 [link_codecov]: https://codecov.io/gh/SirJosh3917/StringDB
 
 [section_tiny]: #tiny-
-[section_api]: #api-
+[section_api]: #api
 
 [source_insert_test]: ./src/StringDB.PerformanceNumbers/SingleInsertFileSize.cs
 [source_insertrange_test]: ./src/StringDB.PerformanceNumbers/InsertRangeFileSize.cs
