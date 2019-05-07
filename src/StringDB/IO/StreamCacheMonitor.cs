@@ -1,5 +1,5 @@
 ﻿using JetBrains.Annotations;
-
+using System;
 using System.IO;
 
 namespace StringDB.IO
@@ -21,15 +21,17 @@ namespace StringDB.IO
 		}
 
 		private long _pos;
-
+		private long _userPos;
 		private long _len;
 
 		public override void Flush()
 			=> InnerStream.Flush();
 
+		[Obsolete("Please use the Position property in combination with the Length property for any kind of seeking.", true)]
 		public override long Seek(long offset, SeekOrigin origin)
 		{
 			_pos = InnerStream.Seek(offset, origin);
+			_userPos = _pos;
 
 			return _pos;
 		}
@@ -42,15 +44,19 @@ namespace StringDB.IO
 
 		public override int Read(byte[] buffer, int offset, int count)
 		{
+			ForceSeek();
+
 			var result = InnerStream.Read(buffer, offset, count);
-			_pos += result;
+			_userPos = _pos += result;
 
 			return result;
 		}
 
 		public override void Write(byte[] buffer, int offset, int count)
 		{
-			_pos += count;
+			ForceSeek();
+
+			_userPos = _pos += count;
 
 			if (_pos > _len)
 			{
@@ -68,10 +74,10 @@ namespace StringDB.IO
 
 		public override long Position
 		{
-			get => _pos;
+			get => _userPos;
 			set
 			{
-				_pos = value;
+				_userPos = value;
 				InnerStream.Position = value;
 			}
 		}
@@ -83,8 +89,16 @@ namespace StringDB.IO
 
 		public void UpdateCache()
 		{
-			_pos = InnerStream.Position;
+			_userPos = _pos = InnerStream.Position;
 			_len = InnerStream.Length;
+		}
+
+		public void ForceSeek()
+		{
+			if (_userPos != _pos)
+			{
+				_userPos = _pos = InnerStream.Seek(_userPos, SeekOrigin.Begin);
+			}
 		}
 	}
 }

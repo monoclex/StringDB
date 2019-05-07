@@ -491,31 +491,29 @@ namespace StringDB.Tests
 			{
 				var (ms, io) = Generate();
 
-				io.SeekEnd();
-				ms.Position
-					.Should()
-					.Be(ms.Length);
+				TestSeekEnd();
 
 				ms.Write(new byte[1]);
 
-				io.SeekEnd();
-				ms.Position
-					.Should()
-					.Be(ms.Length);
+				TestSeekEnd();
 
 				ms.Write(new byte[1]);
 
-				io.SeekEnd();
-				ms.Position
-					.Should()
-					.Be(ms.Length);
+				TestSeekEnd();
 
 				ms.Write(new byte[100]);
 
-				io.SeekEnd();
-				ms.Position
-					.Should()
-					.Be(ms.Length);
+				TestSeekEnd();
+
+				void TestSeekEnd()
+				{
+					io.StreamCacheMonitor.UpdateCache();
+					io.SeekEnd();
+					io.StreamCacheMonitor.ForceSeek();
+					ms.Position
+						.Should()
+						.Be(ms.Length);
+				}
 			}
 
 			[Fact]

@@ -18,7 +18,8 @@ namespace StringDB.IO.Compatibility
 
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
-		private readonly StreamCacheMonitor _stream;
+
+		public StreamCacheMonitor StreamCacheMonitor { get; }
 
 		private bool _disposed;
 		private readonly object _disposeLock = new object();
@@ -38,9 +39,9 @@ namespace StringDB.IO.Compatibility
 			// This has the issue of being cached, but calling IODevice.Reset should fix it right up.
 			// Of course, this has bad implications and might be reverted later, but it definitely
 			// fixes the performance gap without making the code ugly.
-			_stream = new StreamCacheMonitor(stream);
-			_br = new BinaryReader(_stream, Encoding.UTF8, leaveStreamOpen);
-			_bw = new BinaryWriter(_stream, Encoding.UTF8, leaveStreamOpen);
+			StreamCacheMonitor = new StreamCacheMonitor(stream);
+			_br = new BinaryReader(StreamCacheMonitor, Encoding.UTF8, leaveStreamOpen);
+			_bw = new BinaryWriter(StreamCacheMonitor, Encoding.UTF8, leaveStreamOpen);
 
 			JumpPos = ReadBeginning();
 		}
@@ -73,7 +74,7 @@ namespace StringDB.IO.Compatibility
 			_br.Dispose();
 		}
 
-		public Stream InnerStream => _stream;
+		public Stream InnerStream => StreamCacheMonitor;
 
 		public int JumpOffsetSize { get; } = sizeof(byte) + sizeof(int);
 
@@ -83,7 +84,7 @@ namespace StringDB.IO.Compatibility
 		// when using a FileStream.
 		// Thus, the chosen solution was to wrap the given Stream into a StreamCacheMonitor.
 		// This makes these lookups quick and snappy.
-		private bool EOF => GetPosition() >= _stream.Length;
+		private bool EOF => GetPosition() >= StreamCacheMonitor.Length;
 
 		public NextItemPeek Peek(out byte peekResult)
 		{
@@ -161,26 +162,26 @@ namespace StringDB.IO.Compatibility
 			+ value.Length;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public long GetPosition() => _stream.Position;
+		public long GetPosition() => StreamCacheMonitor.Position;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Reset()
 		{
-			_stream.UpdateCache();
+			StreamCacheMonitor.UpdateCache();
 			Seek(sizeof(long));
 		}
 
 		public void Flush()
 		{
 			_bw.Flush();
-			_stream.Flush();
+			StreamCacheMonitor.Flush();
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Seek(long position) => _stream.Seek(position, SeekOrigin.Begin);
+		public void Seek(long position) => StreamCacheMonitor.Position = position;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void SeekEnd() => _stream.Seek(0, SeekOrigin.End);
+		public void SeekEnd() => StreamCacheMonitor.Position = StreamCacheMonitor.Length;
 
 		private int CalculateVariableSize(uint value)
 		{
@@ -242,7 +243,7 @@ namespace StringDB.IO.Compatibility
 		{
 			Seek(0);
 
-			if (_stream.Length >= 8)
+			if (StreamCacheMonitor.Length >= 8)
 			{
 				return _br.ReadInt64();
 			}
