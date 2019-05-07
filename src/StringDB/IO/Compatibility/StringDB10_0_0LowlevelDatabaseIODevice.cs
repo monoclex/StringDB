@@ -20,9 +20,8 @@ namespace StringDB.IO.Compatibility
 		private readonly BinaryWriter _bw;
 		private readonly StreamCacheMonitor _stream;
 
-		private readonly byte[] _buffer;
 		private bool _disposed;
-		private object _disposeLock = new object();
+		private readonly object _disposeLock = new object();
 
 		public StringDB10_0_0LowlevelDatabaseIODevice
 		(
@@ -33,7 +32,6 @@ namespace StringDB.IO.Compatibility
 			// use a buffer when performing single byte writes since writing a single byte
 			// allocates a new byte array every time, and that's a very costly operation.
 			// the size of this buffer is artificial.
-			_buffer = new byte[16 + Constants.MaxIndexSize];
 
 			// We wrap the stream in this so that lookups to Position and Length are quick and snappy.
 			// This is to prevent a performance concern regarding EOF using excessive amounts of time.
@@ -137,29 +135,18 @@ namespace StringDB.IO.Compatibility
 
 		public void WriteIndex(byte[] key, long dataPosition)
 		{
-			_buffer[0] = GetIndexSize(key.Length);
-
-			// we add 1 to the data position since we expect to add the position
-			// to the current position in the stream, however since we're not advancing
-			// the stream at all (we're writing to a buffer) we need to artificially move
-			// the position where the data is being stored.
-			WriteUInt(1, GetJumpSize(dataPosition - 1));
-
-			_bw.Write(_buffer, 0, sizeof(byte) + sizeof(uint));
+			_bw.Write(GetIndexSize(key.Length));
+			_bw.Write(GetJumpSize(dataPosition));
 			_bw.Write(key);
 		}
 
 		public void WriteJump(long jumpTo)
 		{
-			_buffer[0] = Constants.IndexSeparator;
+			_bw.Write(Constants.IndexSeparator);
 
 			// this is to cope with the DatabaseIODevice
 			// it's pretty much a hacky workaround :v (the ternary operator)
-
-			// in addition, see the comment in WriteIndex for why we subtract 1 to GetJumpSize
-			WriteUInt(1, jumpTo == 0 ? 0u : GetJumpSize(jumpTo - 1));
-
-			_bw.Write(_buffer, 0, sizeof(byte) + sizeof(uint));
+			_bw.Write(jumpTo == 0 ? 0u : GetJumpSize(jumpTo));
 		}
 
 		public void WriteValue(byte[] value)
@@ -311,20 +298,9 @@ namespace StringDB.IO.Compatibility
 					read |= 0b10000000;
 				}
 
-				_buffer[bufferIndex++] = read;
+				_bw.Write(read);
 			}
 			while (currentValue != 0);
-
-			_bw.Write(_buffer, 0, bufferIndex);
-		}
-
-		// https://source.dot.net/#System.Private.CoreLib/shared/System/IO/BinaryWriter.cs,297
-		private void WriteUInt(int offset, uint value)
-		{
-			_buffer[offset] = (byte)value;
-			_buffer[1 + offset] = (byte)(value >> 8);
-			_buffer[2 + offset] = (byte)(value >> 16);
-			_buffer[3 + offset] = (byte)(value >> 24);
 		}
 	}
 }
