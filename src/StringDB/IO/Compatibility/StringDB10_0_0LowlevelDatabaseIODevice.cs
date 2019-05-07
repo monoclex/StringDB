@@ -253,7 +253,7 @@ namespace StringDB.IO.Compatibility
 			return 0;
 		}
 
-		private long ReadDownsizedLong() => GetPosition() + _br.ReadInt32();
+		private long ReadDownsizedLong() => GetPosition() + _br.ReadUInt32();
 
 		private uint ReadVariableLength()
 		{
