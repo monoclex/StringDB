@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
-    <Version>10.0.2</Version>
+    <Version>10.0.3</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>SirJosh3917</Authors>
     <Company>SirJosh3917</Company>
@@ -14,7 +14,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/SirJosh3917/StringDB/master/icons/banner_ad.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/SirJosh3917/StringDB</RepositoryUrl>
     <PackageTags>Database, KeyValue, Archival, Storage, Modular, Fluent</PackageTags>
-    <PackageReleaseNotes>10.0.2, featuring minor improvements to APIs and more databases</PackageReleaseNotes>
+    <PackageReleaseNotes>10.0.3, featuring a major API upgrade, optimal enumeration, and performance improvements on a stream.</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
