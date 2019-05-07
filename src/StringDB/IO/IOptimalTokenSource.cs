@@ -6,8 +6,13 @@ namespace StringDB.IO
 	/// Controls the value for an <see cref="IOptimalToken"/>
 	/// </summary>
 	[PublicAPI]
-	public interface IOptimalTokenSource : IOptimalToken
+	public interface IOptimalTokenSource
 	{
+		/// <summary>
+		/// The optimal token this source produces.
+		/// </summary>
+		IOptimalToken OptimalToken { get; }
+
 		/// <summary>
 		/// Sets the value for the optimal reading time.
 		/// </summary>

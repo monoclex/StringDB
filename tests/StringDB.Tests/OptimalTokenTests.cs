@@ -19,7 +19,7 @@ namespace StringDB.Tests
 		{
 			IOptimalTokenSource optimalToken = new OptimalTokenSource();
 
-			optimalToken.OptimalReadingTime.Should().Be(false);
+			optimalToken.OptimalToken.OptimalReadingTime.Should().Be(false);
 
 			SetRead(true);
 			SetRead(false);
@@ -27,7 +27,7 @@ namespace StringDB.Tests
 			void SetRead(bool value)
 			{
 				optimalToken.SetOptimalReadingTime(value);
-				optimalToken.OptimalReadingTime.Should().Be(value);
+				optimalToken.OptimalToken.OptimalReadingTime.Should().Be(value);
 			}
 		}
 	}

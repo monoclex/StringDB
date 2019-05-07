@@ -53,7 +53,7 @@ namespace StringDB.IO
 		/// <inheritdoc />
 		public DatabaseItem ReadNext()
 		{
-			if (OptimalTokenSource.OptimalReadingTime)
+			if (OptimalTokenSource.OptimalToken.OptimalReadingTime)
 			{
 				OptimalTokenSource.SetOptimalReadingTime(false);
 			}
