@@ -28,4 +28,10 @@
     <ProjectReference Include="..\..\src\StringDB\StringDB.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DatabaseTests\" />
+    <Folder Include="OptimalTokenTests\" />
+    <Folder Include="TransformerTests\" />
+  </ItemGroup>
+
 </Project>
