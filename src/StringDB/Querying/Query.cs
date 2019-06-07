@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying
@@ -15,6 +16,7 @@ namespace StringDB.Querying
 	{
 		private readonly Func<TKey, TValue, Task<QueryAcceptance>> _accept;
 		private readonly Func<TKey, TValue, Task> _process;
+		private readonly CancellationToken _cancellationToken;
 
 		/// <summary>
 		/// Create a new query.
@@ -24,12 +26,16 @@ namespace StringDB.Querying
 		public Query
 		(
 			Func<TKey, TValue, Task<QueryAcceptance>> accept,
-			Func<TKey, TValue, Task> process
+			Func<TKey, TValue, Task> process,
+			CancellationToken cancellationToken = default
 		)
 		{
 			_accept = accept;
 			_process = process;
+			_cancellationToken = cancellationToken;
 		}
+
+		public bool IsCancelled => !_cancellationToken.IsCancellationRequested;
 
 		public Task<QueryAcceptance> Accept(TKey key, TValue value)
 			=> _accept(key, value);
