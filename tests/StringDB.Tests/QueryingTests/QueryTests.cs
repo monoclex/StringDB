@@ -1,10 +1,13 @@
 ﻿using FluentAssertions;
+
 using Moq;
+
 using StringDB.Querying;
 
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Xunit;
 
 namespace StringDB.Tests.QueryingTests

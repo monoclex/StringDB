@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
+
 using StringDB.Databases;
 using StringDB.Querying;
+
 using System;
-using System.Collections.Generic;
-using System.Text;
+
 using Xunit;
 
 namespace StringDB.Tests.QueryingTests
