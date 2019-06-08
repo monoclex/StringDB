@@ -35,7 +35,7 @@ namespace StringDB.Querying
 			_cancellationToken = cancellationToken;
 		}
 
-		public bool IsCancelled => !_cancellationToken.IsCancellationRequested;
+		public bool IsCancellationRequested => _cancellationToken.IsCancellationRequested;
 
 		public Task<QueryAcceptance> Accept(TKey key, TValue value)
 			=> _accept(key, value);

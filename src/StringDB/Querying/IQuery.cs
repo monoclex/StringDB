@@ -17,9 +17,9 @@ namespace StringDB.Querying
 	public interface IQuery<TKey, TValue> : IDisposable
 	{
 		/// <summary>
-		/// If the query is cancelled, this should be true.
+		/// If a cancellation is requested.
 		/// </summary>
-		bool IsCancelled { get; }
+		bool IsCancellationRequested { get; }
 
 		// TODO: ValueTask in net core 3
 		/// <summary>
