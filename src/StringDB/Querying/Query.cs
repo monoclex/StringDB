@@ -14,8 +14,8 @@ namespace StringDB.Querying
 	[PublicAPI]
 	public class Query<TKey, TValue> : IQuery<TKey, TValue>
 	{
-		private readonly Func<TKey, TValue, Task<QueryAcceptance>> _accept;
-		private readonly Func<TKey, TValue, Task> _process;
+		private readonly Func<TKey, IRequest<TValue>, Task<QueryAcceptance>> _accept;
+		private readonly Func<TKey, IRequest<TValue>, Task> _process;
 		private readonly CancellationToken _cancellationToken;
 
 		/// <summary>
@@ -25,8 +25,8 @@ namespace StringDB.Querying
 		/// <param name="process">The delegate for processing a query.</param>
 		public Query
 		(
-			Func<TKey, TValue, Task<QueryAcceptance>> accept,
-			Func<TKey, TValue, Task> process,
+			Func<TKey, IRequest<TValue>, Task<QueryAcceptance>> accept,
+			Func<TKey, IRequest<TValue>, Task> process,
 			CancellationToken cancellationToken = default
 		)
 		{
@@ -37,10 +37,10 @@ namespace StringDB.Querying
 
 		public bool IsCancellationRequested => _cancellationToken.IsCancellationRequested;
 
-		public Task<QueryAcceptance> Accept(TKey key, TValue value)
+		public Task<QueryAcceptance> Accept(TKey key, IRequest<TValue> value)
 			=> _accept(key, value);
 
-		public Task Process(TKey key, TValue value)
+		public Task Process(TKey key, IRequest<TValue> value)
 			=> _process(key, value);
 
 		public void Dispose()
