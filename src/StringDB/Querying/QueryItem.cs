@@ -29,5 +29,10 @@ namespace StringDB.Querying
 		/// during a database search.
 		/// </summary>
 		public int Index { get; set; }
+
+		/// <summary>
+		/// If this was just inserted.
+		/// </summary>
+		public bool JustInserted { get; set; } = true;
 	}
 }

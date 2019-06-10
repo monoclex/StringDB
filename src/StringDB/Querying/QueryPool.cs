@@ -53,6 +53,12 @@ namespace StringDB.Querying
 				// first, check if it's looped around
 				if (index == query.Index)
 				{
+					if (query.JustInserted)
+					{
+						query.JustInserted = false;
+						goto @add;
+					}
+
 					// kill it
 					query.CompletionSource.SetResult(false);
 					needsKilling.Add(query);
@@ -60,6 +66,7 @@ namespace StringDB.Querying
 					goto @continue;
 				}
 
+				@add:
 				// then execute it
 				needsAwaiting.Add
 				(
