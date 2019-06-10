@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace StringDB.Querying
 	/// <summary>
 	/// Extension methods that can be applied to an <see cref="IQueryManager{TKey, TValue}"/>.
 	/// </summary>
+	[PublicAPI]
 	public static class QueryManagerExtensions
 	{
 		/// <summary>
@@ -22,16 +24,20 @@ namespace StringDB.Querying
 		/// the cancellation of the query.</param>
 		/// <returns>An awaitable task that will return your key
 		/// and value.</returns>
-		public static async Task<KeyValuePair<TKey, TValue>> Find<TKey, TValue>
+		[NotNull, ItemCanBeNull]
+		public static async Task<KeyValuePair<TKey, TValue>?> Find<TKey, TValue>
 		(
-			this IQueryManager<TKey, TValue> queryManager,
-			Func<TKey, bool> isKey,
-			CancellationToken cancellationToken = default
+			[NotNull] this IQueryManager<TKey, TValue> queryManager,
+			[NotNull] Func<TKey, bool> isKey,
+			[CanBeNull] CancellationToken cancellationToken = default
 		)
 		{
 			var query = new FindQuery<TKey, TValue>(isKey, cancellationToken);
 
-			await queryManager.ExecuteQuery(query).ConfigureAwait(false);
+			if (!await queryManager.ExecuteQuery(query).ConfigureAwait(false))
+			{
+				return null;
+			}
 
 			return new KeyValuePair<TKey, TValue>(query.Key, query.Value);
 		}

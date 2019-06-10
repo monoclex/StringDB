@@ -33,6 +33,8 @@ namespace StringDB.Tests.QueryingTests
 
 					await query.Accept("yes", request.Object).ConfigureAwait(false);
 					await query.Process("a", request.Object).ConfigureAwait(false);
+
+					return true;
 				})
 				.Verifiable();
 
@@ -44,6 +46,20 @@ namespace StringDB.Tests.QueryingTests
 
 			kvp.Should()
 				.Be(new KeyValuePair<string, int>("a", 1));
+
+			_queryManager.Verify();
+		}
+
+		public async Task ExecutingQuery_IsFalse_ReturnsNull()
+		{
+			_queryManager.Setup(x => x.ExecuteQuery(It.IsAny<IQuery<string, int>>()))
+				.Returns<IQuery<string, int>>(async query => false)
+				.Verifiable();
+
+			var result = await _queryManager.Object
+				.Find(x => x == "str");
+
+			result.Should().BeNull();
 
 			_queryManager.Verify();
 		}
