@@ -86,14 +86,20 @@ namespace StringDB.Querying
 
 			try
 			{
+				var indexes = new List<int>();
 				foreach (var kill in needsKilling)
 				{
 					var killIndex = needsKilling.IndexOf(kill);
 
 					if (killIndex != -1)
 					{
-						needsKilling.RemoveAt(killIndex);
+						indexes.Insert(0, killIndex);
 					}
+				}
+
+				foreach(var killIndex in indexes)
+				{
+					_pool.RemoveAt(killIndex);
 				}
 			}
 			finally
