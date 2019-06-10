@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,14 +14,14 @@ namespace StringDB.Querying
 	/// <typeparam name="TKey">The type of key.</typeparam>
 	/// <typeparam name="TValue">The type of value.</typeparam>
 	[PublicAPI]
-	public interface IQueryPool<TKey, TValue>
+	public interface IQueryPool<TKey, TValue> : IDisposable
 	{
 		/// <summary>
 		/// Gets a read-only collection of the queries currently
 		/// in the pool.
 		/// </summary>
 		/// <returns>The current queries in the pool/</returns>
-		IReadOnlyCollection<QueryItem<TKey, TValue>> CurrentQueries();
+		Task<IReadOnlyCollection<QueryItem<TKey, TValue>>> CurrentQueries();
 
 		/// <summary>
 		/// Appends a query to the pool.

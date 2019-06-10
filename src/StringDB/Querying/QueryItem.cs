@@ -10,24 +10,24 @@ namespace StringDB.Querying
 	/// </summary>
 	/// <typeparam name="TKey">The type of key.</typeparam>
 	/// <typeparam name="TValue">The type of value.</typeparam>
-	public struct QueryItem<TKey, TValue>
+	public class QueryItem<TKey, TValue>
 	{
 		/// <summary>
 		/// The completion source for the query. Setting this
 		/// should directly affect the completion state of the
 		/// query, from <see cref="IQueryManager{TKey, TValue}.ExecuteQuery(IQuery{TKey, TValue})"/>.
 		/// </summary>
-		public TaskCompletionSource<bool> CompletionSource;
+		public TaskCompletionSource<bool> CompletionSource { get; set; }
 
 		/// <summary>
 		/// The query this query item focuses on.
 		/// </summary>
-		public IQuery<TKey, TValue> Query;
+		public IQuery<TKey, TValue> Query { get; set; }
 
 		/// <summary>
 		/// The index this query item was appended to
 		/// during a database search.
 		/// </summary>
-		public int Index;
+		public int Index { get; set; }
 	}
 }
