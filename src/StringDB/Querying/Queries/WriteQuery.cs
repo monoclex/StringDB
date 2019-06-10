@@ -2,7 +2,7 @@
 
 using System;
 
-namespace StringDB.Querying
+namespace StringDB.Querying.Queries
 {
 	/// <summary>
 	/// A simple implementation of the <see cref="IWriteQuery{TKey, TValue}"/> interface.
@@ -20,7 +20,7 @@ namespace StringDB.Querying
 		/// <param name="execute">The method to execute.</param>
 		public WriteQuery
 		(
-			Action<IDatabase<TKey, TValue>> execute
+			[NotNull] Action<IDatabase<TKey, TValue>> execute
 		)
 			=> _execute = execute;
 

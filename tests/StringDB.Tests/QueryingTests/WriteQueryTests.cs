@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 
 using StringDB.Databases;
-using StringDB.Querying;
+using StringDB.Querying.Queries;
 
 using System;
 

@@ -1,4 +1,7 @@
 ﻿using JetBrains.Annotations;
+
+using StringDB.Querying.Queries;
+
 using System;
 using System.Collections.Generic;
 using System.Threading;

@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
 
+using StringDB.Querying.Queries;
+
 using System;
 using System.Threading.Tasks;
 

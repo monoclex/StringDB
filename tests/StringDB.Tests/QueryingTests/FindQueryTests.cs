@@ -3,6 +3,7 @@
 using Moq;
 
 using StringDB.Querying;
+using StringDB.Querying.Queries;
 
 using System;
 using System.Threading;

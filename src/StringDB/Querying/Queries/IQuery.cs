@@ -3,7 +3,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace StringDB.Querying
+namespace StringDB.Querying.Queries
 {
 	/// <summary>
 	/// A query for an <see cref="IDatabase{TKey, TValue}"/>.

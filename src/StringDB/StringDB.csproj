@@ -33,4 +33,8 @@
     <PackageReference Include="JetBrains.Annotations" Version="2019.1.1" PrivateAssets="all" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Querying\Queries\" />
+  </ItemGroup>
+
 </Project>

@@ -2,7 +2,7 @@
 
 using System;
 
-namespace StringDB.Querying
+namespace StringDB.Querying.Queries
 {
 	/// <summary>
 	/// A query that modifies the database in some way.
@@ -15,6 +15,6 @@ namespace StringDB.Querying
 		/// those that require writing.
 		/// </summary>
 		/// <param name="database">The database to modify.</param>
-		void Execute(IDatabase<TKey, TValue> database);
+		void Execute([NotNull] IDatabase<TKey, TValue> database);
 	}
 }

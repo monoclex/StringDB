@@ -4,7 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace StringDB.Querying
+namespace StringDB.Querying.Queries
 {
 	/// <summary>
 	/// Represents a query used for finding a value.
@@ -18,8 +18,8 @@ namespace StringDB.Querying
 
 		public FindQuery
 		(
-			Func<TKey, bool> isItem,
-			CancellationToken cancellationToken = default
+			[NotNull] Func<TKey, bool> isItem,
+			[CanBeNull] CancellationToken cancellationToken = default
 		)
 		{
 			_isItem = isItem;

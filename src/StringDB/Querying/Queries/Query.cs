@@ -4,7 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace StringDB.Querying
+namespace StringDB.Querying.Queries
 {
 	/// <summary>
 	/// A simple implementation of the <see cref="IQuery{TKey, TValue}"/> interface.
@@ -25,9 +25,9 @@ namespace StringDB.Querying
 		/// <param name="process">The delegate for processing a query.</param>
 		public Query
 		(
-			Func<TKey, IRequest<TValue>, Task<QueryAcceptance>> accept,
-			Func<TKey, IRequest<TValue>, Task> process,
-			CancellationToken cancellationToken = default
+			[NotNull] Func<TKey, IRequest<TValue>, Task<QueryAcceptance>> accept,
+			[NotNull] Func<TKey, IRequest<TValue>, Task> process,
+			[CanBeNull] CancellationToken cancellationToken = default
 		)
 		{
 			_accept = accept;
