@@ -66,7 +66,7 @@ namespace StringDB.Querying
 					goto @continue;
 				}
 
-				@add:
+			@add:
 				// then execute it
 				needsAwaiting.Add
 				(
@@ -104,7 +104,7 @@ namespace StringDB.Querying
 					}
 				}
 
-				foreach(var killIndex in indexes)
+				foreach (var killIndex in indexes)
 				{
 					_pool.RemoveAt(killIndex);
 				}
