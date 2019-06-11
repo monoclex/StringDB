@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\StringDB\StringDB.csproj" />
+    <ProjectReference Include="..\..\StringDB.Querying\StringDB.Querying.csproj" />
   </ItemGroup>
 
   <ItemGroup>
