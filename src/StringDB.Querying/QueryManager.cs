@@ -15,7 +15,7 @@ namespace StringDB.Querying
 	{
 		private readonly IDatabase<TKey, TValue> _database;
 		private readonly IQueryPool<TKey, TValue> _queryPool;
-		private ManualResetEventSlim _mres = new ManualResetEventSlim(false);
+		private readonly ManualResetEventSlim _mres = new ManualResetEventSlim(false);
 		private readonly RequestLock _databaseLock;
 		private readonly Thread _thread;
 		private int _current;
