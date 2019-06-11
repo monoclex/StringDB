@@ -11,16 +11,37 @@ namespace StringDB.Querying
 {
 	public class ReactiveQueryManager<TKey, TValue> : IQueryManager<TKey, TValue>
 	{
-		private readonly IDatabase<TKey, TValue> _database;
+		private readonly TrainEnumerable<KeyValuePair<TKey, IRequest<TValue>>> _trainEnumerable;
 
-		public ReactiveQueryManager(IDatabase<TKey, TValue> database)
+		public ReactiveQueryManager(TrainEnumerable<KeyValuePair<TKey, IRequest<TValue>>> trainEnumerable)
 		{
-			_database = database;
+			_trainEnumerable = trainEnumerable;
 		}
 
 		public void Dispose() => throw new NotImplementedException();
 
-		public Task<bool> ExecuteQuery([NotNull] IQuery<TKey, TValue> query) => throw new NotImplementedException();
+		public async Task<bool> ExecuteQuery([NotNull] IQuery<TKey, TValue> query)
+		{
+			foreach(var item in _trainEnumerable)
+			{
+				var result = await query.Accept(item.Key, item.Value)
+					.ConfigureAwait(false);
+
+				if (result == QueryAcceptance.Completed
+					|| result == QueryAcceptance.Accepted)
+				{
+					await query.Process(item.Key, item.Value)
+						.ConfigureAwait(false);
+
+					if (result == QueryAcceptance.Completed)
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
 
 		public Task ExecuteQuery([NotNull] IWriteQuery<TKey, TValue> writeQuery) => throw new NotImplementedException();
 	}

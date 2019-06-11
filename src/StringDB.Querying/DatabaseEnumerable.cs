@@ -1,45 +1,72 @@
 ﻿using StringDB.Querying.Threading;
+
 using System;
 using System.Collections.Async;
 using System.Collections.Generic;
-using System.Text;
+using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
+	public class CancellationTokenDisposable : IDisposable
+	{
+		public CancellationTokenDisposable(CancellationTokenSource cancellationTokenSource)
+			=> CancellationTokenSource = cancellationTokenSource;
+
+		public CancellationTokenSource CancellationTokenSource { get; }
+
+		public void Dispose() => CancellationTokenSource.Cancel();
+	}
+
 	public static class DatabaseEnumerable
 	{
-		public static IAsyncEnumerable<KeyValuePair<TKey, IRequest<TValue>>> Enumerate<TKey, TValue>
+		public static TrainEnumerable<KeyValuePair<TKey, IRequest<TValue>>> MakeTrainEnumerable<TKey, TValue>
 		(
 			this IDatabase<TKey, TValue> database,
 			Func<ILazyLoader<TValue>, IRequest<TValue>> requestFactory,
 			RequestLock @lock
 		)
-			=> new AsyncEnumerable<KeyValuePair<TKey, IRequest<TValue>>>(async yield =>
+			=> new TrainEnumerable<KeyValuePair<TKey, IRequest<TValue>>>
+			(
+				database.EnumerateDatabaseLockibly
+				(
+					requestFactory,
+					@lock
+				)
+			);
+
+		public static IEnumerable<KeyValuePair<TKey, IRequest<TValue>>> EnumerateDatabaseLockibly<TKey, TValue>
+		(
+			this IDatabase<TKey, TValue> database,
+			Func<ILazyLoader<TValue>, IRequest<TValue>> requestFactory,
+			RequestLock @lock
+		)
+		{
+			@lock.SemaphoreSlim.Wait();
+
+			foreach (var kvp in database)
 			{
-				await @lock.SemaphoreSlim.WaitAsync()
-					.ConfigureAwait(false);
+				var request = requestFactory(kvp.Value);
 
-				foreach (var kvp in database)
+				using (var cts = new CancellationTokenSource())
 				{
-					var request = requestFactory(kvp.Value);
+					var lazyUnloadTask = Task.Run(async () => await @lock.LazyReleaseAsync(cts.Token));
 
-					using (var cts = new CancellationTokenSource())
-					{
-						var lazyUnloadTask = @lock.LazyReleaseAsync(cts.Token);
+					yield return new KeyValuePair<TKey, IRequest<TValue>>
+					(
+						kvp.Key,
+						request
+					);
 
-						await yield.ReturnAsync(new KeyValuePair<TKey, IRequest<TValue>>
-						(
-							kvp.Key,
-							request
-						)).ConfigureAwait(false);
-
-						cts.Cancel();
-						await lazyUnloadTask;
-					}
+					cts.Cancel();
+					lazyUnloadTask
+						.GetAwaiter()
+						.GetResult();
 				}
+			}
 
-				@lock.SemaphoreSlim.Release();
-			});
+			@lock.SemaphoreSlim.Release();
+		}
 	}
 }
