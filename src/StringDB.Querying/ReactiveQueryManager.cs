@@ -21,13 +21,14 @@ namespace StringDB.Querying
 
 		public async Task<bool> ExecuteQuery([NotNull] IQuery<TKey, TValue> query)
 		{
+			await Task.Yield();
+
 			foreach (var item in _trainEnumerable)
 			{
 				var result = await query.Accept(item.Key, item.Value)
 					.ConfigureAwait(false);
 
-				if (result == QueryAcceptance.Completed
-					|| result == QueryAcceptance.Accepted)
+				if (result != QueryAcceptance.NotAccepted)
 				{
 					await query.Process(item.Key, item.Value)
 						.ConfigureAwait(false);

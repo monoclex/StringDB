@@ -2,6 +2,10 @@
 
 namespace StringDB.Querying
 {
+	// NOTE: adding new values may cause problems, given that in 
+	// the QueryManager, it's checking if something is != NotAccepted,
+	// instead of == Accepted || Completed.
+
 	/// <summary>
 	/// Describes the various ways a given query may
 	/// accept a result.
