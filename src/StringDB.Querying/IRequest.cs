@@ -1,5 +1,5 @@
 ﻿using JetBrains.Annotations;
-
+using System;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying
@@ -9,7 +9,7 @@ namespace StringDB.Querying
 	/// </summary>
 	/// <typeparam name="TValue">The type of value to request.</typeparam>
 	[PublicAPI]
-	public interface IRequest<TValue>
+	public interface IRequest<TValue> : IDisposable
 	{
 		/// <summary>
 		/// Submit a request for the value.

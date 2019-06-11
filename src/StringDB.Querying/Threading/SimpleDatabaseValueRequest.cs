@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying.Threading
@@ -60,5 +61,7 @@ namespace StringDB.Querying.Threading
 				_thisLock.Release();
 			}
 		}
+
+		public void Dispose() => _thisLock.Dispose();
 	}
 }

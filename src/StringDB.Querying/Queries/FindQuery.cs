@@ -26,6 +26,9 @@ namespace StringDB.Querying.Queries
 			_cancellationToken = cancellationToken;
 		}
 
+		private static Task<QueryAcceptance> _completed = Task.FromResult(QueryAcceptance.Completed);
+		private static Task<QueryAcceptance> _notAccepted = Task.FromResult(QueryAcceptance.NotAccepted);
+
 		/// <summary>
 		/// The key as a result of processing.
 		/// </summary>
@@ -38,22 +41,16 @@ namespace StringDB.Querying.Queries
 
 		public bool IsCancellationRequested => _cancellationToken.IsCancellationRequested;
 
-		public async Task<QueryAcceptance> Accept([NotNull] TKey key, [NotNull] IRequest<TValue> value)
-		{
-			await Task.Yield();
-
-			if (_isItem(key))
-			{
-				return QueryAcceptance.Completed;
-			}
-
-			return QueryAcceptance.NotAccepted;
-		}
+		public Task<QueryAcceptance> Accept([NotNull] TKey key, [NotNull] IRequest<TValue> value)
+			=> _isItem(key)
+			? _completed
+			: _notAccepted;
 
 		public async Task Process([NotNull] TKey key, [NotNull] IRequest<TValue> value)
 		{
 			Key = key;
-			Value = await value.Request().ConfigureAwait(false);
+			Value = await value.Request()
+				.ConfigureAwait(false);
 		}
 
 		public void Dispose()

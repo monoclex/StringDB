@@ -41,30 +41,17 @@ namespace StringDB.Querying
 			RequestLock @lock
 		)
 		{
-			@lock.SemaphoreSlim.Wait();
-
 			foreach (var kvp in database)
 			{
-				var request = requestFactory(kvp.Value);
-
-				using (var cts = new CancellationTokenSource())
+				using (var request = requestFactory(kvp.Value))
 				{
-					var lazyUnloadTask = Task.Run(async () => await @lock.LazyReleaseAsync(cts.Token));
-
 					yield return new KeyValuePair<TKey, IRequest<TValue>>
-					(
-						kvp.Key,
-						request
-					);
-
-					cts.Cancel();
-					lazyUnloadTask
-						.GetAwaiter()
-						.GetResult();
+						(
+							kvp.Key,
+							request
+						);
 				}
 			}
-
-			@lock.SemaphoreSlim.Release();
 		}
 	}
 }
