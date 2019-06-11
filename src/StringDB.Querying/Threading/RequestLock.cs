@@ -19,7 +19,7 @@ namespace StringDB.Querying.Threading
 			=> SemaphoreSlim = semaphoreSlim;
 
 		public SemaphoreSlim SemaphoreSlim { get; }
-
+		private bool _released;
 		public int AccessRequests;
 
 		/// <summary>
@@ -43,18 +43,46 @@ namespace StringDB.Querying.Threading
 			SemaphoreSlim.Release();
 		}
 
+		public async Task LazyReleaseAsync(CancellationToken cancellationToken = default)
+		{
+			await Task.Yield();
+
+			var spinLock = new SpinWait();
+
+			while (!cancellationToken.IsCancellationRequested)
+			{
+				spinLock.SpinOnce();
+
+				if (AccessRequests > 0)
+				{
+					await AllowRequestsAsync()
+						.ConfigureAwait(false);
+				}
+			}
+		}
+
 		/// <summary>
 		/// Used by the master thread. This allows any callers
 		/// who requst the lock to have it.
 		/// </summary>
 		public async Task AllowRequestsAsync()
 		{
+			if (AccessRequests == 0)
+			{
+				return;
+			}
+
+			SemaphoreSlim.Release();
+
+			var spinWait = new SpinWait();
+
 			while (AccessRequests > 0)
 			{
-				SemaphoreSlim.Release();
-				await SemaphoreSlim.WaitAsync()
-					.ConfigureAwait(false);
+				spinWait.SpinOnce();
 			}
+
+			await SemaphoreSlim.WaitAsync()
+				.ConfigureAwait(false);
 		}
 	}
 }
