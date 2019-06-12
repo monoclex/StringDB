@@ -153,11 +153,6 @@ namespace StringDB.Querying
 				return _next;
 			});
 
-			if (_doNext == false)
-			{
-				Console.WriteLine("hmm false");
-			}
-
 			return _doNext;
 		}
 

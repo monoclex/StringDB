@@ -33,21 +33,11 @@ namespace StringDB.Querying
 			if (_current == _parent.Current
 				&& _enumerated)
 			{
-				Console.WriteLine("we are dead at the very start - " + $@"_current {_current}
-_parent.Current {_parent.Current}
-_enumerated {_enumerated}
-_index {_index}
-_amt {_amt}");
 				return false;
 			}
 
 			_amt++;
 			_enumerated = true;
-
-			if (!result)
-			{
-				Console.WriteLine("result? false.");
-			}
 
 			return result;
 		}
