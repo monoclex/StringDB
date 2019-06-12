@@ -45,11 +45,12 @@ namespace StringDB.Tests.QueryingTests
 				.ConfigureAwait(false);
 
 			kvp.Should()
-				.Be(new KeyValuePair<string, int>("a", 1));
+				.Be(new KeyValuePair<string, int>("yes", 1));
 
 			_queryManager.Verify();
 		}
 
+		[Fact]
 		public async Task ExecutingQuery_IsFalse_ReturnsNull()
 		{
 			_queryManager.Setup(x => x.ExecuteQuery(It.IsAny<IQuery<string, int>>()))

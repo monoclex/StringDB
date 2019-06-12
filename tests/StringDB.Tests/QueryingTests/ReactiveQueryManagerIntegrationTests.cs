@@ -3,7 +3,6 @@
 using StringDB.Fluency;
 using StringDB.IO;
 using StringDB.Querying;
-using StringDB.Querying.Threading;
 using StringDB.Transformers;
 
 using System;
@@ -30,12 +29,7 @@ namespace StringDB.Tests.QueryingTests
 			_db = new DatabaseBuilder()
 				.UseIODatabase(builder => builder.UseStringDB(StringDBVersion.Latest, _ms, true))
 				.WithTransform(StringTransformer.Default, StringTransformer.Default);
-			_qm = new QueryManager<string, string>(DatabaseEnumerable.MakeTrainEnumerable
-			(
-				_db,
-				lazyLoader => new SimpleDatabaseValueRequest<string>(lazyLoader, _requestLock),
-				_requestLock
-			));
+			_qm = new QueryManager<string, string>(_db, _requestLock);
 
 			// seed the db
 			for (var i = 0; i < 10_000; i++)
