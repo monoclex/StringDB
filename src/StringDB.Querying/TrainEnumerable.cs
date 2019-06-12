@@ -76,7 +76,8 @@ namespace StringDB.Querying
 
 			lock (_top)
 			{
-				_cache[Top++] = trainCache;
+				_cache[Top] = trainCache;
+				Top++;
 			}
 		}
 	}
@@ -146,21 +147,18 @@ namespace StringDB.Querying
 		// next one or die.
 		public bool Next(long index, out T next)
 		{
-			lock (_nextLock)
+			next = _trainCache.Get(index, () =>
 			{
-				next = _trainCache.Get(index, () =>
-				{
-					_doNext = ActualNext(out _next);
-					return _next;
-				});
+				_doNext = ActualNext(out _next);
+				return _next;
+			});
 
-				if (_doNext == false)
-				{
-					Console.WriteLine("hmm false");
-				}
-
-				return _doNext;
+			if (_doNext == false)
+			{
+				Console.WriteLine("hmm false");
 			}
+
+			return _doNext;
 		}
 
 		public void BeheadChild()
