@@ -14,12 +14,12 @@ namespace StringDB.Tests.QueryingTests
 {
 	public class QueryManagerExtensionsTests
 	{
-		private Mock<IQueryManager<string, int>> _queryManager = new Mock<IQueryManager<string, int>>();
+		private readonly Mock<IQueryManager<string, int>> _queryManager = new Mock<IQueryManager<string, int>>();
 
 		[Fact]
 		public async Task CancellationToken_IsPassed_ToQueryManager()
 		{
-			var cancellationRequestedShouldBe = false;
+			const bool cancellationRequestedShouldBe = false;
 
 			var request = new Mock<IRequest<int>>();
 			request.Setup(x => x.Request()).Returns(Task.FromResult(1));
@@ -54,11 +54,12 @@ namespace StringDB.Tests.QueryingTests
 		public async Task ExecutingQuery_IsFalse_ReturnsNull()
 		{
 			_queryManager.Setup(x => x.ExecuteQuery(It.IsAny<IQuery<string, int>>()))
-				.Returns<IQuery<string, int>>(async query => false)
+				.Returns<IQuery<string, int>>(_ => Task.FromResult(false))
 				.Verifiable();
 
 			var result = await _queryManager.Object
-				.Find(x => x == "str");
+				.Find(x => x == "str")
+				.ConfigureAwait(false);
 
 			result.Should().BeNull();
 

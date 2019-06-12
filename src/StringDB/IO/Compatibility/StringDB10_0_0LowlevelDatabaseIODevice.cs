@@ -286,7 +286,6 @@ namespace StringDB.IO.Compatibility
 		private void WriteVariableLength(uint value)
 		{
 			var currentValue = value;
-			var bufferIndex = 0;
 
 			do
 			{

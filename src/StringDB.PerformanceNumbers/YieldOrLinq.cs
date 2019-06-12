@@ -90,14 +90,10 @@ namespace StringDB.PerformanceNumbers
 
 	public class CustomEnumerator : IEnumerator<int>, IEnumerable<int>
 	{
-		private readonly IEnumerable<(int, int)> _enumerateOver;
 		private readonly IEnumerator<(int, int)> _enumerator;
 
 		public CustomEnumerator(IEnumerable<(int, int)> enumerateOver)
-		{
-			_enumerateOver = enumerateOver;
-			_enumerator = enumerateOver.GetEnumerator();
-		}
+			=> _enumerator = enumerateOver.GetEnumerator();
 
 		public bool MoveNext()
 		{

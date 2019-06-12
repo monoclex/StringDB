@@ -51,7 +51,7 @@ namespace StringDB.Tests
 				.Should()
 				.BeEquivalentTo(TestKeyValue().Concat(TestAA()).Concat(DataBad()));
 
-			IEnumerable<byte> TestKeyValue()
+			static IEnumerable<byte> TestKeyValue()
 			{
 				return new byte[]
 				   {
@@ -67,7 +67,7 @@ namespace StringDB.Tests
 				   .Concat(Encoding.UTF8.GetBytes("value"));
 			}
 
-			IEnumerable<byte> TestAA()
+			static IEnumerable<byte> TestAA()
 			{
 				return new byte[]
 				{
@@ -83,7 +83,7 @@ namespace StringDB.Tests
 				.Concat(Encoding.UTF8.GetBytes("a"));
 			}
 
-			IEnumerable<byte> DataBad()
+			static IEnumerable<byte> DataBad()
 			{
 				return new byte[]
 				{
@@ -145,7 +145,7 @@ namespace StringDB.Tests
 			_sviod.ReadNext()
 				.Should().BeEquivalentTo(keys[1]);
 
-			byte[] Bytes(string str) => Encoding.UTF8.GetBytes(str);
+			static byte[] Bytes(string str) => Encoding.UTF8.GetBytes(str);
 		}
 	}
 }

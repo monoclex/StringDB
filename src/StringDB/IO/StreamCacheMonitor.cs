@@ -82,10 +82,7 @@ namespace StringDB.IO
 			}
 		}
 
-		public override void Close()
-		{
-			InnerStream.Close();
-		}
+		public override void Close() => InnerStream.Close();
 
 		public void UpdateCache()
 		{

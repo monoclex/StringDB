@@ -20,6 +20,8 @@ namespace StringDB.PerformanceNumbers
 			new SingleInsertFileSize().Run();
 			new InsertRangeFileSize().Run();
 
+			Console.WriteLine(summary);
+
 			Console.ReadLine();
 		}
 

@@ -6,9 +6,9 @@ namespace _01_GettingStarted
 {
 	// Just an extremely simple example using the StringDatabase helper
 
-	internal class Program
+	internal static class Program
 	{
-		private static void Main(string[] args)
+		private static void Main()
 		{
 			// this is the most simplest way to use StringDB
 			// this creates a database in RAM

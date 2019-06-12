@@ -249,7 +249,7 @@ namespace StringDB.Tests
 				[Fact]
 				public void ReadsIndexOk()
 				{
-					var (ms, io) = Generate();
+					var (_, io) = Generate();
 
 					io.WriteIndex(Encoding.UTF8.GetBytes("key"), 1337);
 
@@ -273,7 +273,7 @@ namespace StringDB.Tests
 				[Fact]
 				public void ReadsValueOk()
 				{
-					var (ms, io) = Generate();
+					var (_, io) = Generate();
 
 					const int len = 12345;
 
@@ -314,7 +314,7 @@ namespace StringDB.Tests
 					[Fact]
 					public void PeeksJumpFine()
 					{
-						var (ms, io) = Generate();
+						var (_, io) = Generate();
 
 						io.WriteJump(1337);
 						io.Reset();
@@ -401,33 +401,31 @@ namespace StringDB.Tests
 			[Fact]
 			public void ReadsLongPrefix()
 			{
-				using (var ms = new MemoryStream())
-				using (var io = new StringDB10_0_0LowlevelDatabaseIODevice(ms))
+				using (var curMs = new MemoryStream())
+				using (var curIo = new StringDB10_0_0LowlevelDatabaseIODevice(curMs))
 				{
-					io.JumpPos
+					curIo.JumpPos
 						.Should()
 						.Be(0);
 
-					ms.Length
+					curMs.Length
 						.Should()
 						.Be(8);
 				}
 
-				using (var ms = new MemoryStream())
-				{
-					ms.Write(new byte[8] { 123, 0, 0, 0, 0, 0, 0, 0 });
+				using var ms = new MemoryStream();
 
-					using (var io = new StringDB10_0_0LowlevelDatabaseIODevice(ms))
-					{
-						io.JumpPos
-							.Should()
-							.Be(123);
+				ms.Write(new byte[8] { 123, 0, 0, 0, 0, 0, 0, 0 });
 
-						ms.Length
-							.Should()
-							.Be(8);
-					}
-				}
+				using var io = new StringDB10_0_0LowlevelDatabaseIODevice(ms);
+
+				io.JumpPos
+					.Should()
+					.Be(123);
+
+				ms.Length
+					.Should()
+					.Be(8);
 			}
 
 			[Fact]

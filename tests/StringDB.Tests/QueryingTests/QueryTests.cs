@@ -86,7 +86,7 @@ namespace StringDB.Tests.QueryingTests
 				p2 = _2;
 
 				invoked = true;
-				return null;
+				return Task.FromResult(QueryAcceptance.Continue);
 			});
 
 			_query.Process(13, mock.Object);
