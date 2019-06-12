@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
-	public struct ParallelAsyncController<TResult>
+	public class ParallelAsyncController<TResult>
 	{
 		private readonly CancellationTokenSource _cancellationTokenSource;
 
@@ -42,12 +42,27 @@ namespace StringDB.Querying
 		{
 			if (degreeOfParallelism == -1)
 			{
-				degreeOfParallelism = Environment.ProcessorCount;
+				degreeOfParallelism = 1; //  Environment.ProcessorCount;
 			}
 
 			var cts = new CancellationTokenSource();
 			var controller = new ParallelAsyncController<TResult>(cts);
 
+			Console.WriteLine("parallel start");
+
+			using (var enumerator = source.GetEnumerator())
+			{
+				while (enumerator.MoveNext())
+				{
+					await body(enumerator.Current, controller)
+						.ConfigureAwait(false);
+				}
+				Console.WriteLine("p1 []] parallel finish");
+			}
+
+			Console.WriteLine("[][][][][][][][][][][][][][[[][]]] parallel finish");
+
+			/*
 			await Task.WhenAll
 			(
 				Partitioner.Create(source)
@@ -63,10 +78,15 @@ namespace StringDB.Querying
 									await body(partition.Current, controller)
 										.ConfigureAwait(false);
 								}
+
+								Console.WriteLine("parallel body stopped");
 							}
+
+							Console.WriteLine("a parallel task finished");
 						});
 					})
 			).ConfigureAwait(false);
+			// */
 
 			return controller.Result;
 		}

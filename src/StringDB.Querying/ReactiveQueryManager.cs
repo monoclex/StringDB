@@ -27,6 +27,7 @@ namespace StringDB.Querying
 			{
 				if (query.IsCancellationRequested)
 				{
+					Console.WriteLine("query is cancellation requested");
 					controller.Stop();
 					return;
 				}
@@ -35,6 +36,7 @@ namespace StringDB.Querying
 
 				if (result == QueryAcceptance.Completed)
 				{
+					Console.WriteLine("query is completed");
 					controller.ProvideResult(true);
 					controller.Stop();
 					return;

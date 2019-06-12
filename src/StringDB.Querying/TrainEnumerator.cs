@@ -8,11 +8,14 @@ namespace StringDB.Querying
 	{
 		private readonly TrainEnumerable<T> _parent;
 		private int _current;
-
-		public TrainEnumerator(TrainEnumerable<T> parent, int current)
+		private long _index;
+		private bool _enumerated;
+		private int _amt;
+		public TrainEnumerator(TrainEnumerable<T> parent, int current, long index)
 		{
 			_parent = parent;
-			_current = current;
+			_current = current == -1 ? 0 : current;
+			_index = index;
 		}
 
 		public T Current { get; private set; }
@@ -23,18 +26,27 @@ namespace StringDB.Querying
 
 		public bool MoveNext()
 		{
-			var result = _parent.Next(out var current);
+			var result = _parent.Next(_index++, out var current);
 			Current = current;
 
 			// stop at where we were picked up
-			if (_current == _parent.Current)
+			if (_current == _parent.Current
+				&& _enumerated)
 			{
+				Console.WriteLine("we are dead at the very start - " + $@"_current {_current}
+_parent.Current {_parent.Current}
+_enumerated {_enumerated}
+_index {_index}
+_amt {_amt}");
 				return false;
 			}
 
-			if (_current == -1)
+			_amt++;
+			_enumerated = true;
+
+			if (!result)
 			{
-				_current = 0;
+				Console.WriteLine("result? false.");
 			}
 
 			return result;
