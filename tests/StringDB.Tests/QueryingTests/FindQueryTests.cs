@@ -40,7 +40,7 @@ namespace StringDB.Tests.QueryingTests
 		{
 			var mock = new Mock<IRequest<int>>();
 
-			var result = await _query.Accept("yes", mock.Object).ConfigureAwait(false);
+			var result = await _query.Process("yes", mock.Object).ConfigureAwait(false);
 			result.Should().Be(QueryAcceptance.Completed);
 		}
 
@@ -49,8 +49,8 @@ namespace StringDB.Tests.QueryingTests
 		{
 			var mock = new Mock<IRequest<int>>();
 
-			var result = await _query.Accept("no", mock.Object).ConfigureAwait(false);
-			result.Should().Be(QueryAcceptance.NotAccepted);
+			var result = await _query.Process("no", mock.Object).ConfigureAwait(false);
+			result.Should().Be(QueryAcceptance.Continue);
 		}
 
 		[Fact]

@@ -21,7 +21,7 @@ namespace StringDB.Tests.QueryingTests
 		{
 			var cts = new CancellationTokenSource();
 
-			_query = new Query<int, int>(null, null, cts.Token);
+			_query = new Query<int, int>(null, cts.Token);
 
 			_query.IsCancellationRequested
 				.Should().BeFalse();
@@ -49,9 +49,9 @@ namespace StringDB.Tests.QueryingTests
 
 				invoked = true;
 				return Task.FromResult(QueryAcceptance.Completed);
-			}, null);
+			});
 
-			_query.Accept(13, mock.Object)
+			_query.Process(13, mock.Object)
 				.GetAwaiter()
 				.GetResult()
 				.Should()
@@ -80,7 +80,7 @@ namespace StringDB.Tests.QueryingTests
 			int p1 = default;
 			IRequest<int> p2 = default;
 
-			_query = new Query<int, int>(null, (_1, _2) =>
+			_query = new Query<int, int>((_1, _2) =>
 			{
 				p1 = _1;
 				p2 = _2;

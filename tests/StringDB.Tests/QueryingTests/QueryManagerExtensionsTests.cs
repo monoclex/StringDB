@@ -31,7 +31,7 @@ namespace StringDB.Tests.QueryingTests
 						.Should()
 						.Be(cancellationRequestedShouldBe);
 
-					await query.Accept("yes", request.Object).ConfigureAwait(false);
+					await query.Process("yes", request.Object).ConfigureAwait(false);
 					await query.Process("a", request.Object).ConfigureAwait(false);
 
 					return true;

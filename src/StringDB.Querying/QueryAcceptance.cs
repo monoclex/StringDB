@@ -2,10 +2,6 @@
 
 namespace StringDB.Querying
 {
-	// NOTE: adding new values may cause problems, given that in 
-	// the QueryManager, it's checking if something is != NotAccepted,
-	// instead of == Accepted || Completed.
-
 	/// <summary>
 	/// Describes the various ways a given query may
 	/// accept a result.
@@ -14,17 +10,9 @@ namespace StringDB.Querying
 	public enum QueryAcceptance
 	{
 		/// <summary>
-		/// The result passed is not accepted. Reading is to be
-		/// continued until the end of the database or a completed
-		/// state.
+		/// The query should continue to be executed.
 		/// </summary>
-		NotAccepted,
-
-		/// <summary>
-		/// The result passed is accepted. It is scheduled for the
-		/// entry to be processed, and reading is to be continued.
-		/// </summary>
-		Accepted,
+		Continue,
 
 		/// <summary>
 		/// The query is done executing. The result passed is accepted
