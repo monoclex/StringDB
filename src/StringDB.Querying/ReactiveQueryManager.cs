@@ -3,7 +3,9 @@
 using StringDB.Querying.Queries;
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying
@@ -23,24 +25,80 @@ namespace StringDB.Querying
 		{
 			await Task.Yield();
 
-			foreach (var item in _trainEnumerable)
+			var process = new ConcurrentQueue<KeyValuePair<TKey, IRequest<TValue>>>();
+
 			{
-				var result = await query.Accept(item.Key, item.Value)
-					.ConfigureAwait(false);
+				bool finished = false;
 
-				if (result != QueryAcceptance.NotAccepted)
+				var cts = new CancellationTokenSource();
+				var consumeTask = Task.Run<bool>(async () =>
 				{
-					await query.Process(item.Key, item.Value)
-						.ConfigureAwait(false);
-
-					if (result == QueryAcceptance.Completed)
+					try
 					{
-						return true;
+						while (!cts.IsCancellationRequested)
+						{
+							if (!process.TryDequeue(out var kvp))
+							{
+								continue;
+							}
+
+							if (await WorkOn(kvp).ConfigureAwait(false))
+							{
+								finished = true;
+								return true;
+							}
+						}
+					}
+					catch (OperationCanceledException)
+					{
+					}
+
+					while (process.TryDequeue(out var kvp))
+					{
+						if (await WorkOn(kvp).ConfigureAwait(false))
+						{
+							finished = true;
+							return true;
+						}
+					}
+
+					return false;
+
+					async Task<bool> WorkOn(KeyValuePair<TKey, IRequest<TValue>> kvp)
+					{
+						var result = await query.Accept(kvp.Key, kvp.Value).ConfigureAwait(false);
+
+						if (result == QueryAcceptance.Completed)
+						{
+							await query.Process(kvp.Key, kvp.Value).ConfigureAwait(false);
+							return true;
+						}
+
+						if (result == QueryAcceptance.Completed)
+						{
+							await query.Process(kvp.Key, kvp.Value).ConfigureAwait(false);
+						}
+
+						return false;
+					}
+				});
+
+				foreach (var item in _trainEnumerable)
+				{
+					process.Enqueue(item);
+
+					if (finished)
+					{
+						goto @exitTrue;
 					}
 				}
-			}
 
-			return false;
+				cts.Cancel();
+
+			@exitTrue:
+
+				return await consumeTask;
+			}
 		}
 
 		public Task ExecuteQuery([NotNull] IWriteQuery<TKey, TValue> writeQuery) => throw new NotImplementedException();

@@ -41,17 +41,26 @@ namespace StringDB.Querying
 			RequestLock @lock
 		)
 		{
+			@lock.SemaphoreSlim.WaitAsync()
+				.ConfigureAwait(false);
+
 			foreach (var kvp in database)
 			{
-				using (var request = requestFactory(kvp.Value))
-				{
-					yield return new KeyValuePair<TKey, IRequest<TValue>>
-						(
-							kvp.Key,
-							request
-						);
-				}
+				var request = requestFactory(kvp.Value);
+
+				@lock.SemaphoreSlim.Release();
+
+				yield return new KeyValuePair<TKey, IRequest<TValue>>
+					(
+						kvp.Key,
+						request
+					);
+
+				@lock.SemaphoreSlim.WaitAsync()
+					.ConfigureAwait(false);
 			}
+
+			@lock.SemaphoreSlim.Release();
 		}
 	}
 }
