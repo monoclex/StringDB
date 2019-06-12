@@ -27,7 +27,6 @@ namespace StringDB.Querying
 		}
 
 		private readonly Barrier _barrier;
-		private readonly object _lock = new object();
 
 		public int Current { get; private set; } = -1;
 
@@ -82,11 +81,8 @@ namespace StringDB.Querying
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			lock (_lock)
-			{
-				_barrier.AddParticipant();
-				return new TrainEnumerator<T>(this, Current);
-			}
+			_barrier.AddParticipant();
+			return new TrainEnumerator<T>(this, Current);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

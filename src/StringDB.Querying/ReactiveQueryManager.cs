@@ -35,8 +35,8 @@ namespace StringDB.Querying
 
 				if (result == QueryAcceptance.Completed)
 				{
-					controller.Stop();
 					controller.ProvideResult(true);
+					controller.Stop();
 					return;
 				}
 			}).ConfigureAwait(false);

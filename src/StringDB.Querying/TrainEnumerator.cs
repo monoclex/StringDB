@@ -7,7 +7,7 @@ namespace StringDB.Querying
 	public class TrainEnumerator<T> : IEnumerator<T>
 	{
 		private readonly TrainEnumerable<T> _parent;
-		private readonly int _current;
+		private int _current;
 
 		public TrainEnumerator(TrainEnumerable<T> parent, int current)
 		{
@@ -30,6 +30,11 @@ namespace StringDB.Querying
 			if (_current == _parent.Current)
 			{
 				return false;
+			}
+
+			if (_current == -1)
+			{
+				_current = 0;
 			}
 
 			return result;
