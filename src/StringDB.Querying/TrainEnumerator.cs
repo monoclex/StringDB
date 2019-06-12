@@ -4,13 +4,30 @@ using System.Collections.Generic;
 
 namespace StringDB.Querying
 {
+	/// <summary>
+	/// The enumerator for a <see cref="TrainEnumerable{T}"/>.
+	/// This will get values from a parent, and kill itself when
+	/// it realizes it's back where it first spawned off of the
+	/// parent.
+	/// </summary>
+	/// <typeparam name="T">The type of source values.</typeparam>
 	public class TrainEnumerator<T> : IEnumerator<T>
 	{
+		// the parent.
 		private readonly TrainEnumerable<T> _parent;
-		private int _current;
+
+		// where it spawned off of the train parent from.
+		private readonly int _current;
+
+		// index in the train cache.
 		private long _index;
+
+		// if the enumerator has been enumerated at least once.
+		// this is to prevent infant death syndrome from thinking
+		// that it is back where it started, when it has really
+		// only just begun
 		private bool _enumerated;
-		private int _amt;
+
 		public TrainEnumerator(TrainEnumerable<T> parent, int current, long index)
 		{
 			_parent = parent;
@@ -36,7 +53,6 @@ namespace StringDB.Querying
 				return false;
 			}
 
-			_amt++;
 			_enumerated = true;
 
 			return result;

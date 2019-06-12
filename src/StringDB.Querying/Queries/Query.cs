@@ -16,6 +16,7 @@ namespace StringDB.Querying.Queries
 	{
 		private readonly Func<TKey, IRequest<TValue>, Task<QueryAcceptance>> _process;
 		private readonly CancellationToken _cancellationToken;
+		private bool _disposed;
 
 		/// <summary>
 		/// Create a new query.
@@ -31,13 +32,11 @@ namespace StringDB.Querying.Queries
 			_cancellationToken = cancellationToken;
 		}
 
-		public bool IsCancellationRequested => _cancellationToken.IsCancellationRequested;
+		public bool IsCancellationRequested => _cancellationToken.IsCancellationRequested || _disposed;
 
 		public Task<QueryAcceptance> Process(TKey key, IRequest<TValue> value)
 			=> _process(key, value);
 
-		public void Dispose()
-		{
-		}
+		public void Dispose() => _disposed = true;
 	}
 }

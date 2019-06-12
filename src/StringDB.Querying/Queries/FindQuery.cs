@@ -11,10 +11,12 @@ namespace StringDB.Querying.Queries
 	/// </summary>
 	/// <typeparam name="TKey">The type of key.</typeparam>
 	/// <typeparam name="TValue">The type of value.</typeparam>
+	[PublicAPI]
 	public class FindQuery<TKey, TValue> : IQuery<TKey, TValue>
 	{
 		private readonly Func<TKey, bool> _isItem;
 		private readonly CancellationToken _cancellationToken;
+		private bool _disposed;
 
 		public FindQuery
 		(
@@ -36,7 +38,7 @@ namespace StringDB.Querying.Queries
 		/// </summary>
 		public TValue Value { get; private set; }
 
-		public bool IsCancellationRequested => _cancellationToken.IsCancellationRequested;
+		public bool IsCancellationRequested => _cancellationToken.IsCancellationRequested || _disposed;
 
 		public async Task<QueryAcceptance> Process([NotNull] TKey key, [NotNull] IRequest<TValue> value)
 		{
@@ -52,8 +54,6 @@ namespace StringDB.Querying.Queries
 			return QueryAcceptance.Completed;
 		}
 
-		public void Dispose()
-		{
-		}
+		public void Dispose() => _disposed = true;
 	}
 }

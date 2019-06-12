@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Moq;
+using StringDB.Querying;
 using System;
 using System.Collections.Generic;
 using System.Linq;

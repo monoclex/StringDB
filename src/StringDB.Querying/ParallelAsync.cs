@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +9,18 @@ using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
+	/// <summary>
+	/// Utility functions for parallel enumeration.
+	/// </summary>
+	[PublicAPI]
 	public static class ParallelAsync
 	{
 		// https://devblogs.microsoft.com/pfxteam/implementing-a-simple-foreachasync-part-2/
+		[NotNull, ItemCanBeNull]
 		public static async Task<TResult> ForEachAsync<T, TResult>
 		(
-			this IEnumerable<T> source,
-			Func<T, ParallelAsyncController<TResult>, Task> body,
+			[NotNull] this IEnumerable<T> source,
+			[NotNull, ItemNotNull] Func<T, ParallelAsyncController<TResult>, Task> body,
 			int degreeOfParallelism = -1
 		)
 		{

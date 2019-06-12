@@ -1,32 +1,40 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using JetBrains.Annotations;
+
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
+	/// <summary>
+	/// A controller to help control the enumeration and result of a parallel foreach async.
+	/// </summary>
+	/// <typeparam name="TResult">The type of result.</typeparam>
+	[PublicAPI]
 	public class ParallelAsyncController<TResult>
 	{
 		private readonly CancellationTokenSource _cancellationTokenSource;
 
-		public ParallelAsyncController(CancellationTokenSource cancellationTokenSource)
+		/// <summary>
+		/// Creates a new <see cref="ParallelAsyncController{TResult}"/>.
+		/// </summary>
+		/// <param name="cancellationTokenSource">The cancellation token source to use.</param>
+		public ParallelAsyncController([NotNull] CancellationTokenSource cancellationTokenSource)
 		{
 			_cancellationTokenSource = cancellationTokenSource;
 			Result = default;
 		}
 
-		public void Stop()
-		{
-			_cancellationTokenSource.Cancel();
-		}
-
+		[NotNull]
 		public TResult Result { get; private set; }
 
-		public void ProvideResult(TResult result)
-		{
-			Result = result;
-		}
+		/// <summary>
+		/// Gives a result to the controller.
+		/// </summary>
+		/// <param name="result">The type of result.</param>
+		public void ProvideResult([NotNull] TResult result) => Result = result;
+
+		/// <summary>
+		/// Cancels the enumeration of the parallel code.
+		/// </summary>
+		public void Stop() => _cancellationTokenSource.Cancel();
 	}
 }

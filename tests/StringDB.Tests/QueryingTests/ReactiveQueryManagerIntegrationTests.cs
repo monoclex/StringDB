@@ -21,7 +21,7 @@ namespace StringDB.Tests.QueryingTests
 		private readonly SemaphoreSlim _requestLock;
 		private readonly MemoryStream _ms;
 		private readonly IDatabase<string, string> _db;
-		private readonly ReactiveQueryManager<string, string> _qm;
+		private readonly QueryManager<string, string> _qm;
 
 		public ReactiveQueryManagerIntegrationTests()
 		{
@@ -30,7 +30,7 @@ namespace StringDB.Tests.QueryingTests
 			_db = new DatabaseBuilder()
 				.UseIODatabase(builder => builder.UseStringDB(StringDBVersion.Latest, _ms, true))
 				.WithTransform(StringTransformer.Default, StringTransformer.Default);
-			_qm = new ReactiveQueryManager<string, string>(DatabaseEnumerable.MakeTrainEnumerable
+			_qm = new QueryManager<string, string>(DatabaseEnumerable.MakeTrainEnumerable
 			(
 				_db,
 				lazyLoader => new SimpleDatabaseValueRequest<string>(lazyLoader, _requestLock),
