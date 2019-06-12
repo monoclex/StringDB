@@ -6,23 +6,13 @@ using System.Threading;
 
 namespace StringDB.Querying
 {
-	public class CancellationTokenDisposable : IDisposable
-	{
-		public CancellationTokenDisposable(CancellationTokenSource cancellationTokenSource)
-			=> CancellationTokenSource = cancellationTokenSource;
-
-		public CancellationTokenSource CancellationTokenSource { get; }
-
-		public void Dispose() => CancellationTokenSource.Cancel();
-	}
-
 	public static class DatabaseEnumerable
 	{
 		public static TrainEnumerable<KeyValuePair<TKey, IRequest<TValue>>> MakeTrainEnumerable<TKey, TValue>
 		(
 			this IDatabase<TKey, TValue> database,
 			Func<ILazyLoader<TValue>, IRequest<TValue>> requestFactory,
-			RequestLock @lock
+			SemaphoreSlim @lock
 		)
 			=> new TrainEnumerable<KeyValuePair<TKey, IRequest<TValue>>>
 			(
@@ -37,17 +27,17 @@ namespace StringDB.Querying
 		(
 			this IDatabase<TKey, TValue> database,
 			Func<ILazyLoader<TValue>, IRequest<TValue>> requestFactory,
-			RequestLock @lock
+			SemaphoreSlim @lock
 		)
 		{
-			@lock.SemaphoreSlim.WaitAsync()
+			@lock.WaitAsync()
 				.ConfigureAwait(false);
 
 			foreach (var kvp in database)
 			{
 				var request = requestFactory(kvp.Value);
 
-				@lock.SemaphoreSlim.Release();
+				@lock.Release();
 
 				yield return new KeyValuePair<TKey, IRequest<TValue>>
 					(
@@ -55,11 +45,11 @@ namespace StringDB.Querying
 						request
 					);
 
-				@lock.SemaphoreSlim.WaitAsync()
+				@lock.WaitAsync()
 					.ConfigureAwait(false);
 			}
 
-			@lock.SemaphoreSlim.Release();
+			@lock.Release();
 		}
 	}
 }

@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Moq;
-using StringDB.Querying.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace StringDB.Tests.QueryingTests.ThreadingTests.cs
+namespace StringDB.Tests.QueryingTests.cs
 {
 	public class SimpleDatabaseValueRequestTests
 	{
@@ -23,7 +22,7 @@ namespace StringDB.Tests.QueryingTests.ThreadingTests.cs
 			var sdvr = new SimpleDatabaseValueRequest<int>
 			(
 				lazyLoader.Object,
-				new RequestLock(new SemaphoreSlim(1))
+				new SemaphoreSlim(1)
 			);
 
 			var tasks = Enumerable.Repeat(Task.Run(async () =>

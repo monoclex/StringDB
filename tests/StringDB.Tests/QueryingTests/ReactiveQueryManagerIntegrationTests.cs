@@ -18,14 +18,14 @@ namespace StringDB.Tests.QueryingTests
 {
 	public class ReactiveQueryManagerIntegrationTests
 	{
-		private readonly RequestLock _requestLock;
+		private readonly SemaphoreSlim _requestLock;
 		private readonly MemoryStream _ms;
 		private readonly IDatabase<string, string> _db;
 		private readonly ReactiveQueryManager<string, string> _qm;
 
 		public ReactiveQueryManagerIntegrationTests()
 		{
-			_requestLock = new RequestLock(new SemaphoreSlim(1));
+			_requestLock = new SemaphoreSlim(1);
 			_ms = new MemoryStream();
 			_db = new DatabaseBuilder()
 				.UseIODatabase(builder => builder.UseStringDB(StringDBVersion.Latest, _ms, true))

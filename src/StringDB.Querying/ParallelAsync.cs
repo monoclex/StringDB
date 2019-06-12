@@ -7,29 +7,6 @@ using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
-	public class ParallelAsyncController<TResult>
-	{
-		private readonly CancellationTokenSource _cancellationTokenSource;
-
-		public ParallelAsyncController(CancellationTokenSource cancellationTokenSource)
-		{
-			_cancellationTokenSource = cancellationTokenSource;
-			Result = default;
-		}
-
-		public void Stop()
-		{
-			_cancellationTokenSource.Cancel();
-		}
-
-		public TResult Result { get; private set; }
-
-		public void ProvideResult(TResult result)
-		{
-			Result = result;
-		}
-	}
-
 	public static class ParallelAsync
 	{
 		// https://devblogs.microsoft.com/pfxteam/implementing-a-simple-foreachasync-part-2/

@@ -1,17 +1,17 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace StringDB.Querying.Threading
+namespace StringDB.Querying
 {
 	public class SimpleDatabaseValueRequest<TValue> : IRequest<TValue>
 	{
 		private readonly ILazyLoader<TValue> _lazyLoader;
-		private readonly RequestLock _databaseLock;
+		private readonly SemaphoreSlim _databaseLock;
 
 		public SimpleDatabaseValueRequest
 		(
 			ILazyLoader<TValue> lazyLoader,
-			RequestLock databaseLock
+			SemaphoreSlim databaseLock
 		)
 		{
 			_lazyLoader = lazyLoader;
@@ -41,7 +41,7 @@ namespace StringDB.Querying.Threading
 
 				// need to access the db
 
-				await _databaseLock.RequestAsync()
+				await _databaseLock.WaitAsync()
 					.ConfigureAwait(false);
 
 				try
