@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Numerics;
 using System.Threading;
 
 namespace StringDB.Querying
@@ -12,22 +13,18 @@ namespace StringDB.Querying
 	/// This will allow one multiple threads to feel like they're accessing an array,
 	/// and can automatically populate future values and remove old ones, so it's
 	/// light on memory and can support lots of values.
-	///
-	/// WARNING: elongated usage may run into issues if you read more values than a long.
-	/// A future version will fix this, but in the meantime, be aware that reading for
-	/// a long time is a bad idea.
 	/// </summary>
 	/// <typeparam name="T">The type of item to cache.</typeparam>
 	public class EnumeratorTrainCache<T>
 	{
-		private readonly ConcurrentDictionary<long, TrainCache<T>> _cache = new ConcurrentDictionary<long, TrainCache<T>>();
+		private readonly ConcurrentDictionary<BigInteger, TrainCache<T>> _cache = new ConcurrentDictionary<BigInteger, TrainCache<T>>();
 		private readonly object _top = new object();
 
-		private long _numTop;
-		private long _numLast;
+		private BigInteger _numTop;
+		private BigInteger _numLast;
 
-		public long Top => _numTop;
-		public long Last => _numLast;
+		public BigInteger Top => _numTop;
+		public BigInteger Last => _numLast;
 
 		public int Participants;
 
@@ -43,12 +40,12 @@ namespace StringDB.Querying
 			lock (_top)
 			{
 				_cache[_numTop] = trainCache;
-				Interlocked.Increment(ref _numTop);
+				_numTop++;
 			}
 		}
 
 		[NotNull]
-		public T this[long index]
+		public T this[BigInteger index]
 		{
 			get
 			{
@@ -60,7 +57,7 @@ namespace StringDB.Querying
 
 					if (trainCache.Accessors >= Participants)
 					{
-						Interlocked.Increment(ref _numLast);
+						_numLast++;
 						_cache.TryRemove(index, out _);
 					}
 
@@ -70,7 +67,7 @@ namespace StringDB.Querying
 		}
 
 		[NotNull]
-		public T Get(long index, [NotNull] Func<T> factory)
+		public T Get(BigInteger index, [NotNull] Func<T> factory)
 		{
 			if (index >= _numTop)
 			{

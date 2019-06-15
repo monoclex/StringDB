@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace StringDB.Querying
 {
@@ -62,7 +63,7 @@ namespace StringDB.Querying
 			return true;
 		}
 
-		public bool Next(long index, out T next)
+		public bool Next(BigInteger index, out T next)
 		{
 			next = _trainCache.Get(index, () =>
 			{

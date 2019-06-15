@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace StringDB.Querying
 {
@@ -20,7 +21,7 @@ namespace StringDB.Querying
 		private readonly int _current;
 
 		// index in the train cache.
-		private long _index;
+		private BigInteger _index;
 
 		// if the enumerator has been enumerated at least once.
 		// this is to prevent infant death syndrome from thinking
@@ -28,7 +29,7 @@ namespace StringDB.Querying
 		// only just begun
 		private bool _enumerated;
 
-		public TrainEnumerator(TrainEnumerable<T> parent, int current, long index)
+		public TrainEnumerator(TrainEnumerable<T> parent, int current, BigInteger index)
 		{
 			_parent = parent;
 			_current = current == -1 ? 0 : current;
