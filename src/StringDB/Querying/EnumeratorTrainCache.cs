@@ -7,6 +7,13 @@ using System.Threading;
 
 namespace StringDB.Querying
 {
+	// hey reader! see that BigInteger?
+	// that's to ensure that the maximum top of the traincache can never be reached.
+	// guess what it also is? a giant hack :v
+	// i'm too freaking lazy to figure out a proper solution so i changed the key
+	// type from int -> long -> BigInteger. so in the future, i need to come around
+	// and fix it.
+
 	/// <summary>
 	/// Caches the results of an <see cref="TrainEnumerable{T}"/> to allow
 	/// for less locking and performance while multiple entires enumerate over one.
