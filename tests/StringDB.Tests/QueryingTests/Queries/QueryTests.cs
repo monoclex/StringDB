@@ -4,13 +4,14 @@ using Moq;
 
 using StringDB.Querying;
 using StringDB.Querying.Queries;
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Xunit;
 
-namespace StringDB.Tests.QueryingTests
+namespace StringDB.Tests.QueryingTests.Queries
 {
 	public class QueryTests : IDisposable
 	{

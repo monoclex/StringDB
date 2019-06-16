@@ -31,6 +31,7 @@
   <ItemGroup>
     <Folder Include="DatabaseTests\" />
     <Folder Include="OptimalTokenTests\" />
+    <Folder Include="QueryingTests\Queries\" />
     <Folder Include="TransformerTests\" />
   </ItemGroup>
 

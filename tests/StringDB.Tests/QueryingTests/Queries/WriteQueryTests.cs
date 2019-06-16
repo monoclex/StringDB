@@ -7,7 +7,7 @@ using System;
 
 using Xunit;
 
-namespace StringDB.Tests.QueryingTests
+namespace StringDB.Tests.QueryingTests.Queries
 {
 	public class WriteQueryTests : IDisposable
 	{
