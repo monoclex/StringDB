@@ -22,7 +22,7 @@ namespace StringDB.Fluency
 		/// <returns>A read only database</returns>
 		[NotNull]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IDatabase<TKey, TValue> AsReadOnly<TKey, TValue>
+		public static IDatabase<TKey, TValue> AsWriteOnly<TKey, TValue>
 		(
 			[NotNull] this IDatabase<TKey, TValue> database,
 			bool disposeDatabase = true

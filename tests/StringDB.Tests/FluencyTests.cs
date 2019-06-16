@@ -14,6 +14,14 @@ using Xunit;
 
 namespace StringDB.Tests
 {
+	/*
+	 * 
+	 * These aren't meant to say "ah ha yes i can expect .Method()
+	 * to give me a MethodDatabase every time!" they're just here
+	 * to hit that sweet :100: unit testing percent
+	 * 
+	 */
+
 	public class FluencyTests
 	{
 		[Fact]
@@ -205,6 +213,61 @@ namespace StringDB.Tests
 				fs.CanRead.Should().BeTrue();
 				fs.CanWrite.Should().BeTrue();
 			}
+		}
+
+		[Fact]
+		public void UseKeyTransform()
+		{
+			using var memdb = new DatabaseBuilder()
+				.UseMemoryDatabase<int, int>();
+
+			using var transform = memdb.WithKeyTransform(IntToStringTransformer.Default);
+
+			transform.Should().BeOfType<TransformDatabase<int, int, string, int>>();
+		}
+
+		[Fact]
+		public void UseValueTransform()
+		{
+			using var memdb = new DatabaseBuilder()
+				.UseMemoryDatabase<int, int>();
+
+			using var transform = memdb.WithValueTransform(IntToStringTransformer.Default);
+
+			transform.Should().BeOfType<TransformDatabase<int, int, int, string>>();
+		}
+
+		[Fact]
+		public void MakeReadOnly()
+		{
+			using var memdb = new DatabaseBuilder()
+				.UseMemoryDatabase<int, int>();
+
+			var readOnly = memdb.AsReadOnly();
+
+			readOnly.Should().BeOfType<ReadOnlyDatabase<int, int>>();
+		}
+
+		[Fact]
+		public void MakeWriteOnly()
+		{
+			using var memdb = new DatabaseBuilder()
+				.UseMemoryDatabase<int, int>();
+
+			var readOnly = memdb.AsWriteOnly();
+
+			readOnly.Should().BeOfType<WriteOnlyDatabase<int, int>>();
+		}
+
+		[Fact]
+		public void WithBufferedDatabase()
+		{
+			using var memdb = new DatabaseBuilder()
+				.UseMemoryDatabase<int, int>();
+
+			var buffered = memdb.WithBuffer();
+
+			buffered.Should().BeOfType<BufferedDatabase<int, int>>();
 		}
 	}
 }
