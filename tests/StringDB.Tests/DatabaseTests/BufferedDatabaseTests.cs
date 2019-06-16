@@ -136,5 +136,17 @@ namespace StringDB.Tests
 			_mockDb.Inserts
 				.Should().BeGreaterOrEqualTo(1);
 		}
+
+		[Fact]
+		public void LessThanMinimumBuffer_Throws()
+		{
+			// this testing class is BAD so i'm just gonna insert one to get the Dispose part over with
+			_mockDb.Insert(0, 0);
+
+			Throws(() => new BufferedDatabase<int, int>(_mockDb, BufferedDatabase<int, int>.MinimumBufferSize - 1));
+		}
+
+		private void Throws(Action throws)
+			=> throws.Should().Throw<Exception>();
 	}
 }

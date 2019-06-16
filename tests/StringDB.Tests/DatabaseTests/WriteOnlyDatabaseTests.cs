@@ -5,6 +5,7 @@ using Moq;
 using StringDB.Fluency;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using Xunit;
@@ -63,6 +64,13 @@ namespace StringDB.Tests.DatabaseTests
 		[Fact]
 		public void GetAll_ShouldThrow()
 			=> Throws(() => _wdb.GetAll(0));
+
+		[Fact]
+		public void Enumerating_ShouldThrow()
+		{
+			Throws(() => _wdb.GetEnumerator());
+			Throws(() => ((IEnumerable)_wdb).GetEnumerator());
+		}
 
 		[Fact]
 		public void Insert_ShouldCall()

@@ -107,7 +107,7 @@ namespace StringDB.Tests
 				.Should()
 				.BeEquivalentTo(mbdb.Enumerator());
 
-			((IEnumerator)mbdb.GetEnumerator())
+			((IEnumerable)mbdb).GetEnumerator()
 				.Should()
 				.BeEquivalentTo(mbdb.Enumerator());
 		}

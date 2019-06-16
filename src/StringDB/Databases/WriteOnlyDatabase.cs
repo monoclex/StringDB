@@ -59,6 +59,6 @@ namespace StringDB.Databases
 		public void InsertRange([NotNull] params KeyValuePair<TKey, TValue>[] items) => InnerDatabase.InsertRange(items);
 
 		/// <inheritdoc/>
-		IEnumerator IEnumerable.GetEnumerator() => InnerDatabase.GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => throw new NotSupportedException(Error);
 	}
 }

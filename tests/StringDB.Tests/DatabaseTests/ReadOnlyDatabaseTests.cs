@@ -5,6 +5,7 @@ using Moq;
 using StringDB.Fluency;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using Xunit;
@@ -74,6 +75,17 @@ namespace StringDB.Tests.DatabaseTests
 			_rdb.GetAll(0);
 
 			_mock.Verify(x => x.GetAll(0));
+		}
+
+		[Fact]
+		public void Enumeration_ShouldWork()
+		{
+			_rdb.GetEnumerator();
+
+			_mock.Verify(x => x.GetEnumerator());
+
+			// can't test this without making a class for it lmao
+			((IEnumerable)_rdb).GetEnumerator();
 		}
 
 		[Fact]
