@@ -26,6 +26,26 @@ namespace StringDB.Tests.DatabaseTests
 		}
 
 		[Fact]
+		public void DisposesInner_IfToldTo()
+		{
+			using (var db = _mock.Object.AsReadOnly(true))
+			{
+			}
+
+			_mock.Verify(x => x.Dispose());
+		}
+
+		[Fact]
+		public void DoesntDisposesInner_IfToldNotTo()
+		{
+			using (var db = _mock.Object.AsReadOnly(false))
+			{
+			}
+
+			_mock.Verify(x => x.Dispose(), Times.Never());
+		}
+
+		[Fact]
 		public void InnerDatabase_IsDatabase()
 		{
 			_dbLayer.InnerDatabase.As<object>()
