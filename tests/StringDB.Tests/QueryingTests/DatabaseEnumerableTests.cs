@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
+
 using StringDB.Querying;
-using System;
+
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
+
 using Xunit;
 
 namespace StringDB.Tests.QueryingTests
@@ -14,7 +15,7 @@ namespace StringDB.Tests.QueryingTests
 		public void ModifyValue()
 		{
 			var current = 0;
-			foreach(var i in DatabaseEnumerable.ModifyValue(new KeyValuePair<int, int>[]
+			foreach (var i in DatabaseEnumerable.ModifyValue(new KeyValuePair<int, int>[]
 			{
 				KeyValuePair.Create(0, 0),
 				KeyValuePair.Create(1, 1),
@@ -39,7 +40,7 @@ namespace StringDB.Tests.QueryingTests
 			// maybe if i were to mock the lock that'd probably work
 			var @lock = new SemaphoreSlim(1);
 
-			foreach(var i in integers.EnumerateWithLocking(@lock))
+			foreach (var i in integers.EnumerateWithLocking(@lock))
 			{
 				// the lock shouldn't be held at this point at least
 

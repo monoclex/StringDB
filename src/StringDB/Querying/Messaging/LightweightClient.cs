@@ -14,15 +14,26 @@ namespace StringDB.Querying.Messaging
 	{
 		private readonly ConcurrentQueue<Message<TMessage>> _queue = new ConcurrentQueue<Message<TMessage>>();
 		private TaskCompletionSource<bool> _added = new TaskCompletionSource<bool>(false);
+		private bool _disposed = false;
 
 		public async Task<Message<TMessage>> Receive()
 		{
+			if (_disposed)
+			{
+				return Message<TMessage>.DefaultLackingData;
+			}
+
 			if (_queue.TryDequeue(out var result))
 			{
 				return result;
 			}
 
 			await _added.Task;
+
+			if (_disposed)
+			{
+				return Message<TMessage>.DefaultLackingData;
+			}
 
 			if (!_queue.TryDequeue(out result))
 			{
@@ -36,6 +47,11 @@ namespace StringDB.Querying.Messaging
 
 		public async Task Queue(Message<TMessage> message)
 		{
+			if (_disposed)
+			{
+				return;
+			}
+
 			await Task.Run(() => _queue.Enqueue(message))
 				.ConfigureAwait(false);
 
@@ -44,9 +60,10 @@ namespace StringDB.Querying.Messaging
 
 		public void Dispose()
 		{
+			_disposed = true;
+
 			// we will pretend/except nothing to be called anymore
 			_added.SetResult(true);
-			_added = null;
 
 			while (!_queue.IsEmpty)
 			{
