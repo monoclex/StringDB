@@ -14,7 +14,7 @@ namespace StringDB.Querying.Queries
 	/// any kind of logical firing order of events.
 	/// </summary>
 	[PublicAPI]
-	public interface IQuery<TKey, TValue> : IDisposable
+	public interface IQuery<in TKey, TValue> : IDisposable
 	{
 		/// <summary>
 		/// If a cancellation is requested.

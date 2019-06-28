@@ -13,29 +13,6 @@ namespace StringDB.Querying
 	public static class DatabaseEnumerable
 	{
 		/// <summary>
-		/// Turns a database into a TrainEnumerable.
-		/// </summary>
-		/// <typeparam name="TKey">The type of key.</typeparam>
-		/// <typeparam name="TValue">The type of value.</typeparam>
-		/// <param name="database">The database to use as a source.</param>
-		/// <param name="requestFactory">The factory to convert lazy loaders to <see cref="IRequest{TValue}"/>s.</param>
-		/// <param name="lock">The lock to use while enumerating.</param>
-		/// <returns>A <see cref="TrainEnumerable{T}"/>, capable of allowing multiple concurrent
-		/// enumerators and only enumerate over the source once.</returns>
-		[NotNull]
-		public static TrainEnumerable<KeyValuePair<TKey, IRequest<TValue>>> MakeTrainEnumerable<TKey, TValue>
-		(
-			[NotNull] this IDatabase<TKey, TValue> database,
-			[NotNull] Func<ILazyLoader<TValue>, IRequest<TValue>> requestFactory,
-			[NotNull] SemaphoreSlim @lock
-		)
-			=> new TrainEnumerable<KeyValuePair<TKey, IRequest<TValue>>>
-			(
-				database.ModifyValue(requestFactory)
-				.EnumerateWithLocking(@lock)
-			);
-
-		/// <summary>
 		/// Enumerates over an enumerable, locking during all points of enumeration
 		/// and unlocking to return a value.
 		/// </summary>

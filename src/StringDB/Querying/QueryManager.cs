@@ -1,6 +1,7 @@
 ﻿using StringDB.Querying.Queries;
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,10 +14,14 @@ namespace StringDB.Querying
 	/// <typeparam name="TValue">The type of value.</typeparam>
 	public class QueryManager<TKey, TValue> : IQueryManager<TKey, TValue>
 	{
-		private readonly TrainEnumerable<KeyValuePair<TKey, IRequest<TValue>>> _trainEnumerable;
 		private readonly IDatabase<TKey, TValue> _database;
 		private readonly SemaphoreSlim _databaseLock;
 		private readonly bool _disposeDatabase;
+
+		private readonly ReaderWriterLockSlim _rw = new ReaderWriterLockSlim();
+		private TaskCompletionSource<object> _writerTcs = new TaskCompletionSource<object>();
+		private readonly SemaphoreSlim _writerLock = new SemaphoreSlim(1);
+		private int _queryAmount = 0;
 
 		/// <summary>
 		/// Creates a new query manager over a database.
@@ -55,18 +60,10 @@ namespace StringDB.Querying
 			_database = database;
 			_databaseLock = databaseLock;
 			_disposeDatabase = disposeDatabase;
-
-			_trainEnumerable = _database.MakeTrainEnumerable
-			(
-				value => new SimpleDatabaseValueRequest<TValue>(value, _databaseLock),
-				databaseLock
-			);
 		}
 
 		public void Dispose()
 		{
-			_trainEnumerable.Dispose();
-
 			if (_disposeDatabase)
 			{
 				_database.Dispose();
@@ -77,23 +74,55 @@ namespace StringDB.Querying
 		{
 			await Task.Yield();
 
-			return await _trainEnumerable.ForEachAsync<KeyValuePair<TKey, IRequest<TValue>>, bool>(async (element, controller) =>
+			_rw.EnterReadLock();
+
+			try
 			{
-				if (query.IsCancellationRequested)
+				return await _database
+					.EnumerateWithLocking(_databaseLock)
+					.ModifyValue(loader => (IRequest<TValue>) new SimpleDatabaseValueRequest<TValue>(loader, _databaseLock))
+					.ForEachAsync<KeyValuePair<TKey, IRequest<TValue>>, bool>(async (element, controller) =>
 				{
-					controller.Stop();
-					return;
-				}
+					if (query.IsCancellationRequested)
+					{
+						await Stop().ConfigureAwait(false);
+						return;
+					}
 
-				var result = await query.Process(element.Key, element.Value).ConfigureAwait(false);
+					var result = await query.Process(element.Key, element.Value).ConfigureAwait(false);
 
-				if (result == QueryAcceptance.Completed)
-				{
-					controller.ProvideResult(true);
-					controller.Stop();
-					return;
-				}
-			}).ConfigureAwait(false);
+					if (result == QueryAcceptance.Completed)
+					{
+						controller.ProvideResult(true);
+						await Stop().ConfigureAwait(false);
+						return;
+					}
+
+					async Task Stop()
+					{
+						await _writerLock.WaitAsync()
+							.ConfigureAwait(false);
+
+						try
+						{
+							_queryAmount--;
+
+							if (_queryAmount == 0)
+							{
+								_writerTcs.SetResult(true);
+							}
+						}
+						finally
+						{
+							_writerLock.Release();
+						}
+					}
+				}).ConfigureAwait(false);
+			}
+			finally
+			{
+				_rw.ExitReadLock();
+			}
 		}
 
 		public async Task ExecuteQuery(IWriteQuery<TKey, TValue> writeQuery)
@@ -101,9 +130,17 @@ namespace StringDB.Querying
 			await _databaseLock.WaitAsync()
 				.ConfigureAwait(false);
 
-			writeQuery.Execute(_database);
+			_rw.EnterWriteLock();
 
-			_databaseLock.Release();
+			try
+			{
+				writeQuery.Execute(_database);
+			}
+			finally
+			{
+				_rw.ExitWriteLock();
+				_databaseLock.Release();
+			}
 		}
 	}
 }
