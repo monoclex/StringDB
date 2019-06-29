@@ -14,7 +14,7 @@ namespace StringDB.Querying
 	public struct LoadRequest<TKey, TValue> : IRequest<TValue>
 	{
 		private readonly int _id;
-		private readonly IMessageClient<QueryMessage<TKey, TValue>> _client;
+		private readonly Func<IMessageClient<QueryMessage<TKey, TValue>>> _clientFactory;
 		private readonly IMessageClient<QueryMessage<TKey, TValue>> _queryManager;
 		private readonly IQuery<TKey, TValue> _query;
 		private readonly ILazyLoader<TValue> _loader;
@@ -24,12 +24,12 @@ namespace StringDB.Querying
 			int id,
 			ILazyLoader<TValue> loader,
 			IQuery<TKey, TValue> query,
-			IMessageClient<QueryMessage<TKey, TValue>> client,
+			Func<IMessageClient<QueryMessage<TKey, TValue>>> clientFactory,
 			IMessageClient<QueryMessage<TKey, TValue>> queryManager
 		)
 		{
 			_id = id;
-			_client = client;
+			_clientFactory = clientFactory;
 			_queryManager = queryManager;
 			_query = query;
 			_loader = loader;
@@ -37,7 +37,9 @@ namespace StringDB.Querying
 
 		public async Task<TValue> Request()
 		{
-			_client.Send(_queryManager, new QueryMessage<TKey, TValue>
+			var client = _clientFactory();
+
+			client.Send(_queryManager, new QueryMessage<TKey, TValue>
 			{
 				KeyValuePair = new KeyValuePair<TKey, ILazyLoader<TValue>>(default, _loader),
 				Id = _id,
@@ -49,7 +51,7 @@ namespace StringDB.Querying
 			do
 			{
 				// TODO: ct here?
-				var result = await _client.Receive().ConfigureAwait(false);
+				var result = await client.Receive().ConfigureAwait(false);
 
 				if (result.Data.HasValue
 					&& result.Data.Id == _id

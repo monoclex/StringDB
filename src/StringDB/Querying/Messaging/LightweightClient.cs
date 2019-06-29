@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying.Messaging
@@ -15,6 +16,14 @@ namespace StringDB.Querying.Messaging
 		private readonly ConcurrentQueue<Message<TMessage>> _queue = new ConcurrentQueue<Message<TMessage>>();
 		private TaskCompletionSource<bool> _added = new TaskCompletionSource<bool>(false);
 		private bool _disposed = false;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void ClearQueue()
+		{
+			while (_queue.TryDequeue(out _))
+			{
+			}
+		}
 
 		public async Task<Message<TMessage>> Receive()
 		{
@@ -63,10 +72,7 @@ namespace StringDB.Querying.Messaging
 			// we will pretend/except nothing to be called anymore
 			_added.SetResult(true);
 
-			while (!_queue.IsEmpty)
-			{
-				_queue.TryDequeue(out _);
-			}
+			ClearQueue();
 		}
 	}
 }

@@ -52,8 +52,12 @@ namespace StringDB.Querying
 		public async Task<bool> ExecuteQuery(IQuery<TKey, TValue> query)
 		{
 			// we expect it being disposed to not throw
+			using (var proxy = new ProxiedClient<QueryMessage<TKey, TValue>>())
 			using (var client = new LightweightClient<QueryMessage<TKey, TValue>>())
+			using (var loadProxy = new LightweightClient<QueryMessage<TKey, TValue>>())
 			{
+				proxy.Proxy(client);
+
 				client.Send(_client, new QueryMessage<TKey, TValue>
 				{
 					Go = true
@@ -68,17 +72,30 @@ namespace StringDB.Querying
 
 				while (!query.IsCancellationRequested)
 				{
+					bool requested = false;
+
 					// TODO: have load proxy client
 					var loadRequest = new LoadRequest<TKey, TValue>
 					(
 						result.Data.Id,
 						result.Data.KeyValuePair.Value,
 						query,
-						client,
+						() =>
+						{
+							requested = true;
+							proxy.Proxy(loadProxy);
+							return loadProxy;
+						},
 						_client
 					);
 
 					var queryResult = await query.Process(result.Data.KeyValuePair.Key, loadRequest).ConfigureAwait(false);
+
+					if (requested)
+					{
+						proxy.Deproxy(loadProxy);
+						loadProxy.ClearQueue();
+					}
 
 					if (queryResult == QueryAcceptance.Completed)
 					{
