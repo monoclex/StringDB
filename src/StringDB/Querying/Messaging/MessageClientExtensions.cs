@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace StringDB.Querying.Messaging
+﻿namespace StringDB.Querying.Messaging
 {
 	public static class MessageClientExtensions
 	{

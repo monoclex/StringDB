@@ -22,7 +22,7 @@ namespace StringDB.Querying.Messaging
 		{
 			_cancellationToken = cancellationToken;
 
-			_thread = new Thread(async () =>
+			_thread = Task.Run(async () =>
 			{
 				try
 				{
@@ -37,11 +37,9 @@ namespace StringDB.Querying.Messaging
 					_threadDeath.SetResult(null);
 				}
 			});
-
-			_thread.Start();
 		}
 
-		private readonly Thread _thread;
+		private readonly Task _thread;
 		private readonly CancellationToken _cancellationToken;
 
 		public Task<Message<TMessage>> Receive(CancellationToken cancellationToken) => _client.Receive(cancellationToken);

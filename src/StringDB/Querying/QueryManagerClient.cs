@@ -1,6 +1,6 @@
 ﻿using StringDB.Querying.Messaging;
+
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -55,7 +55,6 @@ namespace StringDB.Querying
 						var newClients = new IMessageClient<QueryMessage<TKey, TValue>>[clientsCount + incrementalSize];
 						Array.Copy(clients, 0, newClients, 0, clientsCount);
 						clients = newClients;
-						clientsCount += incrementalSize;
 					}
 
 					if (message.Data.HasValue)
@@ -88,6 +87,11 @@ namespace StringDB.Querying
 					// allow this client to start receiving database reads
 					else if (message.Data.Go)
 					{
+						if (clientsCount >= clients.Length)
+						{
+							Console.WriteLine("wat");
+						}
+
 						clients[clientsCount] = message.Sender;
 						clientsCount++;
 
@@ -153,7 +157,14 @@ namespace StringDB.Querying
 
 						for (var clientIndex = 0; clientIndex < clientsCount; clientIndex++)
 						{
-							client.Send(clients[clientIndex], data);
+							var clientValue = clients[clientIndex];
+
+							if (clientValue == null)
+							{
+								continue;
+							}
+
+							client.Send(clientValue, data);
 						}
 
 						workerLock.Relinquish();

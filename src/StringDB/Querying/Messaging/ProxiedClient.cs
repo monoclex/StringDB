@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +8,7 @@ namespace StringDB.Querying.Messaging
 	public class ProxiedClient<T> : IMessageClient<T>
 	{
 		private readonly List<IMessageClient<T>> _proxies = new List<IMessageClient<T>>();
+		private bool _disposed;
 
 		public void Proxy(IMessageClient<T> client)
 		{
@@ -43,9 +41,14 @@ namespace StringDB.Querying.Messaging
 
 		public void Queue(Message<T> message)
 		{
+			if (_disposed)
+			{
+				return;
+			}
+
 			lock (_proxies)
 			{
-				foreach(var proxy in _proxies)
+				foreach (var proxy in _proxies)
 				{
 					proxy.Queue(message);
 				}
@@ -54,9 +57,14 @@ namespace StringDB.Querying.Messaging
 
 		public void Dispose()
 		{
-			foreach(var proxy in _proxies)
+			_disposed = true;
+
+			lock (_proxies)
 			{
-				proxy.Dispose();
+				foreach (var proxy in _proxies)
+				{
+					proxy.Dispose();
+				}
 			}
 		}
 	}

@@ -15,11 +15,11 @@ using Xunit;
 namespace StringDB.Tests
 {
 	/*
-	 * 
+	 *
 	 * These aren't meant to say "ah ha yes i can expect .Method()
 	 * to give me a MethodDatabase every time!" they're just here
 	 * to hit that sweet :100: unit testing percent
-	 * 
+	 *
 	 */
 
 	public class FluencyTests
