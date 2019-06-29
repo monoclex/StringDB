@@ -25,7 +25,16 @@ namespace StringDB.IO
 		private long _len;
 
 		public override void Flush()
-			=> InnerStream.Flush();
+		{
+			if (InnerStream is FileStream fileStream)
+			{
+				fileStream.Flush(true);
+			}
+			else
+			{
+				InnerStream.Flush();
+			}
+		}
 
 		[Obsolete("Please use the Position property in combination with the Length property for any kind of seeking.", true)]
 		public override long Seek(long offset, SeekOrigin origin)

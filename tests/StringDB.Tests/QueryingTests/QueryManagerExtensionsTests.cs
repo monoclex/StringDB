@@ -28,7 +28,7 @@ namespace StringDB.Tests.QueryingTests
 			_queryManager.Setup(x => x.ExecuteQuery(It.IsAny<IQuery<string, int>>()))
 				.Returns<IQuery<string, int>>(async query =>
 				{
-					query.CancellationToken
+					query.CancellationToken.IsCancellationRequested
 						.Should()
 						.Be(cancellationRequestedShouldBe);
 

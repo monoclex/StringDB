@@ -26,12 +26,12 @@ namespace StringDB.Tests.QueryingTests.Queries
 
 			_query = new FindQuery<string, int>(_ => false, cts.Token);
 
-			_query.IsCancellationRequested
+			_query.CancellationToken.IsCancellationRequested
 				.Should().BeFalse();
 
 			cts.Cancel();
 
-			_query.IsCancellationRequested
+			_query.CancellationToken.IsCancellationRequested
 				.Should().BeTrue();
 		}
 

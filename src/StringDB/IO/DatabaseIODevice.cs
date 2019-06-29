@@ -11,6 +11,8 @@ namespace StringDB.IO
 	[PublicAPI]
 	public sealed class DatabaseIODevice : IDatabaseIODevice
 	{
+		private bool _disposed = false;
+
 		public ILowlevelDatabaseIODevice LowLevelDatabaseIODevice { get; }
 
 		/// <inheritdoc />
@@ -175,6 +177,14 @@ namespace StringDB.IO
 
 		public void Dispose()
 		{
+			// we call "flush" when we shouldn't flush something disposed
+			// so we gotta make sure it's not dead
+			if (_disposed)
+			{
+				return;
+			}
+
+			_disposed = true;
 			LowLevelDatabaseIODevice.Flush();
 			LowLevelDatabaseIODevice.Dispose();
 		}
