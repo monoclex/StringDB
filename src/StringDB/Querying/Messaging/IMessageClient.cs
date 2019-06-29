@@ -22,6 +22,6 @@ namespace StringDB.Querying.Messaging
 		/// </summary>
 		/// <param name="message">The message to go into a queue.</param>
 		/// <returns>An awaitable task that will complete once it is queues.</returns>
-		Task Queue(Message<TMessage> message);
+		void Queue(Message<TMessage> message);
 	}
 }

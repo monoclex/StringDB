@@ -45,16 +45,14 @@ namespace StringDB.Querying.Messaging
 			return result;
 		}
 
-		public async Task Queue(Message<TMessage> message)
+		public void Queue(Message<TMessage> message)
 		{
 			if (_disposed)
 			{
 				return;
 			}
 
-			await Task.Run(() => _queue.Enqueue(message))
-				.ConfigureAwait(false);
-
+			_queue.Enqueue(message);
 			_added.SetResult(true);
 		}
 

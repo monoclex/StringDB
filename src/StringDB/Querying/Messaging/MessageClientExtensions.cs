@@ -9,7 +9,7 @@ namespace StringDB.Querying.Messaging
 		/// </summary>
 		/// <param name="message">The message to send.</param>
 		/// <returns>An awaitable task.</returns>
-		public static Task Send<TMessage>
+		public static void Send<TMessage>
 		(
 			this IMessageClient<TMessage> messageClient,
 			IMessageClient<TMessage> target,

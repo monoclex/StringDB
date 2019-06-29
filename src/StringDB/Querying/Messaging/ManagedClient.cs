@@ -47,7 +47,7 @@ namespace StringDB.Querying.Messaging
 
 		public Task<Message<TMessage>> Receive() => _client.Receive();
 
-		public Task Queue(Message<TMessage> message) => _client.Queue(message);
+		public void Queue(Message<TMessage> message) => _client.Queue(message);
 
 		public void Dispose()
 		{

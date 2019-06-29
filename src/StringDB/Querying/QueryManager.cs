@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
-	public struct QueryMessage
+	public struct QueryMessage<TKey, TValue>
 	{
+		public KeyValuePair<TKey, ILazyLoader<TValue>> KeyValuePair;
 		public int Id;
 		public bool Stop;
 		public bool Go;
@@ -24,7 +25,7 @@ namespace StringDB.Querying
 	{
 		private readonly IDatabase<TKey, TValue> _database;
 		private readonly bool _disposeDatabase;
-		private readonly IMessageClient<QueryMessage> _client;
+		private readonly IMessageClient<QueryMessage<TKey, TValue>> _client;
 
 		/// <summary>
 		/// Creates a new query manager over a database.
@@ -40,7 +41,7 @@ namespace StringDB.Querying
 		{
 			_database = database;
 			_disposeDatabase = disposeDatabase;
-			_client = new ManagedClient<QueryMessage>
+			_client = new ManagedClient<QueryMessage<TKey, TValue>>
 			(
 				async (client, cancellatonToken) =>
 				{

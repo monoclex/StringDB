@@ -1,37 +1,39 @@
 ﻿using StringDB.Querying.Messaging;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
-	public class QueryManagerClient<TKey, TValue> : IMessageClient<QueryMessage>
+	public class QueryManagerClient<TKey, TValue> : IMessageClient<QueryMessage<TKey, TValue>>
 	{
 		private readonly IDatabase<TKey, TValue> _database;
-		private readonly ManagedClient<QueryMessage> _client;
+		private readonly bool _disposeDatabase;
+		private readonly ManagedClient<QueryMessage<TKey, TValue>> _client;
 
 		public QueryManagerClient
 		(
 			IDatabase<TKey, TValue> database,
-			CancellationToken cancellationToken = default
+			CancellationToken cancellationToken = default,
+			bool disposeDatabase = true
 		)
 		{
 			_database = database;
-			_client = new ManagedClient<QueryMessage>(WorkerThread, cancellationToken);
+			_disposeDatabase = disposeDatabase;
+			_client = new ManagedClient<QueryMessage<TKey, TValue>>(WorkerThread, cancellationToken);
 		}
 
-		private async Task WorkerThread(IMessageClient<QueryMessage> client, CancellationToken cancellationToken)
+		private async Task WorkerThread(IMessageClient<QueryMessage<TKey, TValue>> client, CancellationToken cancellationToken)
 		{
 			const int initialSize = 10;
 			const int incrementalSize = 5;
 
-			// TODO: move this logic out
-			// for an extremely lightweight lock for clients
-			bool requestingClientsLock = false;
-			bool noticedClientsLockRequest = false;
-
-			var clients = new IMessageClient<QueryMessage>[initialSize];
+			var clients = new IMessageClient<QueryMessage<TKey, TValue>>[initialSize];
 			var clientsCount = 0;
+
+			var clientLightLock = new LightLock();
+			var clientWaiter = new EventWaiter(() => clientsCount != 0);
 
 			// start off a listening thread
 			var listener = Task.Run(async () =>
@@ -49,7 +51,7 @@ namespace StringDB.Querying
 					// allocate bigger array, copy clients to it, re-assign clients and inform size change
 					if (clientsCount == clients.Length)
 					{
-						var newClients = new IMessageClient<QueryMessage>[clientsCount + incrementalSize];
+						var newClients = new IMessageClient<QueryMessage<TKey, TValue>>[clientsCount + incrementalSize];
 						Array.Copy(clients, 0, newClients, 0, clientsCount);
 						clients = newClients;
 						clientsCount += incrementalSize;
@@ -60,6 +62,8 @@ namespace StringDB.Querying
 					{
 						clients[clientsCount] = message.Sender;
 						clientsCount++;
+
+						clientWaiter.Signal();
 					}
 					else if (message.Data.Stop)
 					{
@@ -72,66 +76,50 @@ namespace StringDB.Querying
 						}
 
 						// create new amount of clients
-						var newClients = new IMessageClient<QueryMessage>[clients.Length - 1];
+						var newClients = new IMessageClient<QueryMessage<TKey, TValue>>[clients.Length - 1];
 
 						Array.Copy(clients, 0, newClients, 0, senderIndex);
 						Array.Copy(clients, senderIndex + 1, newClients, senderIndex, clients.Length - senderIndex - 1);
 
-						// unfortunately we can't perform these as an atomic operation
-						// so we'll have to use a very light lock
-
-						var spinWait = new SpinWait();
-
-						requestingClientsLock = true;
-
-						while (!noticedClientsLockRequest)
-						{
-							spinWait.SpinOnce();
-						}
-
-						// so now we can guarentee control, and expect the client
-						// to have set requestingClientsLock to false we will only
-						// set noticedClientsLockRequest to false and set
-						// requestingClientsLock to true when we are done with this operation
-						// we will make sure that requestingClientsLock turns to false
+						// unfortunately, since these two aren't completely atomic
+						// we will request some quick access
+						clientLightLock.Request();
 
 						clientsCount--;
 						clients = newClients;
 
-						noticedClientsLockRequest = false;
-						requestingClientsLock = true;
-
-						// make sure the reader has listened to us
-						while (requestingClientsLock)
-						{
-							spinWait.SpinOnce();
-						}
+						clientLightLock.Release();
 					}
 				}
 			});
 
+			// TODO: split up reader into separate class so we can swap out the reader
+
 			// reader
 			while (!cancellationToken.IsCancellationRequested)
 			{
-				if (requestingClientsLock)
+				clientWaiter.Wait();
+
+				int id = 0;
+				using (var enumerator = _database.GetEnumerator())
 				{
-					// we set this to false because we expect the messanger task
-					// to set this to true very quickly after we set
-					// noticedClientsLock to true.
-
-					requestingClientsLock = false;
-					noticedClientsLockRequest = true;
-
-					var spinWait = new SpinWait();
-
-					// the caller should set this to true when they are done
-					while (!requestingClientsLock)
+					while (enumerator.MoveNext() && clientsCount > 0 && !cancellationToken.IsCancellationRequested)
 					{
-						spinWait.SpinOnce();
-					}
+						var data = new QueryMessage<TKey, TValue>
+						{
+							Id = id,
+							KeyValuePair = enumerator.Current
+						};
 
-					// and reset it all back to false
-					requestingClientsLock = false;
+						for (var clientIndex = 0; clientIndex < clientsCount; clientIndex++)
+						{
+							client.Send(clients[clientIndex], data);
+						}
+
+						clientLightLock.Relinquish();
+
+						id++;
+					}
 				}
 			}
 
@@ -139,10 +127,18 @@ namespace StringDB.Querying
 			await listener;
 		}
 
-		public void Dispose() => _client.Dispose();
+		public void Dispose()
+		{
+			_client.Dispose();
 
-		public Task Queue(Message<QueryMessage> message) => _client.Queue(message);
+			if (_disposeDatabase)
+			{
+				_database.Dispose();
+			}
+		}
 
-		public Task<Message<QueryMessage>> Receive() => _client.Receive();
+		public void Queue(Message<QueryMessage<TKey, TValue>> message) => _client.Queue(message);
+
+		public Task<Message<QueryMessage<TKey, TValue>>> Receive() => _client.Receive();
 	}
 }
