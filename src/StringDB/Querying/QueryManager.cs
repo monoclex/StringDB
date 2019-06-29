@@ -1,6 +1,6 @@
 ﻿using StringDB.Querying.Messaging;
 using StringDB.Querying.Queries;
-
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,14 +8,6 @@ using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
-	public struct QueryMessage<TKey, TValue>
-	{
-		public KeyValuePair<TKey, ILazyLoader<TValue>> KeyValuePair;
-		public int Id;
-		public bool Stop;
-		public bool Go;
-	}
-
 	/// <summary>
 	/// A query manager that uses a train enumerable for operations.
 	/// </summary>
@@ -26,6 +18,7 @@ namespace StringDB.Querying
 		private readonly IDatabase<TKey, TValue> _database;
 		private readonly bool _disposeDatabase;
 		private readonly IMessageClient<QueryMessage<TKey, TValue>> _client;
+		private readonly CancellationToken _cancellationToken;
 
 		/// <summary>
 		/// Creates a new query manager over a database.
@@ -36,20 +29,14 @@ namespace StringDB.Querying
 		public QueryManager
 		(
 			IDatabase<TKey, TValue> database,
-			bool disposeDatabase = true
+			bool disposeDatabase = true,
+			CancellationToken cancellationToken = default
 		)
 		{
 			_database = database;
 			_disposeDatabase = disposeDatabase;
-			_client = new ManagedClient<QueryMessage<TKey, TValue>>
-			(
-				async (client, cancellatonToken) =>
-				{
-					// we would wait for messages on one task while enumerating on the other
-					// and prepare to give clients access to messages and such
-					var message = await client.Receive().ConfigureAwait(false);
-				}
-			);
+			_cancellationToken = cancellationToken;
+			_client = new QueryManagerClient<TKey, TValue>(_database, _cancellationToken, _disposeDatabase);
 		}
 
 		public void Dispose()
@@ -64,7 +51,55 @@ namespace StringDB.Querying
 
 		public async Task<bool> ExecuteQuery(IQuery<TKey, TValue> query)
 		{
-			return false;
+			// we expect it being disposed to not throw
+			using (var client = new LightweightClient<QueryMessage<TKey, TValue>>())
+			{
+				client.Send(_client, new QueryMessage<TKey, TValue>
+				{
+					Go = true
+				});
+
+				// when we hear back a result, this will be our first message
+				var result = await client.Receive().ConfigureAwait(false);
+
+				var initialId = result.Data.Id;
+
+				// now we should constantly be receiving data from the database
+
+				while (!query.IsCancellationRequested)
+				{
+					// TODO: have load proxy client
+					var loadRequest = new LoadRequest<TKey, TValue>
+					(
+						result.Data.Id,
+						result.Data.KeyValuePair.Value,
+						query,
+						client,
+						_client
+					);
+
+					var queryResult = await query.Process(result.Data.KeyValuePair.Key, loadRequest).ConfigureAwait(false);
+
+					if (queryResult == QueryAcceptance.Completed)
+					{
+						Stop();
+						return true;
+					}
+
+					// in the future, if QueryAcceptance gets more values, we should handle them.
+				}
+
+				Stop();
+				return false;
+
+				void Stop()
+				{
+					client.Send(_client, new QueryMessage<TKey, TValue>
+					{
+						Stop = true
+					});
+				}
+			}
 		}
 
 		public async Task ExecuteQuery(IWriteQuery<TKey, TValue> writeQuery)

@@ -32,7 +32,7 @@ namespace StringDB.Querying
 			var clients = new IMessageClient<QueryMessage<TKey, TValue>>[initialSize];
 			var clientsCount = 0;
 
-			var clientLightLock = new LightLock();
+			var workerLock = new LightLock();
 			var clientWaiter = new EventWaiter(() => clientsCount != 0);
 
 			// start off a listening thread
@@ -57,8 +57,35 @@ namespace StringDB.Querying
 						clientsCount += incrementalSize;
 					}
 
+					if (message.Data.HasValue)
+					{
+						// prepare as much as we can so that
+						// the load can be as 'atomic' as possible
+						var loader = message.Data.KeyValuePair.Value;
+						TValue value;
+
+						workerLock.Request();
+
+						try
+						{
+							value = loader.Load();
+						}
+						finally
+						{
+							workerLock.Release();
+						}
+
+						this.Send(message.Sender, new QueryMessage<TKey, TValue>
+						{
+							HasValue = true,
+							Value = value,
+
+							// give back the id they gave so they can filter it out
+							Id = message.Data.Id
+						});
+					}
 					// allow this client to start receiving database reads
-					if (message.Data.Go)
+					else if (message.Data.Go)
 					{
 						clients[clientsCount] = message.Sender;
 						clientsCount++;
@@ -83,12 +110,17 @@ namespace StringDB.Querying
 
 						// unfortunately, since these two aren't completely atomic
 						// we will request some quick access
-						clientLightLock.Request();
+						workerLock.Request();
 
-						clientsCount--;
-						clients = newClients;
-
-						clientLightLock.Release();
+						try
+						{
+							clientsCount--;
+							clients = newClients;
+						}
+						finally
+						{
+							workerLock.Release();
+						}
 					}
 				}
 			});
@@ -116,7 +148,7 @@ namespace StringDB.Querying
 							client.Send(clients[clientIndex], data);
 						}
 
-						clientLightLock.Relinquish();
+						workerLock.Relinquish();
 
 						id++;
 					}
