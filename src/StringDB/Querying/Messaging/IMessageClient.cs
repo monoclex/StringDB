@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying.Messaging
@@ -13,7 +14,7 @@ namespace StringDB.Querying.Messaging
 		/// Receives a message from a sender.
 		/// </summary>
 		/// <returns>An awaitable task that will return the message.</returns>
-		Task<Message<TMessage>> Receive();
+		Task<Message<TMessage>> Receive(CancellationToken cancellationToken);
 
 		/// <summary>
 		/// The incoming place for messages to arrive - this will

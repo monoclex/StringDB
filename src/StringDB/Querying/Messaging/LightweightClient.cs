@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying.Messaging
@@ -14,7 +15,7 @@ namespace StringDB.Querying.Messaging
 	public class LightweightClient<TMessage> : IMessageClient<TMessage>
 	{
 		private readonly ConcurrentQueue<Message<TMessage>> _queue = new ConcurrentQueue<Message<TMessage>>();
-		private TaskCompletionSource<bool> _added = new TaskCompletionSource<bool>(false);
+		private TaskCompletionSource<bool> _disposedTask = new TaskCompletionSource<bool>();
 		private bool _disposed = false;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -25,33 +26,56 @@ namespace StringDB.Querying.Messaging
 			}
 		}
 
-		public async Task<Message<TMessage>> Receive()
+		public async Task<Message<TMessage>> Receive(CancellationToken cancellationToken)
 		{
 			if (_disposed)
 			{
 				return Message<TMessage>.DefaultLackingData;
 			}
 
-			if (_queue.TryDequeue(out var result))
+			var dequeue = TryDequeue();
+
+			if (dequeue.IsCompleted)
 			{
-				return result;
+				return await dequeue;
 			}
 
-			await _added.Task;
+			var tcs = new TaskCompletionSource<bool>();
+			using (var registration = cancellationToken.Register(() =>
+			{
+				if (tcs == null)
+				{
+					return;
+				}
+
+				tcs.SetResult(true);
+			}, false))
+			{
+				await Task.WhenAny(_disposedTask.Task, dequeue, tcs.Task).ConfigureAwait(false);
+			}
+			tcs = null;
 
 			if (_disposed)
 			{
 				return Message<TMessage>.DefaultLackingData;
 			}
 
-			if (!_queue.TryDequeue(out result))
+			return await dequeue;
+		}
+
+		private async Task<Message<TMessage>> TryDequeue()
+		{
+			await Task.Yield();
+
+			while (!_disposed)
 			{
-				throw new Exception("Expected added to be true if there were items in the queue.");
+				if (_queue.TryDequeue(out var result))
+				{
+					return result;
+				}
 			}
 
-			_added = new TaskCompletionSource<bool>(false);
-
-			return result;
+			return Message<TMessage>.DefaultLackingData;
 		}
 
 		public void Queue(Message<TMessage> message)
@@ -62,15 +86,17 @@ namespace StringDB.Querying.Messaging
 			}
 
 			_queue.Enqueue(message);
-			_added.SetResult(true);
 		}
 
 		public void Dispose()
 		{
-			_disposed = true;
+			if (_disposed)
+			{
+				return;
+			}
 
-			// we will pretend/except nothing to be called anymore
-			_added.SetResult(true);
+			_disposed = true;
+			_disposedTask.SetResult(true);
 
 			ClearQueue();
 		}

@@ -43,10 +43,14 @@ namespace StringDB.Querying
 		{
 			_client.Dispose();
 
+			// we depend on QueryManagerClient to do this for us
+			// this is commented out in the event that the behaviour changes
+			/*
 			if (_disposeDatabase)
 			{
 				_database.Dispose();
 			}
+			*/
 		}
 
 		public async Task<bool> ExecuteQuery(IQuery<TKey, TValue> query)
@@ -63,14 +67,17 @@ namespace StringDB.Querying
 					Go = true
 				});
 
+				var combined = CancellationTokenSource.CreateLinkedTokenSource(query.CancellationToken, _cancellationToken)
+					.Token;
+
 				// when we hear back a result, this will be our first message
-				var result = await client.Receive().ConfigureAwait(false);
+				var result = await client.Receive(combined).ConfigureAwait(false);
 
 				var initialId = result.Data.Id;
 
 				// now we should constantly be receiving data from the database
 
-				while (!query.IsCancellationRequested)
+				while (!query.CancellationToken.IsCancellationRequested)
 				{
 					bool requested = false;
 
@@ -86,7 +93,8 @@ namespace StringDB.Querying
 							proxy.Proxy(loadProxy);
 							return loadProxy;
 						},
-						_client
+						_client,
+						combined
 					);
 
 					var queryResult = await query.Process(result.Data.KeyValuePair.Key, loadRequest).ConfigureAwait(false);
@@ -104,6 +112,14 @@ namespace StringDB.Querying
 					}
 
 					// in the future, if QueryAcceptance gets more values, we should handle them.
+					result = await client.Receive(combined).ConfigureAwait(false);
+
+					// if we've looped back to the beginning
+					if (result.Data.Id == initialId
+						&& !result.Data.HasValue)
+					{
+						break;
+					}
 				}
 
 				Stop();

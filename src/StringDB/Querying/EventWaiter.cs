@@ -55,7 +55,7 @@ namespace StringDB.Querying
 		{
 			var waiter = new SpinWait();
 
-			while (!_evaluation() || waiter.Count > 100)
+			while (!_evaluation() || !(waiter.Count > 100))
 			{
 				waiter.SpinOnce();
 			}

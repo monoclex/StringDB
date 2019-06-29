@@ -15,8 +15,7 @@ namespace StringDB.Querying.Queries
 	public class FindQuery<TKey, TValue> : IQuery<TKey, TValue>
 	{
 		private readonly Func<TKey, bool> _isItem;
-		private readonly CancellationToken _cancellationToken;
-		private bool _disposed;
+		private readonly CancellationTokenSource _cts;
 
 		public FindQuery
 		(
@@ -25,7 +24,8 @@ namespace StringDB.Querying.Queries
 		)
 		{
 			_isItem = isItem;
-			_cancellationToken = cancellationToken;
+			_cts = new CancellationTokenSource();
+			CancellationToken = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken).Token;
 		}
 
 		/// <summary>
@@ -38,7 +38,7 @@ namespace StringDB.Querying.Queries
 		/// </summary>
 		public TValue Value { get; private set; }
 
-		public bool IsCancellationRequested => _cancellationToken.IsCancellationRequested || _disposed;
+		public CancellationToken CancellationToken { get; }
 
 		public async Task<QueryAcceptance> Process([NotNull] TKey key, [NotNull] IRequest<TValue> value)
 		{
@@ -54,6 +54,6 @@ namespace StringDB.Querying.Queries
 			return QueryAcceptance.Completed;
 		}
 
-		public void Dispose() => _disposed = true;
+		public void Dispose() => _cts.Cancel();
 	}
 }

@@ -24,12 +24,12 @@ namespace StringDB.Tests.QueryingTests.Queries
 
 			_query = new Query<int, int>(null, cts.Token);
 
-			_query.IsCancellationRequested
+			_query.CancellationToken
 				.Should().BeFalse();
 
 			cts.Cancel();
 
-			_query.IsCancellationRequested
+			_query.CancellationToken
 				.Should().BeTrue();
 		}
 

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying.Messaging
@@ -38,7 +39,7 @@ namespace StringDB.Querying.Messaging
 			"You aren't suppose to receive data from a" + nameof(ProxiedClient<T>) + "."
 			+ " Use the " + nameof(Proxy) + " method to proxy a client and receive data from that instead.";
 
-		public Task<Message<T>> Receive() => throw new NotSupportedException(ReceiveMessage);
+		public Task<Message<T>> Receive(CancellationToken cancellationToken) => throw new NotSupportedException(ReceiveMessage);
 
 		public void Queue(Message<T> message)
 		{

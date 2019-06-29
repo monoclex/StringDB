@@ -22,13 +22,12 @@ namespace StringDB.Querying.Messaging
 		{
 			_cancellationToken = cancellationToken;
 
-			_thread = new Thread(() =>
+			_thread = new Thread(async () =>
 			{
 				try
 				{
-					worker(this, CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken, _dispose.Token).Token)
-						.GetAwaiter()
-						.GetResult();
+					await worker(this, CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken, _dispose.Token).Token)
+						.ConfigureAwait(false);
 				}
 				catch (OperationCanceledException)
 				{
@@ -45,7 +44,7 @@ namespace StringDB.Querying.Messaging
 		private readonly Thread _thread;
 		private readonly CancellationToken _cancellationToken;
 
-		public Task<Message<TMessage>> Receive() => _client.Receive();
+		public Task<Message<TMessage>> Receive(CancellationToken cancellationToken) => _client.Receive(cancellationToken);
 
 		public void Queue(Message<TMessage> message) => _client.Queue(message);
 
@@ -56,7 +55,7 @@ namespace StringDB.Querying.Messaging
 			Task.WhenAny(_threadDeath.Task, Task.Delay(TimeSpan.FromSeconds(10)))
 				.GetAwaiter().GetResult();
 
-			if (_threadDeath.Task.IsCompleted)
+			if (!_threadDeath.Task.IsCompleted)
 			{
 				throw new TimeoutException("Waited too long for worker task to complete before disposing.");
 			}

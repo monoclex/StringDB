@@ -28,19 +28,20 @@ namespace StringDB.Querying
 		{
 			const int initialSize = 10;
 			const int incrementalSize = 5;
+			var abort = false;
 
 			var clients = new IMessageClient<QueryMessage<TKey, TValue>>[initialSize];
 			var clientsCount = 0;
 
 			var workerLock = new LightLock();
-			var clientWaiter = new EventWaiter(() => clientsCount != 0);
+			var clientWaiter = new EventWaiter(() => clientsCount != 0 || abort);
 
 			// start off a listening thread
 			var listener = Task.Run(async () =>
 			{
 				while (!cancellationToken.IsCancellationRequested)
 				{
-					var message = await client.Receive().ConfigureAwait(false);
+					var message = await client.Receive(cancellationToken).ConfigureAwait(false);
 
 					if (message.LacksData)
 					{
@@ -123,6 +124,8 @@ namespace StringDB.Querying
 						}
 					}
 				}
+
+				abort = true;
 			});
 
 			// TODO: split up reader into separate class so we can swap out the reader
@@ -131,6 +134,11 @@ namespace StringDB.Querying
 			while (!cancellationToken.IsCancellationRequested)
 			{
 				clientWaiter.Wait();
+
+				if (cancellationToken.IsCancellationRequested)
+				{
+					return;
+				}
 
 				int id = 0;
 				using (var enumerator = _database.GetEnumerator())
@@ -171,6 +179,6 @@ namespace StringDB.Querying
 
 		public void Queue(Message<QueryMessage<TKey, TValue>> message) => _client.Queue(message);
 
-		public Task<Message<QueryMessage<TKey, TValue>>> Receive() => _client.Receive();
+		public Task<Message<QueryMessage<TKey, TValue>>> Receive(CancellationToken cancellationToken) => _client.Receive(cancellationToken);
 	}
 }

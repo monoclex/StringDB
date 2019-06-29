@@ -15,8 +15,7 @@ namespace StringDB.Querying.Queries
 	public class Query<TKey, TValue> : IQuery<TKey, TValue>
 	{
 		private readonly Func<TKey, IRequest<TValue>, Task<QueryAcceptance>> _process;
-		private readonly CancellationToken _cancellationToken;
-		private bool _disposed;
+		private readonly CancellationTokenSource _cts;
 
 		/// <summary>
 		/// Create a new query.
@@ -29,14 +28,16 @@ namespace StringDB.Querying.Queries
 		)
 		{
 			_process = process;
-			_cancellationToken = cancellationToken;
+			_cts = new CancellationTokenSource();
+
+			CancellationToken = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken).Token;
 		}
 
-		public bool IsCancellationRequested => _cancellationToken.IsCancellationRequested || _disposed;
+		public CancellationToken CancellationToken { get; }
 
 		public Task<QueryAcceptance> Process(TKey key, IRequest<TValue> value)
 			=> _process(key, value);
 
-		public void Dispose() => _disposed = true;
+		public void Dispose() => _cts.Cancel();
 	}
 }

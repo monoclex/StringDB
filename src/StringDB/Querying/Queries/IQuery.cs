@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying.Queries
@@ -17,9 +18,9 @@ namespace StringDB.Querying.Queries
 	public interface IQuery<in TKey, TValue> : IDisposable
 	{
 		/// <summary>
-		/// If a cancellation is requested.
+		/// A cancellation token for this query.
 		/// </summary>
-		bool IsCancellationRequested { get; }
+		CancellationToken CancellationToken { get; }
 
 		// TODO: ValueTask in net core 3
 		/// <summary>

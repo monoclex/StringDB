@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying
@@ -16,6 +17,7 @@ namespace StringDB.Querying
 		private readonly int _id;
 		private readonly Func<IMessageClient<QueryMessage<TKey, TValue>>> _clientFactory;
 		private readonly IMessageClient<QueryMessage<TKey, TValue>> _queryManager;
+		private readonly CancellationToken _cancellationToken;
 		private readonly IQuery<TKey, TValue> _query;
 		private readonly ILazyLoader<TValue> _loader;
 
@@ -25,12 +27,14 @@ namespace StringDB.Querying
 			ILazyLoader<TValue> loader,
 			IQuery<TKey, TValue> query,
 			Func<IMessageClient<QueryMessage<TKey, TValue>>> clientFactory,
-			IMessageClient<QueryMessage<TKey, TValue>> queryManager
+			IMessageClient<QueryMessage<TKey, TValue>> queryManager,
+			CancellationToken cancellationToken
 		)
 		{
 			_id = id;
 			_clientFactory = clientFactory;
 			_queryManager = queryManager;
+			_cancellationToken = cancellationToken;
 			_query = query;
 			_loader = loader;
 		}
@@ -51,15 +55,15 @@ namespace StringDB.Querying
 			do
 			{
 				// TODO: ct here?
-				var result = await client.Receive().ConfigureAwait(false);
+				var result = await client.Receive(_cancellationToken).ConfigureAwait(false);
 
 				if (result.Data.HasValue
 					&& result.Data.Id == _id
-					&& !_query.IsCancellationRequested) // this last one will exit the loop if a cancellation was requested
+					&& !_cancellationToken.IsCancellationRequested) // this last one will exit the loop if a cancellation was requested
 				{
 					return result.Data.Value;
 				}
-			} while (!_query.IsCancellationRequested);
+			} while (!_cancellationToken.IsCancellationRequested);
 
 			throw new TaskCanceledException();
 		}
