@@ -47,6 +47,25 @@ namespace StringDB.Fluency
 			StringDBVersion version,
 			[NotNull] string file
 		)
+			=> builder.UseStringDB(version, file, NoByteBuffer.Read);
+
+		/// <summary>
+		/// Use StringDB from a file.
+		/// </summary>
+		/// <param name="builder">The builder.</param>
+		/// <param name="version">The version of StringDB to use.</param>
+		/// <param name="file">The file to open.</param>
+		/// <param name="buffer">The kind of byte[] reading technique to use.</param>
+		/// <returns>An <see cref="IDatabaseIODevice"/>.</returns>
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IDatabaseIODevice UseStringDB
+		(
+			[CanBeNull] this DatabaseIODeviceBuilder builder,
+			StringDBVersion version,
+			[NotNull] string file,
+			[NotNull] Func<BinaryReader, int, byte[]> buffer
+		)
 			=> builder
 				.UseStringDB
 				(
@@ -56,7 +75,8 @@ namespace StringDB.Fluency
 						file,
 						FileMode.OpenOrCreate,
 						FileAccess.ReadWrite
-					)
+					),
+					buffer
 				);
 
 		/// <summary>
@@ -76,9 +96,30 @@ namespace StringDB.Fluency
 			[NotNull] Stream stream,
 			bool leaveStreamOpen = false
 		)
+			=> builder.UseStringDB(version, stream, NoByteBuffer.Read, leaveStreamOpen);
+
+		/// <summary>
+		/// Use a StringDB IDatabaseIODevice
+		/// </summary>
+		/// <param name="builder">The builder.</param>
+		/// <param name="version">The version of StringDB to accomodate.</param>
+		/// <param name="stream">The stream to use.</param>
+		/// <param name="buffer">The kind of byte[] reading technique to use.</param>
+		/// <param name="leaveStreamOpen">If the stream should be left open after disposing of the <see cref="IDatabaseIODevice"/>.</param>
+		/// <returns>An <see cref="IDatabaseIODevice"/>.</returns>
+		[NotNull]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IDatabaseIODevice UseStringDB
+		(
+			[CanBeNull] this DatabaseIODeviceBuilder builder,
+			StringDBVersion version,
+			[NotNull] Stream stream,
+			[NotNull] Func<BinaryReader, int, byte[]> buffer,
+			bool leaveStreamOpen = false
+		)
 			=> new DatabaseIODevice
 			(
-				version.UseVersion(stream, leaveStreamOpen)
+				version.UseVersion(stream, buffer, leaveStreamOpen)
 			);
 
 		[NotNull]
@@ -86,13 +127,14 @@ namespace StringDB.Fluency
 		(
 			this StringDBVersion version,
 			[NotNull] Stream stream,
+			Func<BinaryReader, int, byte[]> buffer,
 			bool leaveStreamOpen = false
 		)
 		{
 			switch (version)
 			{
-				case StringDBVersion.v5_0_0: return new StringDB5_0_0LowlevelDatabaseIODevice(stream, leaveStreamOpen);
-				case StringDBVersion.v10_0_0: return new StringDB10_0_0LowlevelDatabaseIODevice(stream, leaveStreamOpen);
+				case StringDBVersion.v5_0_0: return new StringDB5_0_0LowlevelDatabaseIODevice(stream, buffer, leaveStreamOpen);
+				case StringDBVersion.v10_0_0: return new StringDB10_0_0LowlevelDatabaseIODevice(stream, buffer, leaveStreamOpen);
 				default: throw new NotSupportedException($"Didn't expect a {version}");
 			}
 		}

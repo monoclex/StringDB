@@ -6,7 +6,8 @@ namespace StringDB.Fluency
 	/// A class that allows the extensive usage of extensions to create DatabaseIODevices.
 	/// </summary>
 	[PublicAPI]
-	public sealed class DatabaseIODeviceBuilder
+	public struct DatabaseIODeviceBuilder
 	{
+		public static DatabaseIODeviceBuilder Instance { get; }
 	}
 }

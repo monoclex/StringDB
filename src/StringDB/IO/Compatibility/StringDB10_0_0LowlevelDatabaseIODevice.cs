@@ -16,6 +16,7 @@ namespace StringDB.IO.Compatibility
 			public const byte MaxIndexSize = IndexSeparator;
 		}
 
+		private Func<BinaryReader, int, byte[]> _buffer;
 		private readonly BinaryReader _br;
 		private readonly BinaryWriter _bw;
 
@@ -27,9 +28,11 @@ namespace StringDB.IO.Compatibility
 		public StringDB10_0_0LowlevelDatabaseIODevice
 		(
 			[NotNull] Stream stream,
+			Func<BinaryReader, int, byte[]> buffer,
 			bool leaveStreamOpen = false
 		)
 		{
+			_buffer = buffer;
 			// use a buffer when performing single byte writes since writing a single byte
 			// allocates a new byte array every time, and that's a very costly operation.
 			// the size of this buffer is artificial.
@@ -109,7 +112,7 @@ namespace StringDB.IO.Compatibility
 			return new LowLevelDatabaseItem
 			{
 				DataPosition = ReadDownsizedLong(),
-				Index = _br.ReadBytes(count: peekResult)
+				Index = _buffer(_br, peekResult)
 			};
 		}
 

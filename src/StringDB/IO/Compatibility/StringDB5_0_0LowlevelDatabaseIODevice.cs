@@ -33,12 +33,16 @@ namespace StringDB.IO.Compatibility
 
 		public Stream InnerStream => _stream;
 
+		private Func<BinaryReader, int, byte[]> _buffer;
+
 		public StringDB5_0_0LowlevelDatabaseIODevice
 		(
 			[NotNull] Stream stream,
+			Func<BinaryReader, int, byte[]> buffer,
 			bool leaveStreamOpen = false
 		)
 		{
+			_buffer = buffer;
 			_stream = new StreamCacheMonitor(stream);
 			_br = new BinaryReader(_stream, Encoding.UTF8, leaveStreamOpen);
 			_bw = new BinaryWriter(_stream, Encoding.UTF8, leaveStreamOpen);
@@ -114,7 +118,7 @@ namespace StringDB.IO.Compatibility
 			_br.ReadByte(); // backwards compatibility - not used
 							// inputType is for TypeManager stuff in StringDB, we can throw it out of the window
 
-			var index = _br.ReadBytes(indexLength);
+			var index = _buffer(_br, indexLength);
 
 			return new LowLevelDatabaseItem
 			{
