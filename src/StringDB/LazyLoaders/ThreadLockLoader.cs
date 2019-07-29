@@ -9,7 +9,7 @@ namespace StringDB.LazyLoaders
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	[PublicAPI]
-	public struct ThreadLockLoader<T> : ILazyLoader<T>
+	public sealed class ThreadLockLoader<T> : ILazyLoader<T>
 	{
 		private readonly object _lock;
 		private readonly ILazyLoader<T> _inner;

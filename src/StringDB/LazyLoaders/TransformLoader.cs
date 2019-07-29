@@ -10,7 +10,7 @@ namespace StringDB.LazyLoaders
 	/// <typeparam name="TPre">The type before transformation.</typeparam>
 	/// <typeparam name="TPost">The type after transformation.</typeparam>
 	[PublicAPI]
-	public struct TransformLazyLoader<TPre, TPost> : ILazyLoader<TPost>
+	public sealed class TransformLazyLoader<TPre, TPost> : ILazyLoader<TPost>
 	{
 		private readonly ITransformer<TPre, TPost> _transformer;
 		private readonly ILazyLoader<TPre> _pre;

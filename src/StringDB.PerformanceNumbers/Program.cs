@@ -63,7 +63,6 @@ namespace StringDB.PerformanceNumbers
 			var db = new DatabaseBuilder()
 				.UseIODatabase(StringDBVersion.Latest, "ZFWorlds.db");
 
-				/*
 			Console.WriteLine(db.Count());
 
 			int cps = 0;
@@ -90,7 +89,7 @@ namespace StringDB.PerformanceNumbers
 			});
 
 			await Task.WhenAll(counter, reader);
-			*/
+			
 			var queryManager = new QueryManager<byte[], byte[]>(db);
 
 			var ips = 0;
