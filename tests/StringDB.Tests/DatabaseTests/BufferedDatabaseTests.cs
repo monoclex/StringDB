@@ -10,7 +10,7 @@ using Xunit;
 
 namespace StringDB.Tests
 {
-	public class BufferedDatabaseTests : IDisposable
+	public class BufferedDatabaseTests
 	{
 		public class MockDatabase : BaseDatabase<int, int>
 		{
@@ -42,7 +42,22 @@ namespace StringDB.Tests
 		public BufferedDatabaseTests()
 		{
 			_mockDb = new MockDatabase();
-			_db = new BufferedDatabase<int, int>(_mockDb, BufferSize);
+			_db = new BufferedDatabase<int, int>(_mockDb, BufferSize, false);
+		}
+
+		[Fact]
+		public void BufferedDatabaseOverflowTest()
+		{
+			const int maxSize = BufferSize - 1;
+			for (var i = 0; i < maxSize; i++)
+			{
+				_db.Insert(i, i);
+			}
+
+			_db.Insert(maxSize, maxSize);
+			_db.Dispose();
+
+			_mockDb.Count().Should().Be(BufferSize);
 		}
 
 		[Fact]
@@ -122,6 +137,7 @@ namespace StringDB.Tests
 				.BeEquivalentTo(Enumerable.Range(0, BufferSize));
 		}
 
+		/*
 		public void Dispose()
 		{
 			_mockDb.Disposed
@@ -136,6 +152,7 @@ namespace StringDB.Tests
 			_mockDb.Inserts
 				.Should().BeGreaterOrEqualTo(1);
 		}
+		*/
 
 		[Fact]
 		public void LessThanMinimumBuffer_Throws()

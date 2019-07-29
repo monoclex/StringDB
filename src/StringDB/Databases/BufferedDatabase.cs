@@ -4,7 +4,7 @@ using StringDB.LazyLoaders;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace StringDB.Databases
 {
@@ -48,6 +48,12 @@ namespace StringDB.Databases
 		private int _bufferPos = 0;
 
 		public IDatabase<TKey, TValue> InnerDatabase { get; }
+
+		/// <summary>
+		/// Flushes the internal buffer.
+		/// </summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Flush() => WriteBuffer();
 
 		/// <summary>
 		/// Fills the internal buffer.
@@ -98,7 +104,7 @@ namespace StringDB.Databases
 
 			_buffer[_bufferPos++] = entry;
 
-			return _bufferPos == _buffer.Length;
+			return false;
 		}
 
 		/// <summary>
@@ -109,7 +115,7 @@ namespace StringDB.Databases
 			// if our buffer is full
 			if (_bufferPos == _buffer.Length)
 			{
-				// write the buffer
+				// write the entire buffer
 				InnerDatabase.InsertRange(_buffer);
 			}
 			else if (_bufferPos == 0)
@@ -152,9 +158,14 @@ namespace StringDB.Databases
 		{
 			var pair = new KeyValuePair<TKey, TValue>(key, value);
 
-			while (FillBufferSingle(pair))
+			// this will be true if it fails to fill
+			if (FillBufferSingle(pair))
 			{
+				// that means we need to flush the buffer,
 				WriteBuffer();
+
+				// and re-add it to the buffer
+				FillBufferSingle(pair);
 			}
 		}
 
@@ -171,12 +182,20 @@ namespace StringDB.Databases
 
 		/// <inheritdoc/>
 		protected override IEnumerable<KeyValuePair<TKey, ILazyLoader<TValue>>> Evaluate()
-			=> InnerDatabase
-			.Concat
-			(
-				_buffer
-					.Take(_bufferPos)
-					.Select(x => new ValueLoader<TValue>(x.Value).ToKeyValuePair(x.Key))
-			);
+		{
+			// return the original database
+			foreach (var kvp in InnerDatabase)
+			{
+				yield return kvp;
+			}
+
+			// and virtually append the buffer
+			for (var i = 0; i < _bufferPos; i++)
+			{
+				var kvp = _buffer[i];
+				yield return new ValueLoader<TValue>(kvp.Value)
+					.ToKeyValuePair(kvp.Key);
+			}
+		}
 	}
 }

@@ -3,7 +3,6 @@
 using StringDB.LazyLoaders;
 
 using System.Collections.Generic;
-using System.Linq;
 
 namespace StringDB.Databases
 {
@@ -88,12 +87,13 @@ namespace StringDB.Databases
 
 		/// <inheritdoc />
 		protected override IEnumerable<KeyValuePair<TPostKey, ILazyLoader<TPostValue>>> Evaluate()
-			=> InnerDatabase
-			.Select
-			(
-				x => new TransformLazyLoader<TPreValue, TPostValue>(x.Value, _valueTransformer)
-					.ToKeyValuePair(_keyTransformer.TransformPre(x.Key))
-			);
+		{
+			foreach (var element in InnerDatabase)
+			{
+				yield return new TransformLazyLoader<TPreValue, TPostValue>(element.Value, _valueTransformer)
+					.ToKeyValuePair(_keyTransformer.TransformPre(element.Key));
+			}
+		}
 
 		/// <inheritdoc />
 		public override void Dispose()
