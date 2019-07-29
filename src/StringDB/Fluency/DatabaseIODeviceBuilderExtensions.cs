@@ -64,7 +64,8 @@ namespace StringDB.Fluency
 			[CanBeNull] this DatabaseIODeviceBuilder builder,
 			StringDBVersion version,
 			[NotNull] string file,
-			[NotNull] Func<BinaryReader, int, byte[]> buffer
+			[NotNull] Func<BinaryReader, int, byte[]> buffer,
+			bool leaveStreamOpen = false
 		)
 			=> builder
 				.UseStringDB
@@ -76,7 +77,8 @@ namespace StringDB.Fluency
 						FileMode.OpenOrCreate,
 						FileAccess.ReadWrite
 					),
-					buffer
+					buffer,
+					leaveStreamOpen: leaveStreamOpen
 				);
 
 		/// <summary>

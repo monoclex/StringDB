@@ -8,7 +8,7 @@ namespace StringDB.LazyLoaders
 	/// Caches the result of an <see cref="ILazyLoader{T}"/>.
 	/// </summary>
 	[PublicAPI]
-	public struct CachedLoader<T> : ILazyLoader<T>, IDisposable
+	public sealed class CachedLoader<T> : ILazyLoader<T>, IDisposable
 	{
 		private readonly ILazyLoader<T> _inner;
 

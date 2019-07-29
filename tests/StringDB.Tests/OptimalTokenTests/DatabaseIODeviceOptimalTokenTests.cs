@@ -39,7 +39,7 @@ namespace StringDB.Tests
 
 			_ms.Position = 0;
 
-			_lldbiod = new StringDB10_0_0LowlevelDatabaseIODevice(_ms, false);
+			_lldbiod = new StringDB10_0_0LowlevelDatabaseIODevice(_ms, NoByteBuffer.Read, false);
 			_dbiod = new DatabaseIODevice(_lldbiod, _token);
 		}
 

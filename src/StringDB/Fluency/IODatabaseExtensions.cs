@@ -125,7 +125,7 @@ namespace StringDB.Fluency
 			IODatabaseOptions options,
 			[NotNull] out IOptimalTokenSource optimalTokenSource
 		)
-			=> builder.UseIODatabase(builder =>
+			=> builder.UseIODatabase(ioDeviceBuilder =>
 			{
 				var buffer =
 					options.UseByteBuffer
@@ -136,7 +136,7 @@ namespace StringDB.Fluency
 
 				if (options.FileName == default)
 				{
-					device = builder.UseStringDB
+					device = ioDeviceBuilder.UseStringDB
 					(
 						version: options.Version,
 						stream: options.Stream,
@@ -146,7 +146,7 @@ namespace StringDB.Fluency
 				}
 				else
 				{
-					device = builder.UseStringDB
+					device = ioDeviceBuilder.UseStringDB
 					(
 						version: options.Version,
 						file: options.FileName,

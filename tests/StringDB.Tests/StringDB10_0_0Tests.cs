@@ -24,7 +24,7 @@ namespace StringDB.Tests
 		public static (MemoryStream ms, StringDB10_0_0LowlevelDatabaseIODevice io) Generate()
 		{
 			var ms = new MemoryStream();
-			var io = new StringDB10_0_0LowlevelDatabaseIODevice(ms, true);
+			var io = new StringDB10_0_0LowlevelDatabaseIODevice(ms, NoByteBuffer.Read, true);
 
 			return (ms, io);
 		}
@@ -402,7 +402,7 @@ namespace StringDB.Tests
 			public void ReadsLongPrefix()
 			{
 				using (var curMs = new MemoryStream())
-				using (var curIo = new StringDB10_0_0LowlevelDatabaseIODevice(curMs))
+				using (var curIo = new StringDB10_0_0LowlevelDatabaseIODevice(curMs, NoByteBuffer.Read))
 				{
 					curIo.JumpPos
 						.Should()
@@ -417,7 +417,7 @@ namespace StringDB.Tests
 
 				ms.Write(new byte[8] { 123, 0, 0, 0, 0, 0, 0, 0 });
 
-				using var io = new StringDB10_0_0LowlevelDatabaseIODevice(ms);
+				using var io = new StringDB10_0_0LowlevelDatabaseIODevice(ms, NoByteBuffer.Read);
 
 				io.JumpPos
 					.Should()
@@ -524,7 +524,7 @@ namespace StringDB.Tests
 				mock.Setup(stream => stream.CanWrite).Returns(true);
 				mock.Setup(stream => stream.Flush()).Callback(() => flushed++);
 
-				var io = new StringDB10_0_0LowlevelDatabaseIODevice(mock.Object);
+				var io = new StringDB10_0_0LowlevelDatabaseIODevice(mock.Object, NoByteBuffer.Read);
 
 				io.Flush();
 
