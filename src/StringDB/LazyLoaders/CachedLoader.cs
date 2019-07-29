@@ -8,7 +8,7 @@ namespace StringDB.LazyLoaders
 	/// Caches the result of an <see cref="ILazyLoader{T}"/>.
 	/// </summary>
 	[PublicAPI]
-	public sealed class CachedLoader<T> : ILazyLoader<T>, IDisposable
+	public struct CachedLoader<T> : ILazyLoader<T>, IDisposable
 	{
 		private readonly ILazyLoader<T> _inner;
 
@@ -20,7 +20,11 @@ namespace StringDB.LazyLoaders
 		/// </summary>
 		/// <param name="inner">The inner lazy loader to cache the result of.</param>
 		public CachedLoader([NotNull] ILazyLoader<T> inner)
-			=> _inner = inner;
+		{
+			_inner = inner;
+			_loaded = false;
+			_value = default;
+		}
 
 		/// <inheritdoc />
 		public T Load()
