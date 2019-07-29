@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace StringDB.IO.Compatibility
+namespace StringDB.IO
 {
 	public sealed class NoByteBuffer
 	{

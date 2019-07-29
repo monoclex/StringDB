@@ -4,6 +4,7 @@ using StringDB.Databases;
 using StringDB.IO;
 
 using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace StringDB.Fluency
@@ -117,5 +118,45 @@ namespace StringDB.Fluency
 			[NotNull] out IOptimalTokenSource optimalTokenSource
 		)
 			=> builder.UseIODatabase(databaseIODeviceBuilder => databaseIODeviceBuilder.UseStringDB(version, file), out optimalTokenSource);
+
+		public static IDatabase<byte[], byte[]> UseIODatabase
+		(
+			this DatabaseBuilder builder,
+			IODatabaseOptions options,
+			[NotNull] out IOptimalTokenSource optimalTokenSource
+		)
+			=> builder.UseIODatabase(builder =>
+			{
+				var buffer =
+					options.UseByteBuffer
+					? (Func<BinaryReader, int, byte[]>)(new ByteBuffer().Read)
+					: NoByteBuffer.Read;
+
+				IDatabaseIODevice device = default;
+
+				if (options.FileName == default)
+				{
+					device = builder.UseStringDB
+					(
+						version: options.Version,
+						stream: options.Stream,
+						buffer: buffer,
+						leaveStreamOpen: options.LeaveStreamOpen
+					);
+				}
+				else
+				{
+					device = builder.UseStringDB
+					(
+						version: options.Version,
+						file: options.FileName,
+						buffer: buffer,
+						leaveStreamOpen: options.LeaveStreamOpen
+					);
+				}
+
+				return device;
+			}, out optimalTokenSource);
+
 	}
 }
