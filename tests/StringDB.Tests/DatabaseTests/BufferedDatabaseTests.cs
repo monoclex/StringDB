@@ -46,18 +46,16 @@ namespace StringDB.Tests
 		}
 
 		[Fact]
-		public void BufferedDatabaseOverflowTest()
+		public void When_DbIsDisposed_BufferedItems_GetWritten()
 		{
-			const int maxSize = BufferSize - 1;
-			for (var i = 0; i < maxSize; i++)
+			for (var i = 0; i < BufferSize - 1; i++)
 			{
 				_db.Insert(i, i);
 			}
 
-			_db.Insert(maxSize, maxSize);
 			_db.Dispose();
 
-			_mockDb.Count().Should().Be(BufferSize);
+			_mockDb.InsertedData.Count().Should().Be(BufferSize - 1);
 		}
 
 		[Fact]
@@ -95,7 +93,7 @@ namespace StringDB.Tests
 			}
 
 			_mockDb.Inserts
-				.Should().Be(1);
+				.Should().Be(0);
 
 			_db.Insert(BufferSize, 0);
 
