@@ -16,15 +16,25 @@ namespace StringDB.Tests.Querying.Messaging
 		{
 			var message = new Message { Id = 5 };
 
-			new Thread(() =>
-			{
-				Thread.Sleep(1000);
-				Assert.True(false, "AfterEnqueueing_CanDequeueImmediately took too long to complete.");
-			}).Start();
+			bool dequeued = false;
 
 			_pipe.Enqueue(message);
 
+			var thread = new Thread(() =>
+			{
+				Thread.Sleep(1000);
+
+				if (!dequeued)
+				{
+					Assert.True(false, "AfterEnqueueing_CanDequeueImmediately took too long to complete.");
+				}
+			});
+
+			thread.Start();
+
 			var dequeuedMessage = await _pipe.Dequeue().ConfigureAwait(false);
+
+			dequeued = true;
 
 			dequeuedMessage.Should().BeEquivalentTo(message);
 		}
