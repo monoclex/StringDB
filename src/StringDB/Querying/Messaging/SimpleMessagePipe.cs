@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,9 +21,11 @@ namespace StringDB.Querying.Messaging
 			_mres.Dispose();
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Enqueue(T message)
 		{
 			_queue.Enqueue(message);
+
 			_mres.Set();
 		}
 
@@ -30,6 +33,11 @@ namespace StringDB.Querying.Messaging
 		{
 			if (_queue.TryDequeue(out var result))
 			{
+				if (_mres.IsSet)
+				{
+					_mres.Reset();
+				}
+
 				return Task.FromResult(result);
 			}
 
@@ -60,6 +68,12 @@ namespace StringDB.Querying.Messaging
 			}, registeredWaitHandle, cancellationToken);
 
 			return tcs.Task;
+		}
+
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		private static void ThrowDispose()
+		{
+			throw new ObjectDisposedException(nameof(SimpleMessagePipe<T>));
 		}
 	}
 }

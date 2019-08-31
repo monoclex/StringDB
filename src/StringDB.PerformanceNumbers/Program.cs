@@ -16,6 +16,7 @@ namespace StringDB.PerformanceNumbers
 		{
 			new SingleInsertFileSize().Run();
 			new InsertRangeFileSize().Run();
+			await new MessagePipeMessagesPerSecond().Run();
 
 			const BenchmarkToRun benchmark = BenchmarkToRun.YieldOrLinq;
 

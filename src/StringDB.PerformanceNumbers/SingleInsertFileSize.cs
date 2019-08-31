@@ -16,8 +16,6 @@ namespace StringDB.PerformanceNumbers
 			Console.WriteLine($"Size after 1 single insert: {size1}");
 			Console.WriteLine($"Size after 50 single inserts: {size2}");
 			Console.WriteLine($"Size after 100 single inserts: {size3}");
-
-			Console.ReadLine();
 		}
 
 		public static long GetSizeAfter(int times, Action<IDatabase<string, string>> action)

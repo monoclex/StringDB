@@ -23,8 +23,6 @@ namespace StringDB.PerformanceNumbers
 			Console.WriteLine($"Size after 1 elements in an insert range: {size1}");
 			Console.WriteLine($"Size after 50 elements in an insert range: {size2}");
 			Console.WriteLine($"Size after 100 elements in an insert range: {size3}");
-
-			Console.ReadLine();
 		}
 
 		public static long GetSizeAfter(int kvps, Action<IDatabase<string, string>, int> action)
