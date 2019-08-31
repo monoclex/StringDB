@@ -157,6 +157,5 @@ namespace StringDB.Fluency
 
 				return device;
 			}, out optimalTokenSource);
-
 	}
 }

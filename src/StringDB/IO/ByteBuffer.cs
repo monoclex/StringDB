@@ -18,7 +18,7 @@ namespace StringDB.IO
 		{
 			_buffers = new byte[byte.MaxValue + 1][];
 
-			for(var i = 0; i <= byte.MaxValue; i++)
+			for (var i = 0; i <= byte.MaxValue; i++)
 			{
 				_buffers[i] = new byte[i];
 			}
