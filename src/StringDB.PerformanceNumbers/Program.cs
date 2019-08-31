@@ -9,16 +9,17 @@ namespace StringDB.PerformanceNumbers
 	{
 		public enum BenchmarkToRun
 		{
-			YieldOrLinq
+			YieldOrLinq,
+			ClassCastOrStructCast
 		}
 
 		private static async Task Main()
 		{
 			new SingleInsertFileSize().Run();
 			new InsertRangeFileSize().Run();
-			await new MessagePipeMessagesPerSecond().Run().ConfigureAwait(false);
+			// await new MessagePipeMessagesPerSecond().Run().ConfigureAwait(false);
 
-			const BenchmarkToRun benchmark = BenchmarkToRun.YieldOrLinq;
+			const BenchmarkToRun benchmark = BenchmarkToRun.ClassCastOrStructCast;
 
 			var summary = BenchmarkRunner.Run(GetBenchmarkType(benchmark));
 
@@ -32,6 +33,7 @@ namespace StringDB.PerformanceNumbers
 			switch (benchmark)
 			{
 				case BenchmarkToRun.YieldOrLinq: return typeof(YieldOrLinq);
+				case BenchmarkToRun.ClassCastOrStructCast: return typeof(ClassCastOrStructCast);
 				default: throw new Exception("");
 			}
 		}
