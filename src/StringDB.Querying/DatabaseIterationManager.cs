@@ -3,6 +3,8 @@
 using StringDB.Querying.Messaging;
 
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
@@ -50,8 +52,14 @@ namespace StringDB.Querying
 			});
 		}
 
-		public void IterateTo(IMessagePipe<KeyValuePair<TKey, IRequest<TValue>>> target)
+		public async ValueTask IterateTo
+		(
+			IMessagePipe<KeyValuePair<TKey, IRequest<TValue>>> target,
+			CancellationToken cancellationToken = default
+		)
 		{
+			await Task.Yield();
+
 			foreach (var kvp in _database.LockWhenEnumerating(_lock))
 			{
 				var key = kvp.Key;
