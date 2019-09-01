@@ -22,9 +22,9 @@ namespace StringDB.Querying
 		public PipeRequestManager()
 			: this
 		(
-			new SimpleMessagePipe<NextRequest<TRequestKey, TValue>>(),
-			new SimpleMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>>(),
-			() => new SimpleMessagePipe<TValue>()
+			new ChannelMessagePipe<NextRequest<TRequestKey, TValue>>(),
+			new ChannelMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>>(),
+			() => new ChannelMessagePipe<TValue>()
 		)
 		{
 		}

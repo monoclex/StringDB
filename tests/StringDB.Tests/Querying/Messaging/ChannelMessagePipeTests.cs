@@ -10,7 +10,7 @@ using Xunit;
 
 namespace StringDB.Tests.Querying.Messaging
 {
-	public class SimpleMessagePipeTests : IDisposable
+	public class ChannelMessagePipeTests : IDisposable
 	{
 		[Fact]
 		public async Task AfterEnqueueing_CanDequeueImmediately()
@@ -68,7 +68,7 @@ namespace StringDB.Tests.Querying.Messaging
 			public static bool operator !=(Message a, Message b) => !(a == b);
 		}
 
-		private readonly IMessagePipe<Message> _pipe = new SimpleMessagePipe<Message>();
+		private readonly IMessagePipe<Message> _pipe = new ChannelMessagePipe<Message>();
 
 		public void Dispose()
 		{

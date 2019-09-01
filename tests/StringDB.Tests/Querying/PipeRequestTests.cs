@@ -22,8 +22,8 @@ namespace StringDB.Tests.Querying
 
 		public PipeRequestTests()
 		{
-			_requestPipe = new SimpleMessagePipe<KeyValuePair<int, PipeRequest<int, string>>>();
-			_valuePipe = new SimpleMessagePipe<string>();
+			_requestPipe = new ChannelMessagePipe<KeyValuePair<int, PipeRequest<int, string>>>();
+			_valuePipe = new ChannelMessagePipe<string>();
 			_pipeRequest = new PipeRequest<int, string>(_requestPipe, _valuePipe, _requestKey);
 		}
 

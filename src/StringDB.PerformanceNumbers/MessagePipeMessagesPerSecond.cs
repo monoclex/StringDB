@@ -7,7 +7,7 @@ namespace StringDB.PerformanceNumbers
 {
 	public class MessagePipeMessagesPerSecond
 	{
-		private readonly IMessagePipe<int> _pipe = new SimpleMessagePipe<int>();
+		private readonly IMessagePipe<int> _pipe = new ChannelMessagePipe<int>(-1);
 
 		public async Task Run()
 		{
@@ -21,7 +21,7 @@ namespace StringDB.PerformanceNumbers
 					System.Threading.Thread.Sleep(1000);
 					var loc = messagesPerSecond;
 					messagesPerSecond = 0;
-					Console.WriteLine($"{nameof(SimpleMessagePipe<int>)} messages per second: {loc:n0}");
+					Console.WriteLine($"{nameof(ChannelMessagePipe<int>)} messages per second: {loc:n0}");
 				}
 			});
 

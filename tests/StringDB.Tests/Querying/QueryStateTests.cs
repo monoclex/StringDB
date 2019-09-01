@@ -25,7 +25,7 @@ namespace StringDB.Tests.Querying
 		public async Task Will_RequestEntries_And_ProcessThem_Synchronously()
 		{
 			// setup
-			_pipe = new SimpleMessagePipe<KeyValuePair<int, IRequest<string>>>();
+			_pipe = new ChannelMessagePipe<KeyValuePair<int, IRequest<string>>>();
 			_pipe.Enqueue(KeyValuePair.Create(0, (IRequest<string>)null));
 			_pipe.Enqueue(KeyValuePair.Create(1, (IRequest<string>)null));
 			_pipe.Enqueue(KeyValuePair.Create(2, (IRequest<string>)null));
