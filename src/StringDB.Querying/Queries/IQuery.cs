@@ -32,7 +32,6 @@ namespace StringDB.Querying.Queries
 		/// <param name="key">The key of the entry in the database.</param>
 		/// <param name="value">A request to get the value of the entry in the database.</param>
 		/// <returns>True if the item is to be accepted, false if it is not.</returns>
-		[NotNull]
-		Task<QueryAcceptance> Process([NotNull] TKey key, [NotNull] IRequest<TValue> value);
+		ValueTask<QueryAcceptance> Process([NotNull] TKey key, [NotNull] IRequest<TValue> value);
 	}
 }

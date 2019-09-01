@@ -40,13 +40,18 @@ namespace StringDB.Querying.Queries
 
 		public CancellationToken CancellationToken { get; }
 
-		public async Task<QueryAcceptance> Process([NotNull] TKey key, [NotNull] IRequest<TValue> value)
+		public ValueTask<QueryAcceptance> Process([NotNull] TKey key, [NotNull] IRequest<TValue> value)
 		{
 			if (!_isItem(key))
 			{
-				return QueryAcceptance.Continue;
+				return new ValueTask<QueryAcceptance>(QueryAcceptance.Continue);
 			}
 
+			return AsyncProcess(key, value);
+		}
+
+		private async ValueTask<QueryAcceptance> AsyncProcess(TKey key, IRequest<TValue> value)
+		{
 			Key = key;
 			Value = await value.Request()
 				.ConfigureAwait(false);

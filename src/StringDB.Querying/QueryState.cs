@@ -31,7 +31,7 @@ namespace StringDB.Querying
 		}
 
 		[NotNull]
-		public async Task Run()
+		public async ValueTask Run()
 		{
 			while (!_query.CancellationToken.IsCancellationRequested)
 			{

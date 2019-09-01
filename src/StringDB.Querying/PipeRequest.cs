@@ -53,7 +53,7 @@ namespace StringDB.Querying
 		public bool HasAnswer { get; set; }
 
 		[NotNull, ItemNotNull]
-		public Task<TValue> Request()
+		public ValueTask<TValue> Request()
 		{
 			_requestPipe.Enqueue(new KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>
 			(
@@ -61,7 +61,7 @@ namespace StringDB.Querying
 				this
 			));
 
-			return _requestTask;
+			return new ValueTask<TValue>(_requestTask);
 		}
 
 		public void Dispose()

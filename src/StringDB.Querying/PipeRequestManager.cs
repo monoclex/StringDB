@@ -19,12 +19,12 @@ namespace StringDB.Querying
 		[NotNull] private readonly IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> _requestPipe;
 		[NotNull] private readonly Func<IMessagePipe<TValue>> _valuePipeFactory;
 
-		public PipeRequestManager()
+		public PipeRequestManager(int maxCapacity = ChannelMessagePipe<int>.DefaultMaxCapacity)
 			: this
 		(
-			new ChannelMessagePipe<NextRequest<TRequestKey, TValue>>(),
-			new ChannelMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>>(),
-			() => new ChannelMessagePipe<TValue>()
+			new ChannelMessagePipe<NextRequest<TRequestKey, TValue>>(maxCapacity),
+			new ChannelMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>>(maxCapacity),
+			() => new ChannelMessagePipe<TValue>(maxCapacity)
 		)
 		{
 		}
@@ -53,7 +53,7 @@ namespace StringDB.Querying
 		}
 
 		[NotNull]
-		public async Task<NextRequest<TRequestKey, TValue>> NextRequest(CancellationToken cancellationToken = default)
+		public async ValueTask<NextRequest<TRequestKey, TValue>> NextRequest(CancellationToken cancellationToken = default)
 		{
 			while (!cancellationToken.IsCancellationRequested)
 			{

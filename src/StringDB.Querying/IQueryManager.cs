@@ -26,7 +26,7 @@ namespace StringDB.Querying
 		/// <param name="query">The query to queue up.</param>
 		/// <returns>An awaitable <see cref="Task"/>.</returns>
 		[NotNull]
-		Task<bool> ExecuteQuery([NotNull] IQuery<TKey, TValue> query);
+		ValueTask<bool> ExecuteQuery([NotNull] IQuery<TKey, TValue> query);
 
 		/// <summary>
 		/// Executes a write query. The query should be scheduled
@@ -36,6 +36,6 @@ namespace StringDB.Querying
 		/// <param name="writeQuery">The write query to queue up.</param>
 		/// <returns>An awaitable <see cref="Task"/>.</returns>
 		[NotNull]
-		Task ExecuteQuery([NotNull] IWriteQuery<TKey, TValue> writeQuery);
+		ValueTask ExecuteQuery([NotNull] IWriteQuery<TKey, TValue> writeQuery);
 	}
 }

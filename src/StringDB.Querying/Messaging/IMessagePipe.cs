@@ -22,7 +22,7 @@ namespace StringDB.Querying.Messaging
 		/// Will not complete until there is something to dequeue.
 		/// </summary>
 		/// <param name="cancellationToken">The token used to cancel the operation</param>
-		[NotNull, ItemNotNull]
-		Task<T> Dequeue(CancellationToken cancellationToken = default);
+		[ItemNotNull]
+		ValueTask<T> Dequeue(CancellationToken cancellationToken = default);
 	}
 }

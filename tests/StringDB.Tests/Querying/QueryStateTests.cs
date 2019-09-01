@@ -38,12 +38,12 @@ namespace StringDB.Tests.Querying
 
 			// we want it to process 1
 			queryMock.Setup(mock => mock.Process(0, null))
-				.Returns(Task.FromResult(QueryAcceptance.Continue))
+				.Returns(new ValueTask<QueryAcceptance>(QueryAcceptance.Continue))
 				.Verifiable();
 
 			// then we dont want it to process any more
 			queryMock.Setup(mock => mock.Process(1, null))
-				.Returns(Task.FromResult(QueryAcceptance.Completed))
+				.Returns(new ValueTask<QueryAcceptance>(QueryAcceptance.Completed))
 				.Verifiable();
 
 			// so a third call is non existent and shouldn't be hit

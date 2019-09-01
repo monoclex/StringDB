@@ -28,7 +28,7 @@ namespace StringDB.Querying
 		/// <returns>An awaitable task that will return your key
 		/// and value.</returns>
 		[NotNull, ItemCanBeNull]
-		public static async Task<KeyValuePair<TKey, TValue>?> Find<TKey, TValue>
+		public static async ValueTask<KeyValuePair<TKey, TValue>?> Find<TKey, TValue>
 		(
 			[NotNull] this IQueryManager<TKey, TValue> queryManager,
 			[NotNull] Func<TKey, bool> isKey,

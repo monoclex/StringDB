@@ -21,8 +21,7 @@ namespace StringDB.Querying
 		/// The provider should call this in a loop. The task will complete
 		/// when the provider needs to provide a value.
 		/// </summary>
-		[NotNull]
-		Task<NextRequest<TRequestKey, TValue>> NextRequest(CancellationToken cancellationToken = default);
+		ValueTask<NextRequest<TRequestKey, TValue>> NextRequest(CancellationToken cancellationToken = default);
 
 		/// <summary>
 		/// Creates an <see cref="IRequest{TValue}"/>, given the
