@@ -1,9 +1,8 @@
 ﻿using JetBrains.Annotations;
+
 using StringDB.Querying.Messaging;
 
-using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying
@@ -16,8 +15,7 @@ namespace StringDB.Querying
 	/// <typeparam name="TValue"></typeparam>
 	public sealed class PipeRequest<TRequestKey, TValue> : IRequest<TValue>
 	{
-		[NotNull] private readonly CancellationTokenSource _cts;
-		[NotNull] private readonly Task<TValue> _requestTask;
+		[NotNull] private readonly BackgroundTask<TValue> _request;
 		[NotNull] private readonly TRequestKey _requestKey;
 		[NotNull] private readonly IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> _requestPipe;
 
@@ -32,19 +30,17 @@ namespace StringDB.Querying
 			ValuePipe = valuePipe;
 			_requestKey = requestKey;
 
-			_cts = new CancellationTokenSource();
-
-			_requestTask = ((Func<Task<TValue>>)(async () =>
+			_request = new BackgroundTask<TValue>(async (cts) =>
 			{
-				var value = await ValuePipe.Dequeue(_cts.Token).ConfigureAwait(false);
+				var value = await ValuePipe.Dequeue(cts).ConfigureAwait(false);
 
-				_cts.Token.ThrowIfCancellationRequested();
+				cts.ThrowIfCancellationRequested();
 
 				// this should be set by the PipeRequestManager *before* the value gets queued
 				// HasAnswer = true;
 
 				return value;
-			}))();
+			});
 		}
 
 		[NotNull]
@@ -61,12 +57,12 @@ namespace StringDB.Querying
 				this
 			));
 
-			return new ValueTask<TValue>(_requestTask);
+			return new ValueTask<TValue>(_request.Task);
 		}
 
 		public void Dispose()
 		{
-			_cts.Cancel();
+			_request.Dispose();
 			ValuePipe.Dispose();
 		}
 	}

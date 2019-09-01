@@ -2,10 +2,7 @@
 
 using StringDB.Querying.Messaging;
 
-using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
@@ -22,11 +19,7 @@ namespace StringDB.Querying
 		[NotNull] private readonly object _lock = new object();
 		[NotNull] private readonly IDatabase<TKey, TValue> _database;
 		[NotNull] private readonly IRequestManager<ILazyLoader<TValue>, TValue> _requestManager;
-
-		// TODO: this pattern is frequent, make a background task thing soon.
-		[NotNull] private readonly CancellationTokenSource _cts;
-
-		[NotNull] private readonly Task _requestHandler;
+		[NotNull] private readonly BackgroundTask _requestHandler;
 
 		public DatabaseIterationManager
 		(
@@ -37,14 +30,13 @@ namespace StringDB.Querying
 			_database = database;
 			_requestManager = requestManager;
 
-			_cts = new CancellationTokenSource();
-			_requestHandler = ((Func<Task>)(async () =>
+			_requestHandler = new BackgroundTask(async (cts) =>
 			{
-				while (!_cts.IsCancellationRequested)
+				while (!cts.IsCancellationRequested)
 				{
-					var request = await _requestManager.NextRequest(_cts.Token);
+					var request = await _requestManager.NextRequest(cts);
 
-					_cts.Token.ThrowIfCancellationRequested();
+					cts.ThrowIfCancellationRequested();
 
 					TValue value;
 
@@ -55,7 +47,7 @@ namespace StringDB.Querying
 
 					request.SupplyValue(value);
 				}
-			}))();
+			});
 		}
 
 		public void IterateTo(IMessagePipe<KeyValuePair<TKey, IRequest<TValue>>> target)
@@ -73,7 +65,7 @@ namespace StringDB.Querying
 
 		public void Dispose()
 		{
-			_cts.Cancel();
+			_requestHandler.Dispose();
 		}
 	}
 }
