@@ -22,7 +22,6 @@ namespace StringDB.Querying.Queries
 		/// </summary>
 		CancellationToken CancellationToken { get; }
 
-		// TODO: ValueTask in net core 3
 		/// <summary>
 		/// Determines whether or not this query accepts a given result.
 		/// This should only do the bare minimum amount of work to verify

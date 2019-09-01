@@ -4,6 +4,7 @@ using StringDB.Querying.Queries;
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying
@@ -31,19 +32,24 @@ namespace StringDB.Querying
 		}
 
 		[NotNull]
-		public async ValueTask Run()
+		public async ValueTask<bool> Run(CancellationToken cancellationToken = default)
 		{
-			while (!_query.CancellationToken.IsCancellationRequested)
+			var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _query.CancellationToken);
+			var token = cts.Token;
+
+			while (!token.IsCancellationRequested)
 			{
-				var kvp = await _consumePipe.Dequeue(_query.CancellationToken).ConfigureAwait(false);
+				var kvp = await _consumePipe.Dequeue(token).ConfigureAwait(false);
 
 				var acceptance = await _query.Process(kvp.Key, kvp.Value).ConfigureAwait(false);
 
 				if (acceptance == QueryAcceptance.Completed)
 				{
-					return;
+					return true;
 				}
 			}
+
+			return false;
 		}
 
 		public void Dispose()
