@@ -1,5 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using JetBrains.Annotations;
+using System;
 
 namespace StringDB.Querying
 {
@@ -21,7 +21,10 @@ namespace StringDB.Querying
 			SupplyValue = supplyValue;
 		}
 
+		[NotNull]
 		public TRequestKey RequestKey { get; }
+
+		[NotNull]
 		public Action<TValue> SupplyValue { get; }
 	}
 }

@@ -1,9 +1,9 @@
-﻿using StringDB.Querying.Messaging;
+﻿using JetBrains.Annotations;
+using StringDB.Querying.Messaging;
 using StringDB.Querying.Queries;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace StringDB.Querying
@@ -15,21 +15,22 @@ namespace StringDB.Querying
 	/// </summary>
 	/// <typeparam name="TKey"></typeparam>
 	/// <typeparam name="TValue"></typeparam>
-	public class QueryState<TKey, TValue> : IDisposable
+	public sealed class QueryState<TKey, TValue> : IDisposable
 	{
-		private readonly IQuery<TKey, TValue> _query;
-		private readonly IMessagePipe<KeyValuePair<TKey, IRequest<TValue>>> _consumePipe;
+		[NotNull] private readonly IQuery<TKey, TValue> _query;
+		[NotNull] private readonly IMessagePipe<KeyValuePair<TKey, IRequest<TValue>>> _consumePipe;
 
 		public QueryState
 		(
-			IQuery<TKey, TValue> query,
-			IMessagePipe<KeyValuePair<TKey, IRequest<TValue>>> consumePipe
+			[NotNull] IQuery<TKey, TValue> query,
+			[NotNull] IMessagePipe<KeyValuePair<TKey, IRequest<TValue>>> consumePipe
 		)
 		{
 			_query = query;
 			_consumePipe = consumePipe;
 		}
 
+		[NotNull]
 		public async Task Run()
 		{
 			while (!_query.CancellationToken.IsCancellationRequested)

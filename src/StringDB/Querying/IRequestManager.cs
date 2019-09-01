@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,12 +14,14 @@ namespace StringDB.Querying
 	/// Whatever this is, it must be uniquely identifiable so values can be
 	/// obtained from it.</typeparam>
 	/// <typeparam name="TValue">The type of the item.</typeparam>
+	[PublicAPI]
 	public interface IRequestManager<TRequestKey, TValue> : IDisposable
 	{
 		/// <summary>
 		/// The provider should call this in a loop. The task will complete
 		/// when the provider needs to provide a value.
 		/// </summary>
+		[NotNull]
 		Task<NextRequest<TRequestKey, TValue>> NextRequest(CancellationToken cancellationToken = default);
 
 		/// <summary>
@@ -29,6 +32,7 @@ namespace StringDB.Querying
 		/// automatically have the value.
 		/// </summary>
 		/// <param name="requestKey"></param>
-		IRequest<TValue> CreateRequest(TRequestKey requestKey);
+		[NotNull]
+		IRequest<TValue> CreateRequest([NotNull] TRequestKey requestKey);
 	}
 }

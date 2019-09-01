@@ -1,8 +1,8 @@
-﻿using StringDB.Querying.Messaging;
+﻿using JetBrains.Annotations;
+using StringDB.Querying.Messaging;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,18 +14,18 @@ namespace StringDB.Querying
 	/// </summary>
 	/// <typeparam name="TRequestKey"></typeparam>
 	/// <typeparam name="TValue"></typeparam>
-	public class PipeRequest<TRequestKey, TValue> : IRequest<TValue>
+	public sealed class PipeRequest<TRequestKey, TValue> : IRequest<TValue>
 	{
-		private readonly CancellationTokenSource _cts;
-		private readonly Task<TValue> _requestTask;
-		private readonly TRequestKey _requestKey;
-		private readonly IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> _requestPipe;
+		[NotNull] private readonly CancellationTokenSource _cts;
+		[NotNull] private readonly Task<TValue> _requestTask;
+		[NotNull] private readonly TRequestKey _requestKey;
+		[NotNull] private readonly IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> _requestPipe;
 
 		public PipeRequest
 		(
-			IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> requestPipe,
-			IMessagePipe<TValue> valuePipe,
-			TRequestKey requestKey
+			[NotNull] IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> requestPipe,
+			[NotNull] IMessagePipe<TValue> valuePipe,
+			[NotNull] TRequestKey requestKey
 		)
 		{
 			_requestPipe = requestPipe;
@@ -47,10 +47,12 @@ namespace StringDB.Querying
 			}))();
 		}
 
+		[NotNull]
 		public IMessagePipe<TValue> ValuePipe { get; }
 
 		public bool HasAnswer { get; set; }
 
+		[NotNull, ItemNotNull]
 		public Task<TValue> Request()
 		{
 			_requestPipe.Enqueue(new KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>

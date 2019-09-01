@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -11,7 +12,8 @@ namespace StringDB.Querying.Messaging
 	/// Expects there to only be one dequeueing task/thread.
 	/// </summary>
 	/// <typeparam name="T">The type of item to transport.</typeparam>
-	public class SimpleMessagePipe<T> : IMessagePipe<T>
+	[PublicAPI]
+	public sealed class SimpleMessagePipe<T> : IMessagePipe<T>
 	{
 		private readonly ManualResetEventSlim _mres = new ManualResetEventSlim(false);
 		private readonly ConcurrentQueue<T> _queue = new ConcurrentQueue<T>();
@@ -45,6 +47,7 @@ namespace StringDB.Querying.Messaging
 		}
 
 		// https://stackoverflow.com/a/18766131
+		[NotNull, ItemNotNull]
 		private Task<T> AsyncDequeue(CancellationToken cancellationToken)
 		{
 			var tcs = new TaskCompletionSource<T>();
@@ -71,6 +74,7 @@ namespace StringDB.Querying.Messaging
 		}
 
 		[MethodImpl(MethodImplOptions.NoInlining)]
+		// TODO: what annotation was for guarenteed code path end?
 		private static void ThrowDispose()
 		{
 			throw new ObjectDisposedException(nameof(SimpleMessagePipe<T>));

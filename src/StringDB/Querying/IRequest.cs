@@ -17,7 +17,7 @@ namespace StringDB.Querying
 		/// This will return a task that will complete once
 		/// the value is read.
 		/// </summary>
-		[NotNull]
+		[NotNull, ItemNotNull]
 		Task<TValue> Request();
 	}
 }

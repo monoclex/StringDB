@@ -1,10 +1,11 @@
 ﻿using FluentAssertions;
+
 using StringDB.Querying.Messaging;
+
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Xunit;
 
 namespace StringDB.Tests.Querying.Messaging
@@ -63,6 +64,7 @@ namespace StringDB.Tests.Querying.Messaging
 			public bool Equals(Message other) => Id == other.Id;
 
 			public static bool operator ==(Message a, Message b) => a.Equals(b);
+
 			public static bool operator !=(Message a, Message b) => !(a == b);
 		}
 

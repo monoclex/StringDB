@@ -1,8 +1,8 @@
-﻿using StringDB.Querying.Messaging;
+﻿using JetBrains.Annotations;
+using StringDB.Querying.Messaging;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,11 +12,12 @@ namespace StringDB.Querying
 	/// A <see cref="IRequestManager{TRequestKey, TValue}"/> implemented using
 	/// <see cref="IMessagePipe{T}"/>s.
 	/// </summary>
-	public class PipeRequestManager<TRequestKey, TValue> : IRequestManager<TRequestKey, TValue>
+	[PublicAPI]
+	public sealed class PipeRequestManager<TRequestKey, TValue> : IRequestManager<TRequestKey, TValue>
 	{
-		private readonly IMessagePipe<NextRequest<TRequestKey, TValue>> _nextRequestPipe;
-		private readonly IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> _requestPipe;
-		private readonly Func<IMessagePipe<TValue>> _valuePipeFactory;
+		[NotNull] private readonly IMessagePipe<NextRequest<TRequestKey, TValue>> _nextRequestPipe;
+		[NotNull] private readonly IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> _requestPipe;
+		[NotNull] private readonly Func<IMessagePipe<TValue>> _valuePipeFactory;
 
 		public PipeRequestManager()
 			: this
@@ -30,9 +31,9 @@ namespace StringDB.Querying
 
 		public PipeRequestManager
 		(
-			IMessagePipe<NextRequest<TRequestKey, TValue>> nextRequestPipe,
-			IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> requestPipe,
-			Func<IMessagePipe<TValue>> valuePipeFactory
+			[NotNull] IMessagePipe<NextRequest<TRequestKey, TValue>> nextRequestPipe,
+			[NotNull] IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> requestPipe,
+			[NotNull] Func<IMessagePipe<TValue>> valuePipeFactory
 		)
 		{
 			_nextRequestPipe = nextRequestPipe;
@@ -40,6 +41,7 @@ namespace StringDB.Querying
 			_valuePipeFactory = valuePipeFactory;
 		}
 
+		[NotNull]
 		public IRequest<TValue> CreateRequest(TRequestKey requestKey)
 		{
 			return new PipeRequest<TRequestKey, TValue>
@@ -50,6 +52,7 @@ namespace StringDB.Querying
 			);
 		}
 
+		[NotNull]
 		public async Task<NextRequest<TRequestKey, TValue>> NextRequest(CancellationToken cancellationToken = default)
 		{
 			while (!cancellationToken.IsCancellationRequested)
