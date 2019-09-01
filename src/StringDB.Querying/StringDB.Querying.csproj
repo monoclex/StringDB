@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
+		<LangVersion>latest</LangVersion>
+		<Version>10.1.0</Version>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Authors>SirJosh3917</Authors>
+		<Company>SirJosh3917</Company>
+		<Description>StringDB.Querying provides an asynchronous way to use a synchronous StringDB Database.</Description>
+		<Copyright></Copyright>
+		<PackageLicenseUrl></PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/SirJosh3917/StringDB</PackageProjectUrl>
+		<PackageIconUrl>https://raw.githubusercontent.com/SirJosh3917/StringDB/master/icons/banner_ad.png</PackageIconUrl>
+		<RepositoryUrl>https://github.com/SirJosh3917/StringDB</RepositoryUrl>
+		<PackageTags>Querying, Asynchronous, Database, KeyValue, Archival, Storage, Modular, Fluent</PackageTags>
+		<PackageReleaseNotes>10.1.0, featuring Querying! Now you can perform asynchronous operations on a StringDB, and use it in something like a web api!</PackageReleaseNotes>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<DocumentationFile></DocumentationFile>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<DocumentationFile></DocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="JetBrains.Annotations" Version="2019.1.3" PrivateAssets="all" />
+		<PackageReference Include="System.Threading.Channels" Version="4.5.0" />
+	</ItemGroup>
+
+</Project>
