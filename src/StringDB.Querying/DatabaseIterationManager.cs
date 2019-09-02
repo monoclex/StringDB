@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
-	// TODO: test *later* since i'm not sure if this is the full implementation we'll need
-
 	/// <summary>
 	/// The most basic implementation of a <see cref="IIterationManager{TKey, TValue}"/>,
 	/// that aims to implement an <see cref="IIterationManager{TKey, TValue}"/> by
@@ -36,9 +34,14 @@ namespace StringDB.Querying
 			{
 				while (!cts.IsCancellationRequested)
 				{
-					var request = await _requestManager.NextRequest(cts);
+					var request = await _requestManager.NextRequest(cts).ConfigureAwait(false);
 
-					cts.ThrowIfCancellationRequested();
+					if (cts.IsCancellationRequested)
+					{
+						// unfortunately we cannot fulfill the next request
+						// because it probably quit early
+						return;
+					}
 
 					TValue value;
 
@@ -48,32 +51,53 @@ namespace StringDB.Querying
 					}
 
 					request.SupplyValue(value);
+
+					if (cts.IsCancellationRequested)
+					{
+						return;
+					}
 				}
 			});
 		}
 
-		public async ValueTask IterateTo
+		[NotNull]
+		public IIterationHandle IterateTo
 		(
-			IMessagePipe<KeyValuePair<TKey, IRequest<TValue>>> target,
+			[NotNull] IMessagePipe<KeyValuePair<TKey, IRequest<TValue>>> target,
 			CancellationToken cancellationToken = default
 		)
 		{
-			await Task.Yield();
+			var index = 0;
+			var atEnd = false;
 
-			foreach (var kvp in _database.LockWhenEnumerating(_lock))
-			{
-				var key = kvp.Key;
-				var value = kvp.Value;
+			return new IterationHandle
+			(
+				new BackgroundTask(async (cts) =>
+				{
+					await Task.Yield();
 
-				var request = _requestManager.CreateRequest(value);
+					foreach (var item in _database.LockWhenEnumerating(_lock))
+					{
+						var key = item.Key;
+						var value = _requestManager.CreateRequest(item.Value);
 
-				target.Enqueue(new KeyValuePair<TKey, IRequest<TValue>>(key, request));
-			}
+						target.Enqueue(new KeyValuePair<TKey, IRequest<TValue>>(key, value));
+
+						if (cts.IsCancellationRequested)
+						{
+							break;
+						}
+
+						index++;
+					}
+
+					atEnd = true;
+				}),
+				() => index,
+				() => atEnd
+			);
 		}
 
-		public void Dispose()
-		{
-			_requestHandler.Dispose();
-		}
+		public void Dispose() => _requestHandler.Dispose();
 	}
 }

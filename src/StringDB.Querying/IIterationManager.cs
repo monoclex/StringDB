@@ -5,7 +5,6 @@ using StringDB.Querying.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace StringDB.Querying
 {
@@ -24,7 +23,8 @@ namespace StringDB.Querying
 		/// <param name="target">The pipe to use when giving results.</param>
 		/// <param name="cancellationToken">The cancellation token to use to
 		/// stop iteration.</param>
-		ValueTask IterateTo
+		[NotNull]
+		IIterationHandle IterateTo
 		(
 			[NotNull] IMessagePipe<KeyValuePair<TKey, IRequest<TValue>>> target,
 			CancellationToken cancellationToken = default
