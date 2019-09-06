@@ -32,6 +32,9 @@ namespace StringDB.Querying
 
 			_request = new BackgroundTask<TValue>(async (cts) =>
 			{
+				// allow the async method to quit early to make ctor fast
+				await Task.Yield();
+
 				var value = await ValuePipe.Dequeue(cts).ConfigureAwait(false);
 
 				cts.ThrowIfCancellationRequested();
