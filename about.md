@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Test
-permalink: /about/
+permalink: /StringDB/about/
 ---
 
 # Getting Jekyll to work
