@@ -25,7 +25,7 @@ namespace StringDB.Tests.Querying
 				}
 			});
 
-			await Task.Delay(100).ConfigureAwait(false);
+			await Task.Delay(1000).ConfigureAwait(false);
 
 			bg.Dispose();
 
@@ -52,7 +52,7 @@ namespace StringDB.Tests.Querying
 				return counter;
 			});
 
-			await Task.Delay(100).ConfigureAwait(false);
+			await Task.Delay(1000).ConfigureAwait(false);
 
 			bg.Dispose();
 
