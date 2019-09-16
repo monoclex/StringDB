@@ -1,0 +1,10 @@
+_site
+.sass-cache
+.jekyll-metadata
+
+# these are from the gitignore at <https://github.com/pmarsceill/just-the-docs/blob/master/.gitignore>
+.bundle
+_site
+Gemfile.lock
+*.gem
+# node_modules - we don't have js
