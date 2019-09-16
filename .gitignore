@@ -1,10 +1,10 @@
-_site
+# _site
 .sass-cache
 .jekyll-metadata
 
 # these are from the gitignore at <https://github.com/pmarsceill/just-the-docs/blob/master/.gitignore>
 .bundle
-_site
+# _site - might be important for github pages? idk what's wrong
 Gemfile.lock
 *.gem
 # node_modules - we don't have js
