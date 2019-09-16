@@ -18,7 +18,7 @@ email:
 description: >- # this means to ignore newlines until "baseurl:"
   StringDB is a modular, key/value pair archival DB designed to
   consume *tiny* amounts of ram & produce *tiny* databases.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/StringDB" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: SirJosh3917
 github_username:  SirJosh3917

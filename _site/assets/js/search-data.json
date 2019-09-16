@@ -3,13 +3,13 @@
   "0": {
     "title": "Test",
     "content": "Getting Jekyll to work .",
-    "url": "http://localhost:4000/about/",
+    "url": "/about/",
     "relUrl": "/about/"
   }
   ,"1": {
     "title": "",
     "content": "Hello, World! .",
-    "url": "http://localhost:4000/",
+    "url": "/",
     "relUrl": "/"
   }
   
