@@ -19,6 +19,10 @@ namespace StringDB.Querying
 		[NotNull] private readonly IMessagePipe<KeyValuePair<TRequestKey, PipeRequest<TRequestKey, TValue>>> _requestPipe;
 		[NotNull] private readonly Func<IMessagePipe<TValue>> _valuePipeFactory;
 
+		[NotNull] private Task _requestLock;
+		[CanBeNull] private IMessagePipe<bool> _lockPipe = null;
+		[NotNull] private readonly ManualResetEventSlim _mres = new ManualResetEventSlim();
+
 		public PipeRequestManager(int maxCapacity = ChannelMessagePipe<int>.DefaultMaxCapacity)
 			: this
 		(
@@ -39,6 +43,28 @@ namespace StringDB.Querying
 			_nextRequestPipe = nextRequestPipe;
 			_requestPipe = requestPipe;
 			_valuePipeFactory = valuePipeFactory;
+
+			// there's no lock so let's just set this to true.
+			var tcs = new TaskCompletionSource<bool>();
+			tcs.SetResult(true);
+			_requestLock = tcs.Task;
+		}
+
+		public IDisposable Disable()
+		{
+			var utility = new DisableRequestManager(() => _lockPipe.Enqueue(true));
+
+			_requestLock = utility.WhenEnabled;
+
+			// now we want to make sure that the caller isn't busy doing work
+			// before we return
+
+			_mres.Reset();
+			_lockPipe = new ChannelMessagePipe<bool>(1);
+
+			_mres.Wait();
+
+			return utility;
 		}
 
 		[NotNull]
@@ -55,6 +81,18 @@ namespace StringDB.Querying
 		[NotNull]
 		public async ValueTask<NextRequest<TRequestKey, TValue>> NextRequest(CancellationToken cancellationToken = default)
 		{
+			if (_lockPipe != null)
+			{
+				// the lock pipe wants something from us
+				// let's try dequeue and set the mres
+				_mres.Set();
+
+				// whatever we dequeue will be the finishing touch
+				await _lockPipe.Dequeue(cancellationToken).ConfigureAwait(false);
+
+				_lockPipe = null;
+			}
+
 			while (!cancellationToken.IsCancellationRequested)
 			{
 				var request = await _requestPipe.Dequeue(cancellationToken).ConfigureAwait(false);
@@ -71,6 +109,9 @@ namespace StringDB.Querying
 
 				// we will expect it to have one
 				pipeRequest.HasAnswer = true;
+
+				// don't give the next request until we're sure we're not disabled
+				await _requestLock.ConfigureAwait(false);
 
 				return new NextRequest<TRequestKey, TValue>(requestKey, pipeRequest.ValuePipe.Enqueue);
 			}

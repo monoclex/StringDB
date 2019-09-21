@@ -28,7 +28,6 @@ namespace StringDB.PerformanceNumbers
 				Console.WriteLine(result);
 			}
 
-
 			new SingleInsertFileSize().Run();
 			new InsertRangeFileSize().Run();
 			await new MessagePipeMessagesPerSecond().Run().ConfigureAwait(false);

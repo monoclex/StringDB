@@ -52,7 +52,19 @@ namespace StringDB.Querying
 			}
 		}
 
-		public ValueTask ExecuteQuery([NotNull] IWriteQuery<TKey, TValue> writeQuery) => throw new NotImplementedException();
+		public async ValueTask ExecuteQuery([NotNull] IWriteQuery<TKey, TValue> writeQuery)
+		{
+			await Task.Yield();
+
+			// we don't want to begin again
+			_executioner.MayBeginAgain = false;
+
+			// we want to obtain full control when it permits us to do so
+			using (var control = _executioner.GainFullControl())
+			{
+				writeQuery.Execute(_executioner.Database);
+			}
+		}
 
 		public void Dispose() => throw new NotImplementedException();
 	}

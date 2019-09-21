@@ -18,12 +18,18 @@ namespace StringDB.Querying
 	public interface IRequestManager<TRequestKey, TValue> : IDisposable
 	{
 		/// <summary>
+		/// <para>
 		/// Temporarily disables all requests from working. This should ensure
 		/// that nobody will access the database after this method is awaited.
+		/// </para>
+		/// <para>
+		/// This method is not thread safe. There should only ever be one caller
+		/// who calls this method.
+		/// </para>
 		/// </summary>
 		/// <returns>A disposable. Once disposed, it will enable the request
 		/// manager.</returns>
-		ValueTask<IDisposable> Disable();
+		IDisposable Disable();
 
 		/// <summary>
 		/// The provider should call this in a loop. The task will complete

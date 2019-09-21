@@ -18,6 +18,8 @@ namespace StringDB.Querying
 
 		public QueryManagerExecutioner
 		(
+			[NotNull] IDatabase<TKey, TValue> database,
+			[NotNull] IRequestManager<ILazyLoader<TValue>, TValue> requestManager,
 			[NotNull] IIterationManager<TKey, TValue> iterationManager
 		)
 		{
@@ -37,14 +39,28 @@ namespace StringDB.Querying
 					}
 
 					_mres.Wait(ct);
+					_mres.Reset();
 				}
 			});
+			_requestManager = requestManager;
+			Database = database;
+		}
+
+		private readonly object _controlLock = new object();
+
+		public IDisposable GainFullControl()
+		{
+			lock (_controlLock)
+			{
+				return _requestManager.Disable();
+			}
 		}
 
 		[NotNull]
 		public IIterationHandle Current { get; private set; }
 
 		private bool _may = true;
+		private readonly IRequestManager<ILazyLoader<TValue>, TValue> _requestManager;
 
 		public bool MayBeginAgain
 		{
@@ -56,6 +72,8 @@ namespace StringDB.Querying
 				_mres.Set();
 			}
 		}
+
+		public IDatabase<TKey, TValue> Database { get; }
 
 		public void Begin()
 		{

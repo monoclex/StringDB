@@ -23,7 +23,7 @@ namespace StringDB.Querying
 		{
 			var requestManager = new PipeRequestManager<ILazyLoader<TValue>, TValue>();
 			var iterationManager = new DatabaseIterationManager<TKey, TValue>(database, requestManager);
-			var executioner = new QueryManagerExecutioner<TKey, TValue>(iterationManager);
+			var executioner = new QueryManagerExecutioner<TKey, TValue>(database, requestManager, iterationManager);
 
 			return new QueryManager<TKey, TValue>(executioner);
 		}
