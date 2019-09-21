@@ -28,6 +28,6 @@ namespace StringDB.Querying
 
 		public bool AtEnd => _atEnd();
 
-		public void Dispose() => IterationTask.Dispose();
+		public void Dispose() => IterationTask?.Dispose();
 	}
 }

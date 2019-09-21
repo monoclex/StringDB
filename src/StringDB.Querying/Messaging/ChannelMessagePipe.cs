@@ -39,36 +39,7 @@ namespace StringDB.Querying.Messaging
 		}
 
 		public ValueTask<T> Dequeue(CancellationToken cancellationToken = default)
-		{
-			if (_channel.Reader.TryRead(out var item))
-			{
-				return new ValueTask<T>(item);
-			}
-
-			return AsyncDequeue(cancellationToken);
-		}
-
-		private async ValueTask<T> AsyncDequeue(CancellationToken cancellationToken)
-		{
-			while (await _channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
-			{
-				if (_channel.Reader.TryRead(out var item))
-				{
-					return item;
-				}
-			}
-
-			ThrowObjectDisposedException();
-
-			// won't execute
-			return default;
-		}
-
-		[MethodImpl(MethodImplOptions.NoInlining)]
-		private static void ThrowObjectDisposedException()
-		{
-			throw new ObjectDisposedException(nameof(ChannelMessagePipe<T>));
-		}
+			=> _channel.Reader.ReadAsync(cancellationToken);
 
 		public void Dispose()
 		{

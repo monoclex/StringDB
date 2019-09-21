@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Running;
-
+using StringDB.Querying;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace StringDB.PerformanceNumbers
@@ -15,6 +16,19 @@ namespace StringDB.PerformanceNumbers
 
 		private static async Task Main()
 		{
+			Console.WriteLine("new");
+			using (var db = StringDatabase.Create())
+			{
+				var qm = db.NewQueryManager();
+
+				db.Insert("t", "m");
+
+				var result = await qm.Find(x => x == "t").ConfigureAwait(false);
+
+				Console.WriteLine(result);
+			}
+
+
 			new SingleInsertFileSize().Run();
 			new InsertRangeFileSize().Run();
 			await new MessagePipeMessagesPerSecond().Run().ConfigureAwait(false);

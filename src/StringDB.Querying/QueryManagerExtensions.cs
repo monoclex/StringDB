@@ -15,6 +15,19 @@ namespace StringDB.Querying
 	[PublicAPI]
 	public static class QueryManagerExtensions
 	{
+		[NotNull]
+		public static IQueryManager<TKey, TValue> NewQueryManager<TKey, TValue>
+		(
+			[NotNull] this IDatabase<TKey, TValue> database
+		)
+		{
+			var requestManager = new PipeRequestManager<ILazyLoader<TValue>, TValue>();
+			var iterationManager = new DatabaseIterationManager<TKey, TValue>(database, requestManager);
+			var executioner = new QueryManagerExecutioner<TKey, TValue>(iterationManager);
+
+			return new QueryManager<TKey, TValue>(executioner);
+		}
+
 		/// <summary>
 		/// Finds the key value pair for a given key in a query manager.
 		/// </summary>
